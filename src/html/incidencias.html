@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Incidencias</title>
+  <link rel="stylesheet" href="../css/incidencias.css" />
+  <link rel="stylesheet" href="../css/menu-lateral.css">
+  <link rel="stylesheet" href="../css/general.css">
+</head>
+
+<body>
+
+  <div class="page-wrapper" id="main-content">
+
+    <header class="page-header">
+      <div class="page-header__info">
+        <h1>Incidencias</h1>
+        <p class="address">Piso Calle Mayor, 12 &middot; 3 compañeros</p>
+      </div>
+      <div class="page-header__actions">
+        <button class="btn-mode">☀ Modo claro</button>
+        <div class="header-icon">
+          🔔
+          <span class="badge">2</span>
+        </div>
+        <div class="avatar">U1</div>
+        <span class="username">Usuario 1</span>
+      </div>
+    </header>
+
+    <section class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-card__icon stat-card__icon--red">🔴</div>
+        <div>
+          <div class="stat-card__value">2</div>
+          <div class="stat-card__label">Abiertas</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__icon stat-card__icon--orange">🔧</div>
+        <div>
+          <div class="stat-card__value">1</div>
+          <div class="stat-card__label">En curso</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__icon stat-card__icon--green">✅</div>
+        <div>
+          <div class="stat-card__value">5</div>
+          <div class="stat-card__label">Resueltas</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__icon stat-card__icon--slate">📋</div>
+        <div>
+          <div class="stat-card__value">8</div>
+          <div class="stat-card__label">Total</div>
+        </div>
+      </div>
+    </section>
+
+    <article class="section">
+      <div class="section__header">
+        <h2 class="section__title">Incidencias Activas</h2>
+        <button class="btn-new">+ Nueva Incidencia</button>
+      </div>
+      <ul class="incident-list">
+        <li class="incident-item">
+          <div class="incident-icon">💧</div>
+          <div class="incident-body">
+            <p class="incident-body__title">Corte de agua — Edificio</p>
+            <p class="incident-body__desc">Mañana de 9h a 14h no habrá suministro de agua por obras en la red. Recordad
+              llenar depósitos y bidones esta noche.</p>
+            <p class="incident-body__meta">Reportado por Laura · Hoy 10:30 · Afecta a todo el piso</p>
+          </div>
+          <div class="incident-status">
+            <span class="status-badge status-badge--open">Abierta</span>
+            <span class="priority-dot priority-dot--high">Alta</span>
+          </div>
+        </li>
+        <li class="incident-item">
+          <div class="incident-icon">❄️</div>
+          <div class="incident-body">
+            <p class="incident-body__title">Aire acondicionado averiado — Salón</p>
+            <p class="incident-body__desc">El aire del salón hace un ruido extraño y no enfría bien. Puede que necesite
+              carga de gas o revisión técnica.</p>
+            <p class="incident-body__meta">Reportado por Pablo · Ayer 18:00 · Salón</p>
+          </div>
+          <div class="incident-status">
+            <span class="status-badge status-badge--open">Abierta</span>
+            <span class="priority-dot priority-dot--high">Alta</span>
+          </div>
+        </li>
+        <li class="incident-item">
+          <div class="incident-icon">⚡</div>
+          <div class="incident-body">
+            <p class="incident-body__title">Enchufe quemado — Habitación Marta</p>
+            <p class="incident-body__desc">El enchufe junto a la cama chispea al conectar el cargador. Se ha avisado al
+              casero, pendiente de respuesta.</p>
+            <p class="incident-body__meta">Reportado por Marta · Hace 2 días · Hab. Marta</p>
+          </div>
+          <div class="incident-status">
+            <span class="status-badge status-badge--progress">En curso</span>
+            <span class="priority-dot priority-dot--medium">Media</span>
+          </div>
+        </li>
+      </ul>
+      <button class="incident-add">
+        <span class="incident-add__icon">＋</span>
+        Nueva incidencia
+      </button>
+    </article>
+
+    <article class="section">
+      <div class="section__header">
+        <h2 class="section__title">Incidencias Resueltas</h2>
+        <button class="section__menu-btn">⋯</button>
+      </div>
+      <ul class="incident-list">
+        <li class="incident-item">
+          <div class="incident-icon">🚿</div>
+          <div class="incident-body">
+            <p class="incident-body__title">Grifo gotea — Baño principal</p>
+            <p class="incident-body__desc">El grifo del lavabo goteaba constantemente. Reparado por el fontanero el
+              martes.</p>
+            <p class="incident-body__meta">Reportado por Laura · Hace 5 días · Baño</p>
+          </div>
+          <div class="incident-status">
+            <span class="status-badge status-badge--done">Resuelta</span>
+            <span class="priority-dot priority-dot--low">Baja</span>
+          </div>
+        </li>
+        <li class="incident-item">
+          <div class="incident-icon">💡</div>
+          <div class="incident-body">
+            <p class="incident-body__title">Bombilla fundida — Pasillo</p>
+            <p class="incident-body__desc">Bombilla LED del pasillo sustituida. Comprada nueva de 10W.</p>
+            <p class="incident-body__meta">Reportado por Pablo · Hace 1 semana · Pasillo</p>
+          </div>
+          <div class="incident-status">
+            <span class="status-badge status-badge--done">Resuelta</span>
+            <span class="priority-dot priority-dot--low">Baja</span>
+          </div>
+        </li>
+      </ul>
+    </article>
+
+  </div>
+  <script defer src="../js/menu-lateral.js"></script>
+
+
+</body>
+
+</html>
