@@ -1,91 +1,200 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Tareas</title>
-  <link rel="stylesheet" href="../css/tareasUser.css">
+<meta charset="UTF-8">
+<title>Tareas</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/tareasUser.css">
+
 </head>
 <body>
 
-<div class="sidebar">
-  <h3>Usuario 1</h3>
-  <ul>
-    <li>Inicio</li>
-    <li class="active">Tareas</li>
-    <li>Calendario</li>
-    <li>Mi Piso</li>
-    <li>Compañeros</li>
-    <li>Incidencias</li>
-    <li>Ajustes</li>
-  </ul>
-</div>
+<div class="app">
 
-<div class="main">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
 
-  <div class="header">
+    <div>
+      <h3>Usuario 1</h3>
+      <span class="subtitle">Panel de inicio</span>
+
+      <p class="section-title">PRINCIPAL</p>
+      <ul>
+        <li>
+          <img src="../css/icons/house.svg" class="icon"> Inicio
+        </li>
+
+        <li class="active">
+          <img src="../css/icons/layout-grid.svg" class="icon">
+          Tareas
+          <span class="badge">5</span>
+        </li>
+
+        <li>
+          <img src="../css/icons/calendar.svg" class="icon"> Calendario
+        </li>
+      </ul>
+
+      <p class="section-title">PISO</p>
+      <ul>
+        <li>
+          <img src="../css/icons/house.svg" class="icon"> Mi Piso
+        </li>
+
+        <li>
+          <img src="../css/icons/users.svg" class="icon"> Compañeros
+        </li>
+
+        <li>
+          <img src="../css/icons/circle-alert.svg" class="icon">
+          Incidencias
+          <span class="badge gray">2</span>
+        </li>
+      </ul>
+
+      <p class="section-title">CUENTA</p>
+      <ul>
+        <li>
+          <img src="../css/icons/settings.svg" class="icon"> Ajustes
+        </li>
+      </ul>
+    </div>
+
+    <div class="logout">
+      <span>Cerrar sesión</span>
+    </div>
+
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="tabs">
+        <span class="active">Mis tareas <b>8</b></span>
+        <span>Del equipo <b>24</b></span>
+        <span>Completadas <b>41</b></span>
+      </div>
+
+      <div class="actions">
+        <button class="btn-light">Filtros</button>
+        <button class="btn-light">Agrupar</button>
+        <button class="btn-light">Vista</button>
+        <button class="btn-primary">+ Nueva tarea</button>
+      </div>
+    </div>
+
     <h1>Tareas</h1>
-    <button class="btn">+ Nueva tarea</button>
-  </div>
 
-  <div class="filters">
-    <button class="active">Todas</button>
-    <button>Hoy</button>
-    <button>Esta semana</button>
-    <button>Atrasadas</button>
-    <button>Alta prioridad</button>
-  </div>
-
-  <!-- PENDIENTES -->
-  <div class="section">
-    <h3>PENDIENTES</h3>
-
-    <div class="task">
-      <div class="task-left">
-        <input type="checkbox">
-        <span>Revisar propuesta de diseño del cliente</span>
-        <span class="tag red">Alta</span>
+    <!-- FILTER + SEARCH -->
+    <div class="filters-bar">
+      <div class="filters">
+        <button class="active">Todas</button>
+        <button>Hoy</button>
+        <button>Esta semana</button>
+        <button>Atrasadas</button>
+        <button>Alta prioridad</button>
       </div>
-      <div class="progress"><div style="width:65%"></div></div>
-    </div>
 
-    <div class="task">
-      <div class="task-left">
-        <input type="checkbox">
-        <span>Preparar informe semanal</span>
-        <span class="tag yellow">Media</span>
-      </div>
-      <div class="progress"><div style="width:30%"></div></div>
-    </div>
-
-  </div>
-
-  <!-- EN PROGRESO -->
-  <div class="section">
-    <h3>EN PROGRESO</h3>
-
-    <div class="task">
-      <div class="task-left">
-        <input type="checkbox">
-        <span>Diseño onboarding</span>
-        <span class="tag blue">Diseño</span>
-      </div>
-      <div class="progress"><div style="width:50%"></div></div>
-    </div>
-
-  </div>
-
-  <!-- COMPLETADAS -->
-  <div class="section">
-    <h3>COMPLETADAS</h3>
-
-    <div class="task completed">
-      <div class="task-left">
-        <input type="checkbox" checked>
-        <span>Configurar entorno</span>
+      <div class="search-box">
+        <img src="../css/icons/search.svg" class="icon">
+        <input placeholder="Buscar tarea...">
       </div>
     </div>
 
-  </div>
+    <!-- PENDIENTES -->
+    <div class="section">
+      <h3>PENDIENTES</h3>
+
+      <div class="task">
+        <div class="left">
+          <input type="checkbox">
+          <div>
+            <p>Revisar propuesta de diseño del cliente</p>
+            <div class="meta">
+              <span class="tag red">Alta prioridad</span>
+              <span class="date">Vence hoy</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="right">
+          <div class="progress"><div style="width:65%"></div></div>
+          <span class="percent">65%</span>
+          <div class="avatars"><span>AL</span></div>
+          <span class="dots">⋮</span>
+        </div>
+      </div>
+
+      <div class="task">
+        <div class="left">
+          <input type="checkbox">
+          <div>
+            <p>Preparar informe semanal de métricas</p>
+            <div class="meta">
+              <span class="tag yellow">Media prioridad</span>
+              <span class="date">Vence 8 abr</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="right">
+          <div class="progress"><div style="width:30%"></div></div>
+          <span class="percent">30%</span>
+          <div class="avatars">
+            <span>ME</span>
+            <span>AL</span>
+          </div>
+          <span class="dots">⋮</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- EN PROGRESO -->
+    <div class="section">
+      <h3>EN PROGRESO</h3>
+
+      <div class="task">
+        <div class="left">
+          <input type="checkbox">
+          <div>
+            <p>Diseño de pantallas de onboarding</p>
+            <div class="meta">
+              <span class="tag blue">Diseño</span>
+              <span class="date">Vence 14 abr</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="right">
+          <div class="progress"><div style="width:50%"></div></div>
+          <span class="percent">50%</span>
+          <div class="avatars">
+            <span>ME</span>
+            <span>JS</span>
+          </div>
+          <span class="dots">⋮</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- COMPLETADAS -->
+    <div class="section">
+      <h3>COMPLETADAS</h3>
+
+      <div class="task completed">
+        <div class="left">
+          <input type="checkbox" checked>
+          <p>Configurar entorno</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
 
 </div>
 
