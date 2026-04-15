@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Tareas</title>
+  <link rel="stylesheet" href="../css/tareasUser.css">
+</head>
+<body>
+
+<div class="sidebar">
+  <h3>Usuario 1</h3>
+  <ul>
+    <li>Inicio</li>
+    <li class="active">Tareas</li>
+    <li>Calendario</li>
+    <li>Mi Piso</li>
+    <li>Compañeros</li>
+    <li>Incidencias</li>
+    <li>Ajustes</li>
+  </ul>
+</div>
+
+<div class="main">
+
+  <div class="header">
+    <h1>Tareas</h1>
+    <button class="btn">+ Nueva tarea</button>
+  </div>
+
+  <div class="filters">
+    <button class="active">Todas</button>
+    <button>Hoy</button>
+    <button>Esta semana</button>
+    <button>Atrasadas</button>
+    <button>Alta prioridad</button>
+  </div>
+
+  <!-- PENDIENTES -->
+  <div class="section">
+    <h3>PENDIENTES</h3>
+
+    <div class="task">
+      <div class="task-left">
+        <input type="checkbox">
+        <span>Revisar propuesta de diseño del cliente</span>
+        <span class="tag red">Alta</span>
+      </div>
+      <div class="progress"><div style="width:65%"></div></div>
+    </div>
+
+    <div class="task">
+      <div class="task-left">
+        <input type="checkbox">
+        <span>Preparar informe semanal</span>
+        <span class="tag yellow">Media</span>
+      </div>
+      <div class="progress"><div style="width:30%"></div></div>
+    </div>
+
+  </div>
+
+  <!-- EN PROGRESO -->
+  <div class="section">
+    <h3>EN PROGRESO</h3>
+
+    <div class="task">
+      <div class="task-left">
+        <input type="checkbox">
+        <span>Diseño onboarding</span>
+        <span class="tag blue">Diseño</span>
+      </div>
+      <div class="progress"><div style="width:50%"></div></div>
+    </div>
+
+  </div>
+
+  <!-- COMPLETADAS -->
+  <div class="section">
+    <h3>COMPLETADAS</h3>
+
+    <div class="task completed">
+      <div class="task-left">
+        <input type="checkbox" checked>
+        <span>Configurar entorno</span>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+</html>
