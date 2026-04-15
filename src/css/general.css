@@ -1,0 +1,36 @@
+/* ── Variables ── */
+:root {
+  --bg-page:        #f0f4f8;
+  --bg-card:        #ffffff;
+  --bg-tag:         #f5f7fa;
+  --border:         #e4e9f0;
+  --border-dashed:  #cdd5e0;
+
+  --text-primary:   #1a2233;
+  --text-secondary: #64748b;
+  --text-muted:     #94a3b8;
+
+  --accent-blue:    #2563eb;
+  --accent-blue-h:  #1d4ed8;
+
+  --status-open-bg:       #fff1f2;
+  --status-open-text:     #e11d48;
+  --status-progress-bg:   #fff7ed;
+  --status-progress-text: #ea580c;
+  --status-done-bg:       #f0fdf4;
+  --status-done-text:     #16a34a;
+
+  --prio-high:   #ef4444;
+  --prio-medium: #f97316;
+  --prio-low:    #22c55e;
+
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  14px;
+
+  --shadow-card: 0 1px 3px rgba(0,0,0,.06), 0 4px 12px rgba(0,0,0,.04);
+  --shadow-btn:  0 2px 8px rgba(37,99,235,.35);
+
+  --font-main: 'DM Sans', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
