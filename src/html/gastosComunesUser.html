@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gastos Comunes</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/gastosComunesUser.css">
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar">
+    <div>
+      <h3>Usuario 1</h3>
+      <span class="subtitle">Panel de inicio</span>
+
+      <p class="section-title">PRINCIPAL</p>
+      <ul>
+        <li><img src="../css/icons/house.svg" class="icon"> Inicio</li>
+
+        <li class="active">
+          <img src="../css/icons/layout-grid.svg" class="icon">
+          Gastos Comunes
+          <span class="badge">3</span>
+        </li>
+
+        <li><img src="../css/icons/check.svg" class="icon"> Tareas</li>
+        <li><img src="../css/icons/calendar.svg" class="icon"> Calendario</li>
+      </ul>
+
+      <p class="section-title">PISO</p>
+      <ul>
+        <li><img src="../css/icons/house.svg" class="icon"> Mi Piso</li>
+        <li><img src="../css/icons/users.svg" class="icon"> Compañeros</li>
+
+        <li>
+          <img src="../css/icons/alert.svg" class="icon">
+          Incidencias
+          <span class="badge gray">2</span>
+        </li>
+      </ul>
+
+      <p class="section-title">CUENTA</p>
+      <ul>
+        <li><img src="../css/icons/settings.svg" class="icon"> Ajustes</li>
+      </ul>
+    </div>
+
+    <div class="logout">Cerrar sesión</div>
+  </aside>
+
+  <!-- ================= MAIN ================= -->
+  <main class="main">
+
+    <div class="topbar">
+      <h1>Gastos Comunes</h1>
+    </div>
+
+    <!-- CARDS -->
+    <div class="cards">
+      <!-- (tus cards se quedan igual) -->
+    </div>
+
+    <!-- LISTA -->
+    <div class="list">
+
+      <div class="list-header">
+        <h3>Todos los gastos</h3>
+
+        <div class="list-actions">
+          <div class="filters">
+            <button class="active">Todos</button>
+            <button>Este mes</button>
+            <button>Pendientes</button>
+            <button>Liquidados</button>
+          </div>
+
+          <input type="text" placeholder="Buscar gasto...">
+          <button class="btn-primary add-btn">+ Añadir gasto</button>
+        </div>
+      </div>
+
+      <!-- (tus items se quedan igual) -->
+
+    </div>
+
+  </main>
+</div>
+
+<!-- ================= MODAL SPLITWISE ================= -->
+<div id="gastoModal" class="modal-overlay hidden">
+
+  <div class="modal splitwise">
+
+    <!-- HEADER -->
+    <div class="modal-header">
+      <h2>Añadir gasto</h2>
+      <span id="closeGastoModal" class="close">&times;</span>
+    </div>
+
+    <!-- BODY -->
+    <div class="modal-body">
+
+      <input id="gastoTitulo" type="text" placeholder="¿En qué has gastado?">
+
+      <div class="amount-input">
+        <span>€</span>
+        <input id="gastoImporte" type="number" placeholder="0.00">
+      </div>
+
+      <div class="split-row">
+        <span>Pagado por</span>
+        <select id="gastoPagador">
+          <option>Tú</option>
+          <option>Laura</option>
+          <option>Pablo</option>
+          <option>Marta</option>
+        </select>
+      </div>
+
+      <div class="split-row">
+        <span>Dividido entre</span>
+        <select id="gastoPersonas">
+          <option>3 personas</option>
+          <option>2 personas</option>
+          <option>4 personas</option>
+        </select>
+      </div>
+
+      <div class="extra-options">
+        <button class="btn-light">Dividir igualmente</button>
+        <button class="btn-light">Ajustar importes</button>
+      </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <div class="modal-footer">
+      <button id="cancelGasto" class="btn-light">Cancelar</button>
+      <button id="guardarGasto" class="btn-primary">Guardar gasto</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- JS EXTERNO -->
+<script src="../js/gastosComunes.js"></script>
+
+</body>
+</html>
