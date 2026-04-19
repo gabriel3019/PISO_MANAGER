@@ -12,169 +12,209 @@
 
 <body>
 
-<div class="app">
+  <div class="app">
 
-  <!-- ================= SIDEBAR ================= -->
-  <aside class="sidebar">
-    <div>
-      <h3>Usuario 1</h3>
-      <span class="subtitle">Panel de inicio</span>
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="sidebar">
+      <div>
+        <h3>Usuario 1</h3>
+        <span class="subtitle">Panel de inicio</span>
 
-      <p class="section-title">PRINCIPAL</p>
-      <ul>
+        <p class="section-title">PRINCIPAL</p>
+        <ul>
 
-        <li>
-          <a href="../html/inicioUser.html" class="sidebar__link">
-            <img src="../css/icons/house.svg" class="icon"> Inicio
-          </a>
-        </li>
+          <li>
+            <a href="../html/inicioUser.html">
+              <img src="../css/icons/house.svg" class="icon"> Inicio
+            </a>
+          </li>
 
-        <li class="active">
-          <a href="../html/gastosComunesUser.html" class="sidebar__link">
-            <img src="../css/icons/euro.svg" class="icon">
-            Gastos Comunes
-            <span class="badge">3</span>
-          </a>
-        </li>
+          <li class="active">
+            <a href="../html/gastosComunesUser.html">
+              <img src="../css/icons/euro.svg" class="icon">
+              Gastos Comunes
+              <span class="badge">3</span>
+            </a>
+          </li>
 
-        <li>
-          <a href="../html/tareasUser.html" class="sidebar__link">
-            <img src="../css/icons/square-check-big.svg" class="icon"> Tareas
-          </a>
-        </li>
+          <li>
+            <a href="../html/tareasUser.html">
+              <img src="../css/icons/square-check-big.svg" class="icon"> Tareas
+            </a>
+          </li>
 
-        <li>
-          <a href="../html/calendario.html" class="sidebar__link">
-            <img src="../css/icons/calendar.svg" class="icon"> Calendario
-          </a>
-        </li>
+          <li>
+            <a href="../html/calendario.html">
+              <img src="../css/icons/calendar.svg" class="icon"> Calendario
+            </a>
+          </li>
 
-      </ul>
+        </ul>
 
-      <p class="section-title">PISO</p>
-      <ul>
+        <p class="section-title">PISO</p>
+        <ul>
 
-        <li>
-          <a href="../html/piso.html" class="sidebar__link">
-            <img src="../css/icons/house.svg" class="icon"> Mi Piso
-          </a>
-        </li>
+          <li>
+            <a href="../html/piso.html">
+              <img src="../css/icons/house.svg" class="icon"> Mi Piso
+            </a>
+          </li>
 
-        <li>
-          <a href="../html/companeros.html" class="sidebar__link">
-            <img src="../css/icons/users.svg" class="icon"> Compañeros
-          </a>
-        </li>
+          <li>
+            <a href="../html/companeros.html">
+              <img src="../css/icons/users.svg" class="icon"> Compañeros
+            </a>
+          </li>
 
-        <li>
-          <a href="../html/incidenciasUser.html" class="sidebar__link">
-            <img src="../css/icons/circle-alert.svg" class="icon">
-            Incidencias
-            <span class="badge gray">2</span>
-          </a>
-        </li>
+          <li>
+            <a href="../html/incidenciasUser.html">
+              <img src="../css/icons/circle-alert.svg" class="icon">
+              Incidencias
+              <span class="badge gray">2</span>
+            </a>
+          </li>
 
-      </ul>
+        </ul>
 
-      <p class="section-title">CUENTA</p>
-      <ul>
-        <li>
-          <a href="../html/ajustes.html" class="sidebar__link">
-            <img src="../css/icons/settings.svg" class="icon"> Ajustes
-          </a>
-        </li>
-      </ul>
-    </div>
+        <p class="section-title">CUENTA</p>
+        <ul>
+          <li>
+            <a href="../html/ajustes.html">
+              <img src="../css/icons/settings.svg" class="icon"> Ajustes
+            </a>
+          </li>
+        </ul>
+      </div>
 
-    <div class="logout">Cerrar sesión</div>
-  </aside>
+      <div class="logout">Cerrar sesión</div>
+    </aside>
 
-  <!-- ================= MAIN ================= -->
-  <main class="main">
+    <!-- ================= MAIN ================= -->
+    <main class="main">
 
-    <div class="topbar">
-      <h1>Gastos Comunes</h1>
-    </div>
+      <div class="topbar">
+        <h1>Gastos Comunes</h1>
+      </div>
 
-    <div class="cards"></div>
+      <!-- LISTA -->
+      <div class="list">
 
-    <div class="list">
+        <div class="list-header">
+          <h3>Todos los gastos</h3>
 
-      <div class="list-header">
-        <h3>Todos los gastos</h3>
+          <div class="list-actions">
+            <div class="filters">
+              <button class="active">Todos</button>
+              <button>Este mes</button>
+              <button>Pendientes</button>
+              <button>Liquidados</button>
+            </div>
 
-        <div class="list-actions">
-          <div class="filters">
-            <button class="active">Todos</button>
-            <button>Este mes</button>
-            <button>Pendientes</button>
-            <button>Liquidados</button>
+            <input type="text" placeholder="Buscar gasto...">
+            <button class="btn-primary add-btn">+ Añadir gasto</button>
           </div>
-
-          <input type="text" placeholder="Buscar gasto...">
-          <button class="btn-primary add-btn">+ Añadir gasto</button>
         </div>
+
+        <!-- CONTENEDOR DINÁMICO -->
+        <div id="gastosContainer"></div>
+
       </div>
 
-    </div>
-
-  </main>
-</div>
-
-<!-- ================= MODAL ================= -->
-<div id="gastoModal" class="modal-overlay hidden">
-
-  <div class="modal splitwise">
-
-    <div class="modal-header">
-      <h2>Añadir gasto</h2>
-      <span id="closeGastoModal" class="close">&times;</span>
-    </div>
-
-    <div class="modal-body">
-
-      <input id="gastoTitulo" type="text" placeholder="¿En qué has gastado?">
-
-      <div class="amount-input">
-        <span>€</span>
-        <input id="gastoImporte" type="number" placeholder="0.00">
-      </div>
-
-      <div class="split-row">
-        <span>Pagado por</span>
-        <select id="gastoPagador">
-          <option>Tú</option>
-          <option>Laura</option>
-          <option>Pablo</option>
-          <option>Marta</option>
-        </select>
-      </div>
-
-      <div class="split-row">
-        <span>Dividido entre</span>
-        <select id="gastoPersonas">
-          <option>3 personas</option>
-          <option>2 personas</option>
-          <option>4 personas</option>
-        </select>
-      </div>
-
-      <div class="extra-options">
-        <button class="btn-light">Dividir igualmente</button>
-        <button class="btn-light">Ajustar importes</button>
-      </div>
-
-    </div>
-
-    <div class="modal-footer">
-      <button id="cancelGasto" class="btn-light">Cancelar</button>
-      <button id="guardarGasto" class="btn-primary">Guardar gasto</button>
-    </div>
-
+    </main>
   </div>
-</div>
 
-<script src="../js/gastosComunes.js"></script>
+  <!-- ================= MODAL ================= -->
+  <div id="gastoModal" class="modal-overlay hidden">
+
+    <div class="modal splitwise">
+
+      <!-- HEADER -->
+      <div class="modal-header">
+        <h2>Añadir gasto</h2>
+        <span id="closeGastoModal" class="close">&times;</span>
+      </div>
+
+      <!-- BODY -->
+      <div class="modal-body">
+
+        <!-- TITULO -->
+        <div class="field">
+          <input id="gastoTitulo" type="text" placeholder="¿En qué has gastado?">
+          <span id="errorTitulo" class="error-text"></span>
+        </div>
+
+        <!-- IMPORTE -->
+        <div class="field">
+          <div class="amount-input">
+            <span>€</span>
+            <input id="gastoImporte" type="number" placeholder="0.00">
+          </div>
+          <span id="errorImporte" class="error-text"></span>
+        </div>
+
+        <!-- PAGADOR -->
+        <div class="split-row">
+          <span>Pagado por</span>
+          <select id="gastoPagador">
+            <option value="Tú">Tú</option>
+            <option value="Laura">Laura</option>
+            <option value="Pablo">Pablo</option>
+            <option value="Marta">Marta</option>
+          </select>
+        </div>
+
+        <!-- PERSONAS -->
+        <div class="split-row">
+          <span>Dividido entre</span>
+          <select id="gastoPersonas">
+            <option value="3">3 personas</option>
+            <option value="2">2 personas</option>
+            <option value="4">4 personas</option>
+          </select>
+        </div>
+
+        <!-- OPCIONES -->
+        <div class="extra-options">
+          <button class="btn-light">Dividir igualmente</button>
+          <button class="btn-light">Ajustar importes</button>
+        </div>
+
+        <!-- AQUÍ SE GENERA LA DIVISIÓN -->
+        <div id="divisionContainer"></div>
+
+      </div>
+
+      <!-- FOOTER -->
+      <div class="modal-footer">
+        <button id="cancelGasto" class="btn-light">Cancelar</button>
+        <button id="guardarGasto" class="btn-primary">Guardar gasto</button>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="deleteModal" class="modal-overlay hidden">
+    <div class="modal delete-modal">
+
+      <div class="delete-icon">⚠️</div>
+
+      <h2>Eliminar gasto</h2>
+
+      <p>
+        ¿Seguro que quieres eliminar este gasto?<br>
+        Esta acción no se puede deshacer.
+      </p>
+
+      <div class="modal-footer center">
+        <button id="cancelDelete" class="btn-light">Cancelar</button>
+        <button id="confirmDelete" class="btn-danger">Eliminar</button>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="../js/gastosComunes.js"></script>
 
 </body>
+
 </html>
