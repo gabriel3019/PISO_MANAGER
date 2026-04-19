@@ -2,7 +2,7 @@
   // Inyectar CSS del menú
   const link = document.createElement('link');
   link.rel = 'stylesheet';
-  link.href = '../css/menu-lateral.css'; // Asegúrate de que la ruta sea correcta según tu carpeta
+  link.href = '../css/menu-lateral.css';
   document.head.appendChild(link);
 
   const pages = {
@@ -57,8 +57,17 @@
 
   // Contenedor donde se cargará el contenido dinámico
   const mainContent = document.createElement('div');
-  mainContent.id = 'dynamic-container'; // ID distinto para evitar líos
-  mainContent.style.cssText = 'flex:1; padding: 2rem; overflow-y: auto;';
+  mainContent.id = 'dynamic-container';
+  mainContent.style.cssText = 'flex:1; overflow-y: auto;';
+
+  // Mapa de funciones de inicialización por página
+  const pageInits = {
+    incidencias: () => {
+      if (typeof initIncidencias === 'function') initIncidencias();
+    },
+    // Añade aquí otras páginas cuando tengan su propio init:
+    // tareas: () => { if (typeof initTareas === 'function') initTareas(); },
+  };
 
   function loadPage(pageKey) {
     const page = pages[pageKey];
@@ -71,16 +80,41 @@
         const doc = parser.parseFromString(html, 'text/html');
         const body = doc.getElementById('page-body');
 
-        // Insertamos el contenido. Si no hay "page-body", avisamos.
         mainContent.innerHTML = `
           <div class="page-content">
             ${body ? body.innerHTML : '<p style="color:orange;">⚠️ Error: El archivo cargado no tiene un id="page-body"</p>'}
           </div>
         `;
+
+        // Cargar el script de la página si existe y luego inicializar
+        loadPageScript(pageKey);
       })
       .catch(() => {
         mainContent.innerHTML = `<p>⚠️ No se pudo cargar el archivo: ${page.file}</p>`;
       });
+  }
+
+  function loadPageScript(pageKey) {
+    // Eliminar script anterior de página si existía
+    const old = document.getElementById('page-script');
+    if (old) old.remove();
+
+    const scriptMap = {
+      incidencias: '../js/incidencias.js',
+      // tareas: '../js/tareas.js',
+    };
+
+    const src = scriptMap[pageKey];
+    if (!src) return;
+
+    const script = document.createElement('script');
+    script.id = 'page-script';
+    script.src = src;
+    script.onload = () => {
+      // Una vez cargado el script, llamar a su función de init
+      if (pageInits[pageKey]) pageInits[pageKey]();
+    };
+    document.body.appendChild(script);
   }
 
   // Eventos de click en el menú
@@ -93,13 +127,11 @@
     });
   });
 
-  // Inicialización
+  // Inicialización del layout
   document.body.style.display = 'flex';
   document.body.style.minHeight = '100vh';
   document.body.style.margin = '0';
-  
-  // Limpiamos el body original para que el JS tome el control del layout
-  document.body.innerHTML = ''; 
+  document.body.innerHTML = '';
   document.body.appendChild(nav);
   document.body.appendChild(mainContent);
 
