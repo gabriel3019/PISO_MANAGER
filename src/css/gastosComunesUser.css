@@ -373,6 +373,26 @@ h1 {
   background: #fef2f2;
 }
 
+.resumen {
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.deuda {
+  color: #dc2626;
+  margin-bottom: 5px;
+}
+
+.recibe {
+  color: #16a34a;
+  margin-bottom: 5px;
+}
+
+.pago {
+  color: #2563eb;
+  margin-bottom: 5px;
+}
+
 /* ================= RESPONSIVE ================= */
 @media (max-width: 600px) {
   .sidebar {

@@ -1,12 +1,21 @@
 // ================= ESTADO =================
 let modoDivision = "igual";
-let gastos = [];
+let gastos = JSON.parse(localStorage.getItem("gastos")) || [];
+let pagos = JSON.parse(localStorage.getItem("pagos")) || [];
+
 let gastoEditando = null;
 let gastoAEliminar = null;
+
+const personasLista = ["Tú", "Laura", "Pablo", "Marta"];
 
 // ================= MODALES =================
 const modal = document.getElementById("gastoModal");
 const deleteModal = document.getElementById("deleteModal");
+
+// 🔥 NUEVO (DETALLE)
+const detalleModal = document.getElementById("detalleModal");
+const detalleContenido = document.getElementById("detalleContenido");
+const closeDetalle = document.getElementById("closeDetalle");
 
 const btnAbrir = document.querySelector(".add-btn");
 const btnCerrar = document.getElementById("closeGastoModal");
@@ -23,10 +32,14 @@ const personasInput = document.getElementById("gastoPersonas");
 
 const btnGuardar = document.getElementById("guardarGasto");
 const lista = document.getElementById("gastosContainer");
+const resumen = document.getElementById("resumenDeudas");
 
 // ================= ERRORES =================
 const errorTitulo = document.getElementById("errorTitulo");
 const errorImporte = document.getElementById("errorImporte");
+
+// ================= DIVISION =================
+const divisionContainer = document.getElementById("divisionContainer");
 
 // ================= ABRIR / CERRAR =================
 btnAbrir.onclick = () => {
@@ -42,21 +55,18 @@ function cerrarModal() {
   limpiarFormulario();
 }
 
+// cerrar detalle
+closeDetalle.onclick = () => {
+  detalleModal.classList.add("hidden");
+};
+
 // ================= BOTONES =================
-const btnIgual = document.querySelector(".extra-options button:nth-child(1)");
-const btnManual = document.querySelector(".extra-options button:nth-child(2)");
-
-// contenedor división
-const divisionContainer = document.createElement("div");
-divisionContainer.id = "divisionContainer";
-document.querySelector(".modal-body").appendChild(divisionContainer);
-
-btnIgual.onclick = () => {
+document.getElementById("btnIgual").onclick = () => {
   modoDivision = "igual";
   renderDivision();
 };
 
-btnManual.onclick = () => {
+document.getElementById("btnManual").onclick = () => {
   modoDivision = "manual";
   renderDivision();
 };
@@ -69,18 +79,16 @@ function renderDivision() {
   const personas = parseInt(personasInput.value) || 1;
 
   if (modoDivision === "igual") {
-    const porPersona = personas ? (importe / personas).toFixed(2) : 0;
+    const porPersona = (importe / personas || 0).toFixed(2);
 
     divisionContainer.innerHTML = `
-      <p style="font-size:13px;color:#6b7280">
-        ${personas} personas · ${porPersona}€ por persona
-      </p>
+      <p>${personas} personas · ${porPersona}€ por persona</p>
     `;
   } else {
     for (let i = 0; i < personas; i++) {
       divisionContainer.innerHTML += `
-        <div style="display:flex; justify-content:space-between; padding:10px; background:#f3f4f6; border-radius:10px; margin-top:6px;">
-          <span>Persona ${i + 1}</span>
+        <div style="display:flex; justify-content:space-between; margin-top:6px;">
+          <span>${personasLista[i]}</span>
           <input type="number" class="input-manual" placeholder="0.00">
         </div>
       `;
@@ -128,29 +136,35 @@ btnGuardar.onclick = () => {
 
   if (!valido) return;
 
-  let divisionTexto = "";
-  let esManual = false;
+  let division = [];
 
   if (modoDivision === "igual") {
-    const porPersona = (importe / personas).toFixed(2);
-    divisionTexto = `${personas} personas · ${porPersona}€/c`;
-  } else {
-    esManual = true;
+    const porPersona = importe / personas;
 
+    for (let i = 0; i < personas; i++) {
+      division.push({
+        nombre: personasLista[i],
+        paga: porPersona
+      });
+    }
+  } else {
     const inputs = document.querySelectorAll(".input-manual");
     let suma = 0;
 
-    inputs.forEach(input => {
-      suma += parseFloat(input.value) || 0;
+    inputs.forEach((input, i) => {
+      const valor = parseFloat(input.value) || 0;
+      suma += valor;
+
+      division.push({
+        nombre: personasLista[i],
+        paga: valor
+      });
     });
 
     if (suma.toFixed(2) != importe.toFixed(2)) {
       errorImporte.textContent = "La suma no coincide";
-      importeInput.classList.add("input-error");
       return;
     }
-
-    divisionTexto = "Importe ajustado";
   }
 
   const gasto = {
@@ -158,9 +172,7 @@ btnGuardar.onclick = () => {
     titulo,
     importe,
     pagador,
-    personas,
-    divisionTexto,
-    esManual
+    division
   };
 
   if (gastoEditando) {
@@ -169,11 +181,106 @@ btnGuardar.onclick = () => {
   }
 
   gastos.push(gasto);
-  renderLista();
+  guardarLocalStorage();
+  renderTodo();
   cerrarModal();
 };
 
-// ================= RENDER =================
+// ================= LOCAL STORAGE =================
+function guardarLocalStorage() {
+  localStorage.setItem("gastos", JSON.stringify(gastos));
+  localStorage.setItem("pagos", JSON.stringify(pagos));
+}
+
+// ================= BALANCE =================
+function calcularBalance() {
+  const balance = {};
+  personasLista.forEach(p => balance[p] = 0);
+
+  gastos.forEach(g => {
+    balance[g.pagador] += g.importe;
+
+    g.division.forEach(p => {
+      balance[p.nombre] -= p.paga;
+    });
+  });
+
+  pagos.forEach(p => {
+    balance[p.deudor] += p.cantidad;
+    balance[p.acreedor] -= p.cantidad;
+  });
+
+  return balance;
+}
+
+// ================= RENDER DEUDAS =================
+function renderDeudas() {
+  const balance = calcularBalance();
+  resumen.innerHTML = "";
+
+  const deudores = [];
+  const acreedores = [];
+
+  Object.keys(balance).forEach(p => {
+    if (balance[p] < 0) deudores.push({ persona: p, valor: Math.abs(balance[p]) });
+    if (balance[p] > 0) acreedores.push({ persona: p, valor: balance[p] });
+  });
+
+  deudores.forEach(d => {
+    const a = acreedores[0];
+    if (!a) return;
+
+    resumen.innerHTML += `
+      <div style="display:flex; gap:10px; align-items:center;">
+        <span style="color:red">${d.persona} → ${a.persona}: ${d.valor.toFixed(2)}€</span>
+        <button class="btn-pagar" data-deudor="${d.persona}" data-acreedor="${a.persona}" data-cantidad="${d.valor}">
+          Pagar
+        </button>
+      </div>
+    `;
+  });
+}
+
+// ================= PAGAR =================
+document.addEventListener("click", (e) => {
+  if (e.target.classList.contains("btn-pagar")) {
+
+    pagos.push({
+      deudor: e.target.dataset.deudor,
+      acreedor: e.target.dataset.acreedor,
+      cantidad: parseFloat(e.target.dataset.cantidad)
+    });
+
+    guardarLocalStorage();
+    renderTodo();
+  }
+});
+
+// ================= DETALLE =================
+function abrirDetalle(gasto) {
+
+  let html = `
+    <h3>${gasto.titulo}</h3>
+    <p>Total: ${gasto.importe.toFixed(2)}€</p>
+    <p>Pagado por: ${gasto.pagador}</p>
+    <hr>
+    <b>División:</b>
+  `;
+
+  gasto.division.forEach(p => {
+    html += `
+      <div style="display:flex; justify-content:space-between; margin-top:6px;">
+        <span>${p.nombre}</span>
+        <span>${p.paga.toFixed(2)}€</span>
+      </div>
+    `;
+  });
+
+  detalleContenido.innerHTML = html;
+  detalleModal.classList.remove("hidden");
+}
+
+// ================= LISTA =================
 function renderLista() {
   lista.innerHTML = "";
 
@@ -191,25 +298,16 @@ function renderLista() {
         </div>
       </div>
 
-      <div class="right" style="display:flex; gap:12px">
-
-        <div>
-          <span class="badge ${gasto.esManual ? "gray" : "blue"}">
-            ${gasto.esManual ? "Ajustado" : "A dividir"}
-          </span>
-          <div class="split">${gasto.divisionTexto}</div>
-          <div class="amount">${gasto.importe.toFixed(2)} €</div>
-        </div>
-
-        <div style="display:flex; gap:6px">
-          <span class="edit-btn">✏️</span>
-          <span class="delete-btn">🗑️</span>
-        </div>
-
+      <div class="right">
+        <div class="amount">${gasto.importe.toFixed(2)} €</div>
+        <span class="edit-btn">✏️</span>
+        <span class="delete-btn">🗑️</span>
       </div>
     `;
 
-    // EDITAR
+    // 👉 CLICK DETALLE
+    div.onclick = () => abrirDetalle(gasto);
+
     div.querySelector(".edit-btn").onclick = (e) => {
       e.stopPropagation();
       gastoEditando = gasto;
@@ -217,15 +315,11 @@ function renderLista() {
       tituloInput.value = gasto.titulo;
       importeInput.value = gasto.importe;
       pagadorInput.value = gasto.pagador;
-      personasInput.value = gasto.personas;
-
-      modoDivision = gasto.esManual ? "manual" : "igual";
+      personasInput.value = gasto.division.length;
 
       modal.classList.remove("hidden");
-      renderDivision();
     };
 
-    // ELIMINAR
     div.querySelector(".delete-btn").onclick = (e) => {
       e.stopPropagation();
       gastoAEliminar = gasto;
@@ -237,14 +331,13 @@ function renderLista() {
 }
 
 // ================= ELIMINAR =================
-cancelDelete.onclick = () => {
-  deleteModal.classList.add("hidden");
-};
+cancelDelete.onclick = () => deleteModal.classList.add("hidden");
 
 confirmDelete.onclick = () => {
   gastos = gastos.filter(g => g.id !== gastoAEliminar.id);
+  guardarLocalStorage();
   deleteModal.classList.add("hidden");
-  renderLista();
+  renderTodo();
 };
 
 // ================= LIMPIAR =================
@@ -256,7 +349,16 @@ function limpiarFormulario() {
   divisionContainer.innerHTML = "";
 }
 
-// ================= UX =================
+// ================= RENDER =================
+function renderTodo() {
+  renderLista();
+  renderDeudas();
+}
+
+// ================= INIT =================
+renderTodo();
+
+// UX
 window.addEventListener("click", (e) => {
   if (e.target === modal) cerrarModal();
 });

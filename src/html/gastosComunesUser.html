@@ -22,12 +22,7 @@
 
         <p class="section-title">PRINCIPAL</p>
         <ul>
-
-          <li>
-            <a href="../html/inicioUser.html">
-              <img src="../css/icons/house.svg" class="icon"> Inicio
-            </a>
-          </li>
+          <li><a href="../html/inicioUser.html"><img src="../css/icons/house.svg" class="icon"> Inicio</a></li>
 
           <li class="active">
             <a href="../html/gastosComunesUser.html">
@@ -37,34 +32,15 @@
             </a>
           </li>
 
-          <li>
-            <a href="../html/tareasUser.html">
-              <img src="../css/icons/square-check-big.svg" class="icon"> Tareas
-            </a>
+          <li><a href="../html/tareasUser.html"><img src="../css/icons/square-check-big.svg" class="icon"> Tareas</a>
           </li>
-
-          <li>
-            <a href="../html/calendario.html">
-              <img src="../css/icons/calendar.svg" class="icon"> Calendario
-            </a>
-          </li>
-
+          <li><a href="../html/calendario.html"><img src="../css/icons/calendar.svg" class="icon"> Calendario</a></li>
         </ul>
 
         <p class="section-title">PISO</p>
         <ul>
-
-          <li>
-            <a href="../html/piso.html">
-              <img src="../css/icons/house.svg" class="icon"> Mi Piso
-            </a>
-          </li>
-
-          <li>
-            <a href="../html/companeros.html">
-              <img src="../css/icons/users.svg" class="icon"> Compañeros
-            </a>
-          </li>
+          <li><a href="../html/piso.html"><img src="../css/icons/house.svg" class="icon"> Mi Piso</a></li>
+          <li><a href="../html/companeros.html"><img src="../css/icons/users.svg" class="icon"> Compañeros</a></li>
 
           <li>
             <a href="../html/incidenciasUser.html">
@@ -73,16 +49,11 @@
               <span class="badge gray">2</span>
             </a>
           </li>
-
         </ul>
 
         <p class="section-title">CUENTA</p>
         <ul>
-          <li>
-            <a href="../html/ajustes.html">
-              <img src="../css/icons/settings.svg" class="icon"> Ajustes
-            </a>
-          </li>
+          <li><a href="../html/ajustes.html"><img src="../css/icons/settings.svg" class="icon"> Ajustes</a></li>
         </ul>
       </div>
 
@@ -96,7 +67,15 @@
         <h1>Gastos Comunes</h1>
       </div>
 
-      <!-- LISTA -->
+      <!-- ================= RESUMEN ================= -->
+
+      <!-- 🔴 / 🟢 DEUDAS -->
+      <div id="resumenDeudas" class="resumen"></div>
+
+      <!-- 🔵 PAGOS -->
+      <div id="resumenPagos" class="resumen"></div>
+
+      <!-- ================= LISTA ================= -->
       <div class="list">
 
         <div class="list-header">
@@ -123,18 +102,16 @@
     </main>
   </div>
 
-  <!-- ================= MODAL ================= -->
+  <!-- ================= MODAL CREAR ================= -->
   <div id="gastoModal" class="modal-overlay hidden">
 
     <div class="modal splitwise">
 
-      <!-- HEADER -->
       <div class="modal-header">
         <h2>Añadir gasto</h2>
         <span id="closeGastoModal" class="close">&times;</span>
       </div>
 
-      <!-- BODY -->
       <div class="modal-body">
 
         <!-- TITULO -->
@@ -173,18 +150,17 @@
           </select>
         </div>
 
-        <!-- OPCIONES -->
+        <!-- BOTONES -->
         <div class="extra-options">
-          <button class="btn-light">Dividir igualmente</button>
-          <button class="btn-light">Ajustar importes</button>
+          <button class="btn-light" id="btnIgual">Dividir igualmente</button>
+          <button class="btn-light" id="btnManual">Ajustar importes</button>
         </div>
 
-        <!-- AQUÍ SE GENERA LA DIVISIÓN -->
+        <!-- DIVISION -->
         <div id="divisionContainer"></div>
 
       </div>
 
-      <!-- FOOTER -->
       <div class="modal-footer">
         <button id="cancelGasto" class="btn-light">Cancelar</button>
         <button id="guardarGasto" class="btn-primary">Guardar gasto</button>
@@ -193,6 +169,7 @@
     </div>
   </div>
 
+  <!-- ================= MODAL ELIMINAR ================= -->
   <div id="deleteModal" class="modal-overlay hidden">
     <div class="modal delete-modal">
 
@@ -213,6 +190,20 @@
     </div>
   </div>
 
+  <div id="detalleModal" class="modal-overlay hidden">
+    <div class="modal">
+
+      <div class="modal-header">
+        <h2>Detalle del gasto</h2>
+        <span id="closeDetalle" class="close">&times;</span>
+      </div>
+
+      <div class="modal-body" id="detalleContenido">
+        <!-- contenido dinámico -->
+      </div>
+
+    </div>
+  </div>
   <script src="../js/gastosComunes.js"></script>
 
 </body>
