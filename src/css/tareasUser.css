@@ -481,6 +481,15 @@ select[multiple] {
   justify-content: center;
 }
 
+.sidebar li a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-decoration: none;
+  color: inherit;
+}
+
 /* ================= TOAST CENTRADO ================= */
 .toast {
   position: fixed;

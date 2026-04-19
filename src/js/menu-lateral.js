@@ -31,9 +31,9 @@
       <p class="sidebar__group-label">Principal</p>
       <ul class="sidebar__list">
         <li><a href="./html/homeUser.html" class="sidebar__link" data-page="inicio"><img src="../css/icons/house.svg"> Inicio</a></li>
-        <li><a href="#gastos" class="sidebar__link" data-page="gastos"><img src="../css/icons/euro.svg"> Gastos Comunes<span class="sidebar__badge">3</span></a></li>
+        <li><a href="./html/gastosComunesUser.html" class="sidebar__link" data-page="gastos"><img src="../css/icons/euro.svg"> Gastos Comunes<span class="sidebar__badge">3</span></a></li>
         <li><a href="./html/tareasUser.html" class="sidebar__link" data-page="tareas"><img src="../css/icons/#check.svg"> Tareas<span class="sidebar__badge">5</span></a></li>
-        <li><a href="#calendario" class="sidebar__link" data-page="calendario"><img src="../css/icons/calendar.svg"> Calendario</a></li>
+        <li><a href="./html/calendario.html" class="sidebar__link" data-page="calendario"><img src="../css/icons/calendar.svg"> Calendario</a></li>
       </ul>
     </div>
     <div class="sidebar__group">
@@ -41,7 +41,7 @@
       <ul class="sidebar__list">
         <li><a href="#piso" class="sidebar__link" data-page="piso"><img src="../css/icons/house.svg"> Mi Piso</a></li>
         <li><a href="#compañeros" class="sidebar__link" data-page="compañeros"><img src="../css/icons/users.svg"> Compañeros</a></li>
-        <li><a href="#incidencias" class="sidebar__link sidebar__link--active" data-page="incidencias"><img src="../css/icons/circle-alert.svg"> Incidencias<span class="sidebar__badge">2</span></a></li>
+        <li><a href="./html/incidenciasUser.html" class="sidebar__link sidebar__link--active" data-page="incidencias"><img src="../css/icons/circle-alert.svg"> Incidencias<span class="sidebar__badge">2</span></a></li>
       </ul>
     </div>
     <div class="sidebar__group">
