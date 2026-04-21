@@ -6,318 +6,320 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calendario - PSIO Manager</title>
     <link rel="stylesheet" href="../css/general.css">
-    <link rel="stylesheet" href="../css/menu-lateral.css">
     <link rel="stylesheet" href="../css/calendario.css">
 </head>
 
 <body>
-
-    <aside class="sidebar">
-        <div>
-            <h3>Usuario 1</h3>
-            <span class="subtitle">Panel de inicio</span>
-
-            <p class="section-title">PRINCIPAL</p>
-            <ul>
-                <li><a href="../html/inicioUser.html"><img src="../css/icons/house.svg" class="icon"> Inicio</a></li>
-
-                <li>
-                    <a href="../html/gastosComunesUser.html">
-                        <img src="../css/icons/euro.svg" class="icon">
-                        Gastos Comunes
-                        <span class="badge">3</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="../html/tareasUser.html">
-                        <img src="../css/icons/square-check-big.svg" class="icon"> Tareas
-                    </a>
-                </li>
-
-                <li class="active">
-                    <a href="../html/calendario.html">
-                        <img src="../css/icons/calendar.svg" class="icon"> Calendario
-                    </a>
-                </li>
-            </ul>
-
-            <p class="section-title">PISO</p>
-            <ul>
-                <li><a href="../html/piso.html"><img src="../css/icons/house.svg" class="icon"> Mi Piso</a></li>
-                <li><a href="../html/companeros.html"><img src="../css/icons/users.svg" class="icon"> Compañeros</a>
-                </li>
-
-                <li>
-                    <a href="../html/incidenciasUser.html">
-                        <img src="../css/icons/circle-alert.svg" class="icon">
-                        Incidencias
-                        <span class="badge gray">2</span>
-                    </a>
-                </li>
-            </ul>
-
-            <p class="section-title">CUENTA</p>
-            <ul>
-                <li><a href="../html/ajustes.html"><img src="../css/icons/settings.svg" class="icon"> Ajustes</a></li>
-            </ul>
-        </div>
-
-        <div class="logout">Cerrar sesión</div>
-    </aside>
-
-    <main class="calendar-page">
-
-        <!-- HEADER -->
-        <header class="calendar-header">
+    <div class="app">
+        <aside class="sidebar">
             <div>
-                <h1>Calendario</h1>
-                <p class="calendar-subtitle">Piso Calle Mayor, 12 · 3 compañeros</p>
+                <h3>Usuario 1</h3>
+                <span class="subtitle">Panel de inicio</span>
+
+                <p class="section-title">PRINCIPAL</p>
+                <ul>
+                    <li><a href="../html/inicioUser.html"><img src="../css/icons/house.svg" class="icon"> Inicio</a>
+                    </li>
+
+                    <li>
+                        <a href="../html/gastosComunesUser.html">
+                            <img src="../css/icons/euro.svg" class="icon">
+                            Gastos Comunes
+                            <span class="badge">3</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="../html/tareasUser.html">
+                            <img src="../css/icons/square-check-big.svg" class="icon"> Tareas
+                        </a>
+                    </li>
+
+                    <li class="active">
+                        <a href="../html/calendario.html">
+                            <img src="../css/icons/calendar.svg" class="icon"> Calendario
+                        </a>
+                    </li>
+                </ul>
+
+                <p class="section-title">PISO</p>
+                <ul>
+                    <li><a href="../html/piso.html"><img src="../css/icons/house.svg" class="icon"> Mi Piso</a></li>
+                    <li><a href="../html/companeros.html"><img src="../css/icons/users.svg" class="icon"> Compañeros</a>
+                    </li>
+
+                    <li>
+                        <a href="../html/incidenciasUser.html">
+                            <img src="../css/icons/circle-alert.svg" class="icon">
+                            Incidencias
+                            <span class="badge gray">2</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <p class="section-title">CUENTA</p>
+                <ul>
+                    <li><a href="../html/ajustes.html"><img src="../css/icons/settings.svg" class="icon"> Ajustes</a>
+                    </li>
+                </ul>
             </div>
 
-            <div class="calendar-actions">
-                <button id="btn-prev">◀</button>
-                <button id="btn-details">Ver primer evento</button>
-                <button id="btn-add" class="btn-primary">+ Nuevo evento</button>
-                <button id="btn-next">▶</button>
-            </div>
-        </header>
+            <div class="logout">Cerrar sesión</div>
+        </aside>
 
-        <!-- CONTENIDO -->
-        <section class="calendar-layout">
+        <main class="calendar-page">
 
-            <!-- CALENDARIO -->
-            <div class="calendar-main">
-                <div class="calendar-month-bar">
-                    <h2 id="month-title">Abril de 2026</h2>
+            <!-- HEADER -->
+            <header class="calendar-header">
+                <div>
+                    <h1>Calendario</h1>
+                    <p class="calendar-subtitle">Piso Calle Mayor, 12 · 3 compañeros</p>
                 </div>
 
-                <div class="legend">
-                    <div class="legend-item">
-                        <span class="legend-color incidencia"></span>
-                        <span>Incidencias</span>
+                <div class="calendar-actions">
+                    <button id="btn-prev">◀</button>
+                    <button id="btn-details">Ver primer evento</button>
+                    <button id="btn-add" class="btn-primary">+ Nuevo evento</button>
+                    <button id="btn-next">▶</button>
+                </div>
+            </header>
+
+            <!-- CONTENIDO -->
+            <section class="calendar-layout">
+
+                <!-- CALENDARIO -->
+                <div class="calendar-main">
+                    <div class="calendar-month-bar">
+                        <h2 id="month-title">Abril de 2026</h2>
                     </div>
-                    <div class="legend-item">
-                        <span class="legend-color tarea"></span>
-                        <span>Tareas</span>
+
+                    <div class="legend">
+                        <div class="legend-item">
+                            <span class="legend-color incidencia"></span>
+                            <span>Incidencias</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color tarea"></span>
+                            <span>Tareas</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color evento"></span>
+                            <span>Eventos</span>
+                        </div>
                     </div>
-                    <div class="legend-item">
-                        <span class="legend-color evento"></span>
-                        <span>Eventos</span>
+
+                    <div class="calendar-weekdays">
+                        <div>Lun</div>
+                        <div>Mar</div>
+                        <div>Mié</div>
+                        <div>Jue</div>
+                        <div>Vie</div>
+                        <div>Sáb</div>
+                        <div>Dom</div>
                     </div>
+
+                    <div id="calendar-grid" class="calendar-grid"></div>
                 </div>
 
-                <div class="calendar-weekdays">
-                    <div>Lun</div>
-                    <div>Mar</div>
-                    <div>Mié</div>
-                    <div>Jue</div>
-                    <div>Vie</div>
-                    <div>Sáb</div>
-                    <div>Dom</div>
+                <!-- PANEL DERECHO -->
+                <aside class="calendar-sidebar">
+                    <h3>Próximos eventos</h3>
+                    <div id="events-list" class="events-list"></div>
+                </aside>
+
+            </section>
+        </main>
+
+        <!-- MODAL AÑADIR EVENTO -->
+        <div id="modal-add" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Nuevo evento</h3>
+                    <button id="close-add-modal" class="modal-close">&times;</button>
                 </div>
 
-                <div id="calendar-grid" class="calendar-grid"></div>
-            </div>
+                <form id="add-event-form" class="modal-form">
+                    <label for="event-title">Título</label>
+                    <input type="text" id="event-title" placeholder="Ej: Cena del piso" required>
 
-            <!-- PANEL DERECHO -->
-            <aside class="calendar-sidebar">
-                <h3>Próximos eventos</h3>
-                <div id="events-list" class="events-list"></div>
-            </aside>
-
-        </section>
-    </main>
-
-    <!-- MODAL AÑADIR EVENTO -->
-    <div id="modal-add" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Nuevo evento</h3>
-                <button id="close-add-modal" class="modal-close">&times;</button>
-            </div>
-
-            <form id="add-event-form" class="modal-form">
-                <label for="event-title">Título</label>
-                <input type="text" id="event-title" placeholder="Ej: Cena del piso" required>
-
-                <label for="event-type">Tipo</label>
-                <select id="event-type" required>
-                    <option value="">Selecciona una opción</option>
-                    <option value="incidencia">Incidencia</option>
-                    <option value="tarea">Tarea</option>
-                    <option value="evento">Evento</option>
-                </select>
-
-                <!-- BLOQUE INCIDENCIA -->
-                <div id="incidencia-fields" class="conditional-fields hidden">
-                    <label for="event-start-date">Fecha de inicio</label>
-                    <input type="date" id="event-start-date">
-
-                    <label for="event-end-date">Fecha de fin</label>
-                    <input type="date" id="event-end-date">
-                </div>
-
-                <!-- BLOQUE TAREA / EVENTO -->
-                <div id="general-fields" class="conditional-fields hidden">
-                    <label for="event-date">Fecha</label>
-                    <input type="date" id="event-date">
-                </div>
-
-                <div id="people-fields" class="conditional-fields hidden">
-                    <label>Personas asignadas</label>
-                    <div class="checkbox-group">
-                        <label class="checkbox-item">
-                            <input type="checkbox" name="event-people" value="Celia">
-                            Celia
-                        </label>
-                        <label class="checkbox-item">
-                            <input type="checkbox" name="event-people" value="Gabriel">
-                            Gabriel
-                        </label>
-                        <label class="checkbox-item">
-                            <input type="checkbox" name="event-people" value="Carlos">
-                            Carlos
-                        </label>
-                    </div>
-                </div>
-
-                <!-- BLOQUE HORA PARA TAREA / EVENTO -->
-                <div id="time-fields" class="conditional-fields hidden">
-                    <label for="event-time">Hora</label>
-                    <select id="event-time">
-                        <option value="">Selecciona una hora</option>
-                        <option value="08:00">08:00</option>
-                        <option value="08:15">08:15</option>
-                        <option value="08:30">08:30</option>
-                        <option value="08:45">08:45</option>
-                        <option value="09:00">09:00</option>
-                        <option value="09:15">09:15</option>
-                        <option value="09:30">09:30</option>
-                        <option value="09:45">09:45</option>
-                        <option value="10:00">10:00</option>
-                        <option value="10:15">10:15</option>
-                        <option value="10:30">10:30</option>
-                        <option value="10:45">10:45</option>
-                        <option value="11:00">11:00</option>
-                        <option value="11:15">11:15</option>
-                        <option value="11:30">11:30</option>
-                        <option value="11:45">11:45</option>
-                        <option value="12:00">12:00</option>
-                        <option value="12:15">12:15</option>
-                        <option value="12:30">12:30</option>
-                        <option value="12:45">12:45</option>
-                        <option value="13:00">13:00</option>
-                        <option value="13:15">13:15</option>
-                        <option value="13:30">13:30</option>
-                        <option value="13:45">13:45</option>
-                        <option value="14:00">14:00</option>
-                        <option value="14:15">14:15</option>
-                        <option value="14:30">14:30</option>
-                        <option value="14:45">14:45</option>
-                        <option value="15:00">15:00</option>
-                        <option value="15:15">15:15</option>
-                        <option value="15:30">15:30</option>
-                        <option value="15:45">15:45</option>
-                        <option value="16:00">16:00</option>
-                        <option value="16:15">16:15</option>
-                        <option value="16:30">16:30</option>
-                        <option value="16:45">16:45</option>
-                        <option value="17:00">17:00</option>
-                        <option value="17:15">17:15</option>
-                        <option value="17:30">17:30</option>
-                        <option value="17:45">17:45</option>
-                        <option value="18:00">18:00</option>
-                        <option value="18:15">18:15</option>
-                        <option value="18:30">18:30</option>
-                        <option value="18:45">18:45</option>
-                        <option value="19:00">19:00</option>
-                        <option value="19:15">19:15</option>
-                        <option value="19:30">19:30</option>
-                        <option value="19:45">19:45</option>
-                        <option value="20:00">20:00</option>
-                        <option value="20:15">20:15</option>
-                        <option value="20:30">20:30</option>
-                        <option value="20:45">20:45</option>
-                        <option value="21:00">21:00</option>
-                        <option value="21:15">21:15</option>
-                        <option value="21:30">21:30</option>
-                        <option value="21:45">21:45</option>
-                        <option value="22:00">22:00</option>
-                        <option value="22:15">22:15</option>
-                        <option value="22:30">22:30</option>
-                        <option value="22:45">22:45</option>
+                    <label for="event-type">Tipo</label>
+                    <select id="event-type" required>
+                        <option value="">Selecciona una opción</option>
+                        <option value="incidencia">Incidencia</option>
+                        <option value="tarea">Tarea</option>
+                        <option value="evento">Evento</option>
                     </select>
-                </div>
 
-                <div id="event-warning" class="modal-warning"></div>
+                    <!-- BLOQUE INCIDENCIA -->
+                    <div id="incidencia-fields" class="conditional-fields hidden">
+                        <label for="event-start-date">Fecha de inicio</label>
+                        <input type="date" id="event-start-date">
 
-                <div class="modal-buttons">
-                    <button type="button" id="cancel-add" class="btn-secondary">Cancelar</button>
-                    <button type="submit" class="btn-primary">Guardar</button>
-                </div>
-            </form>
+                        <label for="event-end-date">Fecha de fin</label>
+                        <input type="date" id="event-end-date">
+                    </div>
+
+                    <!-- BLOQUE TAREA / EVENTO -->
+                    <div id="general-fields" class="conditional-fields hidden">
+                        <label for="event-date">Fecha</label>
+                        <input type="date" id="event-date">
+                    </div>
+
+                    <div id="people-fields" class="conditional-fields hidden">
+                        <label>Personas asignadas</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="event-people" value="Celia">
+                                Celia
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="event-people" value="Gabriel">
+                                Gabriel
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="event-people" value="Carlos">
+                                Carlos
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- BLOQUE HORA PARA TAREA / EVENTO -->
+                    <div id="time-fields" class="conditional-fields hidden">
+                        <label for="event-time">Hora</label>
+                        <select id="event-time">
+                            <option value="">Selecciona una hora</option>
+                            <option value="08:00">08:00</option>
+                            <option value="08:15">08:15</option>
+                            <option value="08:30">08:30</option>
+                            <option value="08:45">08:45</option>
+                            <option value="09:00">09:00</option>
+                            <option value="09:15">09:15</option>
+                            <option value="09:30">09:30</option>
+                            <option value="09:45">09:45</option>
+                            <option value="10:00">10:00</option>
+                            <option value="10:15">10:15</option>
+                            <option value="10:30">10:30</option>
+                            <option value="10:45">10:45</option>
+                            <option value="11:00">11:00</option>
+                            <option value="11:15">11:15</option>
+                            <option value="11:30">11:30</option>
+                            <option value="11:45">11:45</option>
+                            <option value="12:00">12:00</option>
+                            <option value="12:15">12:15</option>
+                            <option value="12:30">12:30</option>
+                            <option value="12:45">12:45</option>
+                            <option value="13:00">13:00</option>
+                            <option value="13:15">13:15</option>
+                            <option value="13:30">13:30</option>
+                            <option value="13:45">13:45</option>
+                            <option value="14:00">14:00</option>
+                            <option value="14:15">14:15</option>
+                            <option value="14:30">14:30</option>
+                            <option value="14:45">14:45</option>
+                            <option value="15:00">15:00</option>
+                            <option value="15:15">15:15</option>
+                            <option value="15:30">15:30</option>
+                            <option value="15:45">15:45</option>
+                            <option value="16:00">16:00</option>
+                            <option value="16:15">16:15</option>
+                            <option value="16:30">16:30</option>
+                            <option value="16:45">16:45</option>
+                            <option value="17:00">17:00</option>
+                            <option value="17:15">17:15</option>
+                            <option value="17:30">17:30</option>
+                            <option value="17:45">17:45</option>
+                            <option value="18:00">18:00</option>
+                            <option value="18:15">18:15</option>
+                            <option value="18:30">18:30</option>
+                            <option value="18:45">18:45</option>
+                            <option value="19:00">19:00</option>
+                            <option value="19:15">19:15</option>
+                            <option value="19:30">19:30</option>
+                            <option value="19:45">19:45</option>
+                            <option value="20:00">20:00</option>
+                            <option value="20:15">20:15</option>
+                            <option value="20:30">20:30</option>
+                            <option value="20:45">20:45</option>
+                            <option value="21:00">21:00</option>
+                            <option value="21:15">21:15</option>
+                            <option value="21:30">21:30</option>
+                            <option value="21:45">21:45</option>
+                            <option value="22:00">22:00</option>
+                            <option value="22:15">22:15</option>
+                            <option value="22:30">22:30</option>
+                            <option value="22:45">22:45</option>
+                        </select>
+                    </div>
+
+                    <div id="event-warning" class="modal-warning"></div>
+
+                    <div class="modal-buttons">
+                        <button type="button" id="cancel-add" class="btn-secondary">Cancelar</button>
+                        <button type="submit" class="btn-primary">Guardar</button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
 
-    <!-- MODAL DETALLES EVENTO -->
-    <div id="modal-details" class="modal hidden">
-        <div class="modal-content details-card">
-            <div class="modal-header">
-                <h3>Detalles</h3>
-                <button id="close-details-modal" class="modal-close">&times;</button>
-            </div>
-
-            <div class="details-badge-row">
-                <span id="detail-badge" class="detail-badge">Evento</span>
-            </div>
-
-            <div class="details-grid">
-                <div class="detail-box">
-                    <span class="detail-label">Título</span>
-                    <span id="detail-title" class="detail-value"></span>
+        <!-- MODAL DETALLES EVENTO -->
+        <div id="modal-details" class="modal hidden">
+            <div class="modal-content details-card">
+                <div class="modal-header">
+                    <h3>Detalles</h3>
+                    <button id="close-details-modal" class="modal-close">&times;</button>
                 </div>
 
-                <div class="detail-box">
-                    <span class="detail-label">Tipo</span>
-                    <span id="detail-type" class="detail-value"></span>
+                <div class="details-badge-row">
+                    <span id="detail-badge" class="detail-badge">Evento</span>
                 </div>
 
-                <div class="detail-box">
-                    <span class="detail-label">Fecha / rango</span>
-                    <span id="detail-day" class="detail-value"></span>
+                <div class="details-grid">
+                    <div class="detail-box">
+                        <span class="detail-label">Título</span>
+                        <span id="detail-title" class="detail-value"></span>
+                    </div>
+
+                    <div class="detail-box">
+                        <span class="detail-label">Tipo</span>
+                        <span id="detail-type" class="detail-value"></span>
+                    </div>
+
+                    <div class="detail-box">
+                        <span class="detail-label">Fecha / rango</span>
+                        <span id="detail-day" class="detail-value"></span>
+                    </div>
+
+                    <div class="detail-box">
+                        <span class="detail-label">Hora</span>
+                        <span id="detail-time" class="detail-value"></span>
+                    </div>
+
+                    <div class="detail-box">
+                        <span class="detail-label">Personas asignadas</span>
+                        <span id="detail-person" class="detail-value"></span>
+                    </div>
+
+                    <div class="detail-box">
+                        <span class="detail-label">Color</span>
+                        <span id="detail-color" class="detail-value"></span>
+                    </div>
+
+                    <div class="detail-box">
+                        <span class="detail-label">Estado</span>
+                        <span id="detail-status" class="detail-value"></span>
+                    </div>
                 </div>
 
-                <div class="detail-box">
-                    <span class="detail-label">Hora</span>
-                    <span id="detail-time" class="detail-value"></span>
+                <div class="modal-buttons details-actions">
+                    <button id="resolve-incidencia-btn" type="button" class="btn-danger hidden">Marcar como
+                        resuelta</button>
+                    <button id="complete-task-btn" type="button" class="btn-success hidden">Completada</button>
                 </div>
-
-                <div class="detail-box">
-                    <span class="detail-label">Personas asignadas</span>
-                    <span id="detail-person" class="detail-value"></span>
-                </div>
-
-                <div class="detail-box">
-                    <span class="detail-label">Color</span>
-                    <span id="detail-color" class="detail-value"></span>
-                </div>
-
-                <div class="detail-box">
-                    <span class="detail-label">Estado</span>
-                    <span id="detail-status" class="detail-value"></span>
-                </div>
-            </div>
-
-            <div class="modal-buttons details-actions">
-                <button id="resolve-incidencia-btn" type="button" class="btn-danger hidden">Marcar como
-                    resuelta</button>
-                <button id="complete-task-btn" type="button" class="btn-success hidden">Completada</button>
             </div>
         </div>
-    </div>
 
-    <script src="../js/calendario.js"></script>
+        <script src="../js/calendario.js"></script>
+    </div>
 </body>
 
 </html>
