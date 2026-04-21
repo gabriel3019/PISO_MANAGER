@@ -13,33 +13,57 @@
 <body>
 
     <aside class="sidebar">
-        <div class="sidebar__user">
-            <div class="sidebar__avatar">U1</div>
-            <div>
-                <p class="sidebar__username">Usuario1</p>
-                <p class="sidebar__role">Panel de inicio</p>
-            </div>
-        </div>
+        <div>
+            <h3>Usuario 1</h3>
+            <span class="subtitle">Panel de inicio</span>
 
-        <div class="sidebar__group">
-            <p class="sidebar__group-label">Principal</p>
-            <ul class="sidebar__list">
-                <li><a href="#" class="sidebar__link"><span class="sidebar__icon">🏠</span> Inicio</a></li>
-                <li><a href="#" class="sidebar__link"><span class="sidebar__icon">€</span> Gastos comunes</a></li>
-                <li><a href="#" class="sidebar__link"><span class="sidebar__icon">✔</span> Tareas</a></li>
-                <li><a href="#" class="sidebar__link sidebar__link--active"><span class="sidebar__icon">📅</span>
-                        Calendario</a></li>
+            <p class="section-title">PRINCIPAL</p>
+            <ul>
+                <li><a href="../html/inicioUser.html"><img src="../css/icons/house.svg" class="icon"> Inicio</a></li>
+
+                <li>
+                    <a href="../html/gastosComunesUser.html">
+                        <img src="../css/icons/euro.svg" class="icon">
+                        Gastos Comunes
+                        <span class="badge">3</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="../html/tareasUser.html">
+                        <img src="../css/icons/square-check-big.svg" class="icon"> Tareas
+                    </a>
+                </li>
+
+                <li class="active">
+                    <a href="../html/calendario.html">
+                        <img src="../css/icons/calendar.svg" class="icon"> Calendario
+                    </a>
+                </li>
+            </ul>
+
+            <p class="section-title">PISO</p>
+            <ul>
+                <li><a href="../html/piso.html"><img src="../css/icons/house.svg" class="icon"> Mi Piso</a></li>
+                <li><a href="../html/companeros.html"><img src="../css/icons/users.svg" class="icon"> Compañeros</a>
+                </li>
+
+                <li>
+                    <a href="../html/incidenciasUser.html">
+                        <img src="../css/icons/circle-alert.svg" class="icon">
+                        Incidencias
+                        <span class="badge gray">2</span>
+                    </a>
+                </li>
+            </ul>
+
+            <p class="section-title">CUENTA</p>
+            <ul>
+                <li><a href="../html/ajustes.html"><img src="../css/icons/settings.svg" class="icon"> Ajustes</a></li>
             </ul>
         </div>
 
-        <div class="sidebar__group">
-            <p class="sidebar__group-label">Piso</p>
-            <ul class="sidebar__list">
-                <li><a href="#" class="sidebar__link"><span class="sidebar__icon">🏠</span> Mi piso</a></li>
-                <li><a href="#" class="sidebar__link"><span class="sidebar__icon">👥</span> Compañeros</a></li>
-                <li><a href="#" class="sidebar__link"><span class="sidebar__icon">⚠️</span> Incidencias</a></li>
-            </ul>
-        </div>
+        <div class="logout">Cerrar sesión</div>
     </aside>
 
     <main class="calendar-page">
