@@ -70,6 +70,28 @@ if ($resultado && $resultado->num_rows <= 0) {
         FOREIGN KEY (id_piso) REFERENCES pisos(id_piso) ON DELETE CASCADE
     );
 
+    CREATE TABLE calendario_eventos (
+    id_evento INT AUTO_INCREMENT PRIMARY KEY,
+    id_piso INT NOT NULL,
+    titulo VARCHAR(150) NOT NULL,
+    tipo ENUM('incidencia','tarea','evento') NOT NULL,
+    fecha DATE DEFAULT NULL,
+    fecha_inicio DATE DEFAULT NULL,
+    fecha_fin DATE DEFAULT NULL,
+    hora TIME DEFAULT NULL,
+    estado VARCHAR(30) DEFAULT NULL,
+    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_piso) REFERENCES pisos(id_piso) ON DELETE CASCADE
+    );
+
+    CREATE TABLE calendario_evento_personas (
+    id_evento INT NOT NULL,
+    id_usuario INT NOT NULL,
+    PRIMARY KEY (id_evento, id_usuario),
+    FOREIGN KEY (id_evento) REFERENCES calendario_eventos(id_evento) ON DELETE CASCADE,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
+    );
+
     /* ===================== USUARIOS ===================== */
 
     INSERT INTO usuarios (nombre, email, password) VALUES
@@ -101,22 +123,41 @@ if ($resultado && $resultado->num_rows <= 0) {
     (1,'Limpiar cocina'),
     (1,'Sacar basura');
 
+     /* ===================== CALENDARIO EVENTOS ===================== */
+
+    INSERT INTO calendario_eventos (id_piso, titulo, tipo, fecha_inicio, fecha_fin, estado)
+    VALUES (1, 'Lavadora averiada', 'incidencia', '2026-04-10', '2026-04-14', 'activa');
+
+    INSERT INTO calendario_eventos (id_piso, titulo, tipo, fecha, hora, estado)
+    VALUES (1, 'Limpiar baño', 'tarea', '2026-04-15', '18:00:00', 'pendiente');
+
+    INSERT INTO calendario_eventos (id_piso, titulo, tipo, fecha, hora, estado)
+    VALUES (1, 'Cena del piso', 'evento', '2026-04-20', '21:30:00', 'programado');
+
+     /* ===================== CALENDARIO EVENTOS PERSONAS ===================== */
+
+    INSERT INTO calendario_evento_personas (id_evento, id_usuario)
+    VALUES 
+    (2, 3), 
+    (3, 2),
+    (3, 3),
+    (3, 4);
+
     INSERT INTO avisos (id_piso, titulo, descripcion) VALUES
     (1,'Reunión','Reunión el viernes a las 20:00'),
     (1,'Compra','Hay que comprar papel higiénico');
     ";
 
     if ($conn->multi_query($sql)) {
-        while ($conn->next_result()) {;}
+        while ($conn->next_result()) {;
+        }
         echo "BBDD creada correctamente";
     } else {
         echo "Error: " . $conn->error;
     }
-
 } else {
     $conn->select_db("piso_manager");
     echo "La base de datos ya existe";
 }
 
 $conn->close();
-?>
