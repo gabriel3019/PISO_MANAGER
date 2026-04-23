@@ -4,23 +4,133 @@
 
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
 
-
-
 /* ── Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ── Layout principal (sin sidebar) ── */
+/* ── Layout principal (con sidebar) ── */
 body {
   font-family: var(--font-main);
   background: var(--bg-page);
   color: var(--text-primary);
   min-height: 100vh;
+  display: flex;
 }
 
 .page-wrapper {
+  flex: 1;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  overflow-y: auto;
+}
+/* ══════════════════════════════════════════════════════════════
+   SIDEBAR
+   ══════════════════════════════════════════════════════════════ */
+
+.sidebar {
+  width: 260px;
+  min-height: 100vh;
+  background: white;
+  border-right: 1px solid var(--border);
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.sidebar h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.sidebar .subtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.sidebar .section-title {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 20px;
+  margin-bottom: 10px;
+  letter-spacing: .05em;
+}
+
+.sidebar ul {
+  list-style: none;
+}
+
+.sidebar li {
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius-sm);
+  margin-bottom: 2px;
+  transition: background .15s;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--text-primary);
+  padding: 10px;
+  width: 100%;
+  border-radius: var(--radius-sm);
+}
+
+.sidebar li:hover {
+  background: var(--bg-tag);
+}
+
+/* Estado activo gestionado por JS — se aplica al <li> */
+.sidebar li.active {
+  background: #e0e7ff;
+}
+
+/* El enlace y el texto dentro del li activo */
+.sidebar li.active .sidebar-link {
+  color: var(--accent-blue);
+  font-weight: 600;
+}
+
+.icon {
+  width: 18px;
+  height: 18px;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+.sidebar li.active .icon {
+  opacity: 1;
+  filter: invert(31%) sepia(94%) saturate(1134%) hue-rotate(211deg) brightness(96%) contrast(92%);
+}
+
+.sidebar .badge {
+  margin-left: auto;
+  background: var(--accent-blue);
+  color: white;
+  font-size: 11px;
+  border-radius: 999px;
+  padding: 2px 7px;
+  font-weight: 700;
+}
+
+.sidebar .badge.gray {
+  background: var(--border);
+  color: var(--text-secondary);
+}
+
+.logout {
+  color: #dc2626;
+  padding: 12px;
+  border-top: 1px solid var(--border);
+  cursor: pointer;
+  font-size: .85rem;
+  margin-top: auto;
 }
 
 /* ── Cabecera ── */
@@ -352,7 +462,6 @@ body {
    MODALES
    ══════════════════════════════════════════════════════════════ */
 
-/* ── Overlay ── */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -368,7 +477,6 @@ body {
   display: none;
 }
 
-/* ── Caja del modal ── */
 .modal {
   background: #ffffff;
   border-radius: 16px;
@@ -385,7 +493,6 @@ body {
   max-width: 420px;
 }
 
-/* ── Cabecera del modal ── */
 .modal__header {
   display: flex;
   align-items: center;
@@ -427,7 +534,6 @@ body {
   color: var(--text-primary);
 }
 
-/* ── Divisor ── */
 .modal__divider {
   border: none;
   border-top: 1px solid var(--border);
@@ -435,7 +541,6 @@ body {
   flex-shrink: 0;
 }
 
-/* ── Cuerpo del modal ── */
 .modal__body {
   padding: 4px 24px 8px;
   flex: 1;
@@ -448,7 +553,6 @@ body {
   padding: 28px 24px;
 }
 
-/* ── Campos del formulario ── */
 .modal__field {
   margin-bottom: 18px;
 }
@@ -475,7 +579,6 @@ body {
   color: var(--text-muted);
 }
 
-/* ─ Select ─ */
 .modal__select-wrapper {
   position: relative;
 }
@@ -508,7 +611,6 @@ body {
   font-size: .85rem;
 }
 
-/* ─ Input texto ─ */
 .modal__input {
   width: 100%;
   border: 1.5px solid var(--border);
@@ -532,7 +634,6 @@ body {
   margin-top: 4px;
 }
 
-/* ─ Textarea ─ */
 .modal__textarea {
   width: 100%;
   border: 1.5px solid var(--border);
@@ -550,7 +651,6 @@ body {
 .modal__textarea:focus { border-color: var(--accent-blue); }
 .modal__textarea::placeholder { color: var(--text-muted); }
 
-/* ─ Botones de urgencia ─ */
 .modal__urgencia-row {
   display: flex;
   gap: 10px;
@@ -589,7 +689,6 @@ body {
 .modal__urgencia-dot--medium { background: var(--prio-medium); }
 .modal__urgencia-dot--high   { background: var(--prio-high); }
 
-/* ─ Dropzone imagen ─ */
 .modal__dropzone {
   display: flex;
   flex-direction: column;
@@ -623,7 +722,6 @@ body {
   color: var(--text-muted);
 }
 
-/* ── Pie del modal ── */
 .modal__footer {
   display: flex;
   justify-content: flex-end;
@@ -632,7 +730,6 @@ body {
   flex-shrink: 0;
 }
 
-/* ─ Botones del modal ─ */
 .modal__btn {
   padding: 9px 20px;
   border-radius: 8px;
@@ -665,7 +762,6 @@ body {
 }
 .modal__btn--danger:hover { background: #f87171; }
 
-/* ── Texto de confirmación (modal eliminar) ── */
 .modal__confirm-text {
   font-size: .8rem;
   font-weight: 600;
@@ -674,12 +770,13 @@ body {
   text-align: center;
 }
 
-
 /* ── Responsive básico ── */
 @media (max-width: 860px) {
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .sidebar { width: 200px; }
 }
 @media (max-width: 540px) {
+  .sidebar { display: none; }
   .stats-grid { grid-template-columns: 1fr; }
   .page-header, .stats-grid, .section { padding-left: 16px; padding-right: 16px; }
   .section { margin-left: 16px; margin-right: 16px; }

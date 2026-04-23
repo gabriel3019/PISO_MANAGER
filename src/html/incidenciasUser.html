@@ -6,11 +6,71 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Incidencias</title>
   <link rel="stylesheet" href="../css/incidencias.css" />
-  <link rel="stylesheet" href="../css/menu-lateral.css">
   <link rel="stylesheet" href="../css/general.css">
 </head>
 
 <body>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div>
+      <h3>Usuario 1</h3>
+      <span class="subtitle">Panel de inicio</span>
+
+      <p class="section-title">PRINCIPAL</p>
+      <ul>
+        <li>
+          <a href="homeUser.html" class="sidebar-link">
+            <img src="../css/icons/house.svg" class="icon"> Inicio
+          </a>
+        </li>
+        <li>
+          <a href="tareasUser.html" class="sidebar-link">
+            <img src="../css/icons/layout-grid.svg" class="icon"> Tareas
+
+            <span class="badge">5</span>
+          </a>
+        </li>
+        <li>
+          <a href="calendario.html" class="sidebar-link">
+            <img src="../css/icons/calendar.svg" class="icon"> Calendario
+          </a>
+        </li>
+      </ul>
+
+      <p class="section-title">PISO</p>
+      <ul>
+        <li>
+          <a href="mipiso.html" class="sidebar-link">
+            <img src="../css/icons/house.svg" class="icon"> Mi Piso
+          </a>
+        </li>
+        <li>
+          <a href="companyeros.html" class="sidebar-link">
+            <img src="../css/icons/users.svg" class="icon"> Compañeros
+          </a>
+        </li>
+        <li>
+          <a href="incidenciasUser.html" class="sidebar-link">
+            <img src="../css/icons/circle-alert.svg" class="icon"> Incidencias
+            <span class="badge gray">2</span>
+          </a>
+        </li>
+      </ul>
+
+      <p class="section-title">CUENTA</p>
+      <ul>
+        <li>
+          <a href="ajustes.html" class="sidebar-link">
+            <img src="../css/icons/settings.svg" class="icon"> Ajustes
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="logout">
+      <span>Cerrar sesión</span>
+    </div>
+  </aside>
 
   <div class="page-wrapper" id="page-body">
 
@@ -124,10 +184,6 @@
         </li>
 
       </ul>
-      <button class="incident-add btn-abrir-nueva">
-        <span class="incident-add__icon">＋</span>
-        Nueva incidencia
-      </button>
     </article>
 
     <article class="section">
@@ -372,7 +428,6 @@
   </div><!-- fin #page-body -->
 
 
-  <script src="../js/menu-lateral.js"></script>
   <script src="../js/incidencias.js"></script>
 
 </body>
