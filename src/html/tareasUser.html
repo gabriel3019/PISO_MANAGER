@@ -1,202 +1,225 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="UTF-8">
-<title>Tareas</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tareas</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../css/tareasUser.css">
-
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/tareasUser.css">
 </head>
+
 <body>
 
-<div class="app">
+  <div class="app">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div>
+        <h3>Usuario 1</h3>
+        <span class="subtitle">Panel de inicio</span>
 
-    <div>
-      <h3>Usuario 1</h3>
-      <span class="subtitle">Panel de inicio</span>
+        <p class="section-title">PRINCIPAL</p>
+        <ul>
+          <li>
+            <a href="">
+              <img src="../css/icons/house.svg" class="icon"> Inicio
+            </a>
+          </li>
 
-      <p class="section-title">PRINCIPAL</p>
-      <ul>
-        <li>
-          <img src="../css/icons/house.svg" class="icon"> Inicio
-        </li>
+          <li class="active">
+            <a href="../html/gastosComunesUser.html" class="sidebar__link">
+              <img src="../css/icons/euro.svg" class="icon">
+              Gastos Comunes
+              <span class="badge">3</span>
+            </a>
+          </li>
 
-        <li class="active">
-          <img src="../css/icons/layout-grid.svg" class="icon">
-          Tareas
-          <span class="badge">5</span>
-        </li>
+          <li class="active">
+            <a href="../html/tareasUser.html">
+              <img src="../css/icons/layout-grid.svg" class="icon">
+              Tareas
+              <span class="badge">5</span>
+            </a>
+          </li>
 
-        <li>
-          <img src="../css/icons/calendar.svg" class="icon"> Calendario
-        </li>
-      </ul>
+          <li>
+            <a href="../html/calendario.html">
+              <img src="../css/icons/calendar.svg" class="icon"> Calendario
+            </a>
+          </li>
+        </ul>
 
-      <p class="section-title">PISO</p>
-      <ul>
-        <li>
-          <img src="../css/icons/house.svg" class="icon"> Mi Piso
-        </li>
+        <p class="section-title">PISO</p>
+        <ul>
+          <li>
+            <a href="piso.html">
+              <img src="../css/icons/house.svg" class="icon"> Mi Piso
+            </a>
+          </li>
 
-        <li>
-          <img src="../css/icons/users.svg" class="icon"> Compañeros
-        </li>
+          <li>
+            <a href="companeros.html">
+              <img src="../css/icons/users.svg" class="icon"> Compañeros
+            </a>
+          </li>
 
-        <li>
-          <img src="../css/icons/circle-alert.svg" class="icon">
-          Incidencias
-          <span class="badge gray">2</span>
-        </li>
-      </ul>
+          <li>
+            <a href="../html/incidenciasUser.html">
+              <img src="../css/icons/circle-alert.svg" class="icon">
+              Incidencias
+              <span class="badge gray">2</span>
+            </a>
+          </li>
+        </ul>
 
-      <p class="section-title">CUENTA</p>
-      <ul>
-        <li>
-          <img src="../css/icons/settings.svg" class="icon"> Ajustes
-        </li>
-      </ul>
-    </div>
-
-    <div class="logout">
-      <span>Cerrar sesión</span>
-    </div>
-
-  </aside>
-
-  <!-- MAIN -->
-  <main class="main">
-
-    <!-- TOPBAR -->
-    <div class="topbar">
-      <div class="tabs">
-        <span class="active">Mis tareas <b>8</b></span>
-        <span>Del equipo <b>24</b></span>
-        <span>Completadas <b>41</b></span>
+        <p class="section-title">CUENTA</p>
+        <ul>
+          <li>
+            <a href="ajustes.html">
+              <img src="../css/icons/settings.svg" class="icon"> Ajustes
+            </a>
+          </li>
+        </ul>
       </div>
 
-      <div class="actions">
-        <button class="btn-light">Filtros</button>
-        <button class="btn-light">Agrupar</button>
-        <button class="btn-light">Vista</button>
-        <button class="btn-primary">+ Nueva tarea</button>
+      <div class="logout">Cerrar sesión</div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+      <div class="topbar">
+        <div class="tabs">
+          <span class="active">Mis tareas <b>8</b></span>
+          <span>Del equipo <b>24</b></span>
+          <span>Completadas <b>41</b></span>
+        </div>
+
+        <div class="actions">
+          <button type="button" class="btn-light">Filtros</button>
+          <button type="button" class="btn-light">Agrupar</button>
+          <button type="button" class="btn-light">Vista</button>
+          <button type="button" class="btn-primary" id="openModal">+ Nueva tarea</button>
+        </div>
       </div>
-    </div>
 
-    <h1>Tareas</h1>
+      <h1>Tareas</h1>
 
-    <!-- FILTER + SEARCH -->
-    <div class="filters-bar">
-      <div class="filters">
-        <button class="active">Todas</button>
-        <button>Hoy</button>
-        <button>Esta semana</button>
-        <button>Atrasadas</button>
-        <button>Alta prioridad</button>
+      <div class="filters-bar">
+        <div class="filters">
+          <button type="button" class="active">Todas</button>
+          <button type="button">Hoy</button>
+          <button type="button">Esta semana</button>
+          <button type="button">Atrasadas</button>
+          <button type="button">Alta prioridad</button>
+        </div>
+
+        <div class="search-box">
+          <img src="../css/icons/search.svg" class="icon">
+          <input type="text" placeholder="Buscar tarea...">
+        </div>
       </div>
 
-      <div class="search-box">
-        <img src="../css/icons/search.svg" class="icon">
-        <input placeholder="Buscar tarea...">
+      <div id="taskContainer"></div>
+
+    </main>
+  </div>
+
+  <!-- ================= MODAL ================= -->
+  <div id="taskModal" class="modal-overlay hidden">
+    <div class="modal">
+
+      <div class="modal-header">
+        <h2>Nueva tarea</h2>
+        <span id="closeModal" class="close">&times;</span>
       </div>
-    </div>
 
-    <!-- PENDIENTES -->
-    <div class="section">
-      <h3>PENDIENTES</h3>
+      <div class="modal-body">
 
-      <div class="task">
-        <div class="left">
-          <input type="checkbox">
-          <div>
-            <p>Revisar propuesta de diseño del cliente</p>
-            <div class="meta">
-              <span class="tag red">Alta prioridad</span>
-              <span class="date">Vence hoy</span>
-            </div>
+        <input type="hidden" id="editIndex">
+
+        <div class="form-group">
+          <label for="titulo">Título*</label>
+          <input id="titulo" type="text">
+          <span id="errorTitulo" class="error-text"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="descripcion">Descripción</label>
+          <textarea id="descripcion"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="frecuencia">Frecuencia</label>
+          <select id="frecuencia">
+            <option value="puntual">Puntual</option>
+            <option value="semanal">Semanal</option>
+            <option value="quincenal">Quincenal</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="asignados">Asignar a*</label>
+          <select id="asignados" multiple>
+            <option value="YO">Yo</option>
+            <option value="AL">AL</option>
+            <option value="ME">ME</option>
+          </select>
+          <span id="errorAsignados" class="error-text"></span>
+        </div>
+
+        <div class="form-group">
+          <label>Prioridad*</label>
+          <div class="priority-selector">
+            <button type="button" class="prio baja active" data-value="baja">Baja</button>
+            <button type="button" class="prio media" data-value="media">Media</button>
+            <button type="button" class="prio alta" data-value="alta">Alta</button>
           </div>
         </div>
 
-        <div class="right">
-          <div class="progress"><div style="width:65%"></div></div>
-          <span class="percent">65%</span>
-          <div class="avatars"><span>AL</span></div>
-          <span class="dots">⋮</span>
+        <div class="form-group">
+          <label for="fecha">Fecha*</label>
+          <input type="date" id="fecha">
+          <span id="errorFecha" class="error-text"></span>
         </div>
+
       </div>
 
-      <div class="task">
-        <div class="left">
-          <input type="checkbox">
-          <div>
-            <p>Preparar informe semanal de métricas</p>
-            <div class="meta">
-              <span class="tag yellow">Media prioridad</span>
-              <span class="date">Vence 8 abr</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="right">
-          <div class="progress"><div style="width:30%"></div></div>
-          <span class="percent">30%</span>
-          <div class="avatars">
-            <span>ME</span>
-            <span>AL</span>
-          </div>
-          <span class="dots">⋮</span>
-        </div>
+      <div class="modal-footer">
+        <button type="button" id="cancelModal" class="btn-cancel">Cancelar</button>
+        <button type="button" id="crearTarea" class="btn-primary">Crear</button>
       </div>
 
     </div>
+  </div>
 
-    <!-- EN PROGRESO -->
-    <div class="section">
-      <h3>EN PROGRESO</h3>
+  <!-- MODAL ELIMINAR -->
+  <div id="deleteModal" class="modal-overlay hidden">
+    <div class="modal delete-modal">
 
-      <div class="task">
-        <div class="left">
-          <input type="checkbox">
-          <div>
-            <p>Diseño de pantallas de onboarding</p>
-            <div class="meta">
-              <span class="tag blue">Diseño</span>
-              <span class="date">Vence 14 abr</span>
-            </div>
-          </div>
-        </div>
+      <div class="delete-icon">⚠️</div>
 
-        <div class="right">
-          <div class="progress"><div style="width:50%"></div></div>
-          <span class="percent">50%</span>
-          <div class="avatars">
-            <span>ME</span>
-            <span>JS</span>
-          </div>
-          <span class="dots">⋮</span>
-        </div>
+      <h2>Eliminar tarea</h2>
+
+      <p>
+        ¿Estás seguro de que quieres eliminar esta tarea?<br>
+        Esta acción no se puede deshacer.
+      </p>
+
+      <div class="modal-footer center">
+        <button id="cancelDelete" class="btn-light">Cancelar</button>
+        <button id="confirmDelete" class="btn-danger">Eliminar</button>
       </div>
 
     </div>
+  </div>
 
-    <!-- COMPLETADAS -->
-    <div class="section">
-      <h3>COMPLETADAS</h3>
+  <div id="toast" class="toast hidden">Tarea eliminada correctamente</div>
 
-      <div class="task completed">
-        <div class="left">
-          <input type="checkbox" checked>
-          <p>Configurar entorno</p>
-        </div>
-      </div>
-    </div>
-
-  </main>
-
-</div>
+  <script src="../js/tareasUser.js"></script>
 
 </body>
+
 </html>

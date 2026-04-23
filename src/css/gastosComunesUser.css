@@ -1,0 +1,405 @@
+/* ================= RESET ================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", sans-serif;
+}
+
+body {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+/* ================= LAYOUT ================= */
+.app {
+  display: flex;
+  height: 100vh;
+}
+
+/* ================= SIDEBAR ================= */
+.sidebar {
+  width: 250px;
+  background: #fff;
+  border-right: 1px solid #e5e7eb;
+  padding: 20px 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar > div:first-child {
+  flex: 1;
+}
+
+.subtitle {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.section-title {
+  font-size: 11px;
+  color: #9ca3af;
+  margin: 18px 0 8px;
+}
+
+.sidebar ul {
+  list-style: none;
+}
+
+.sidebar li {
+  border-radius: 10px;
+  transition: 0.2s;
+}
+
+/* 🔥 ENLACES */
+.sidebar li a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.sidebar li:hover {
+  background: #f1f5f9;
+}
+
+.sidebar li.active {
+  background: #e0e7ff;
+  color: #2563eb;
+  font-weight: 500;
+}
+
+.icon {
+  width: 18px;
+  opacity: 0.7;
+}
+
+.badge {
+  margin-left: auto;
+  background: #2563eb;
+  color: white;
+  font-size: 11px;
+  border-radius: 999px;
+  padding: 2px 6px;
+}
+
+.badge.gray {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.logout {
+  color: #dc2626;
+  padding: 14px;
+  border-top: 1px solid #f1f5f9;
+  margin-top: auto;
+  cursor: pointer;
+}
+
+/* ================= MAIN ================= */
+.main {
+  flex: 1;
+  padding: 30px 40px;
+  overflow-y: auto;
+}
+
+/* ================= HEADER ================= */
+.topbar {
+  margin-bottom: 25px;
+}
+
+h1 {
+  font-size: 28px;
+  font-weight: 600;
+}
+
+/* ================= LIST ================= */
+.list {
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+}
+
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.list-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.filters {
+  display: flex;
+  gap: 8px;
+}
+
+.filters button {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: white;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.filters .active {
+  background: #2d5bff;
+  color: white;
+}
+
+.list-actions input {
+  width: 180px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+}
+
+/* ================= BUTTONS ================= */
+.btn-light {
+  border: 1px solid #e5e7eb;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: white;
+  cursor: pointer;
+}
+
+.btn-light:hover {
+  background: #f3f4f6;
+}
+
+.btn-primary {
+  background: #2d5bff;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: #1d4ed8;
+}
+
+/* 🔥 CANCELAR ROJO */
+#cancelGasto {
+  background: white;
+  color: #ef4444;
+  border: 1px solid #fca5a5;
+}
+
+#cancelGasto:hover {
+  background: #fef2f2;
+}
+
+/* ================= ITEMS ================= */
+.expense-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 14px;
+  border-radius: 14px;
+  background: #f9fafb;
+  margin-bottom: 10px;
+  transition: 0.2s;
+}
+
+.expense-item:hover {
+  background: #f1f5f9;
+}
+
+.left {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.icon-box {
+  width: 36px;
+  height: 36px;
+  background: #e5e7eb;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.meta {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.right {
+  text-align: right;
+}
+
+.amount {
+  font-weight: 600;
+}
+
+.split {
+  font-size: 11px;
+  color: #16a34a;
+}
+
+/* ================= MODAL ================= */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.hidden {
+  display: none;
+}
+
+.modal {
+  width: 420px;
+  background: white;
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+}
+
+/* HEADER */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.close {
+  cursor: pointer;
+  font-size: 20px;
+}
+
+/* BODY */
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 15px;
+}
+
+/* INPUT NORMAL */
+.modal-body input {
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  font-size: 14px;
+}
+
+/* IMPORTE GRANDE (BONITO) */
+.amount-input {
+  display: flex;
+  align-items: center;
+  font-size: 26px;
+  font-weight: 600;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 6px;
+}
+
+.amount-input span {
+  margin-right: 8px;
+}
+
+.amount-input input {
+  border: none;
+  font-size: 26px;
+  outline: none;
+  width: 100%;
+  background: transparent;
+}
+
+/* FILAS */
+.split-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f3f4f6;
+  padding: 12px;
+  border-radius: 10px;
+}
+
+/* SELECT BONITO */
+.split-row select {
+  border: 1px solid #e5e7eb;
+  background: white;
+  border-radius: 8px;
+  padding: 5px 8px;
+}
+
+/* BOTONES EXTRA */
+.extra-options {
+  display: flex;
+  gap: 10px;
+}
+
+/* FOOTER */
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+/* ================= ERRORES ================= */
+
+.field {
+  display: flex;
+  flex-direction: column;
+}
+
+.error-text {
+  color: #ef4444;
+  font-size: 12px;
+  margin-top: 4px;
+  display: none; /* oculto por defecto */
+}
+
+.input-error {
+  border: 1.5px solid #ef4444 !important;
+  background: #fef2f2;
+}
+
+.resumen {
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.deuda {
+  color: #dc2626;
+  margin-bottom: 5px;
+}
+
+.recibe {
+  color: #16a34a;
+  margin-bottom: 5px;
+}
+
+.pago {
+  color: #2563eb;
+  margin-bottom: 5px;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 600px) {
+  .sidebar {
+    display: none;
+  }
+
+  .modal {
+    width: 90%;
+  }
+}

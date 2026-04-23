@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "titulo": "Revisar propuesta de diseño",
+    "descripcion": "Cliente X",
+    "estado": "pendiente",
+    "prioridad": "alta",
+    "fecha": "2026-04-17",
+    "asignados": ["AL"],
+    "progreso": 65
+  },
+  {
+    "id": 2,
+    "titulo": "Informe semanal",
+    "descripcion": "Métricas",
+    "estado": "pendiente",
+    "prioridad": "media",
+    "fecha": "2026-04-20",
+    "asignados": ["ME", "AL"],
+    "progreso": 30
+  }
+]
