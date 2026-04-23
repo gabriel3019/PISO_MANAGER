@@ -184,4 +184,34 @@ function initIncidencias() {
     cerrarModal("modal-eliminar-incidencia");
   });
 
-} // fin initIncidencias
+
+  // ─── Sidebar: marcar ítem activo según página ────────────────────────────────
+
+  // ─── Sidebar: Lógica de Selección ──────────────────────────────────────────
+  const rutaActual = window.location.pathname.split("/").pop().replace(".html", "");
+  
+  const mapaRutas = {
+    "incidenciasUser": "Incidencias",
+    "tareas":          "Tareas",
+    "calendario":      "Calendario",
+    "inicio":          "Inicio",
+    "companyeros":     "Compañeros",
+    "ajustes":         "Ajustes",
+  };
+
+  const nombreSeccion = mapaRutas[rutaActual];
+
+  if (nombreSeccion) {
+    document.querySelectorAll(".sidebar li").forEach((li) => {
+      // Si el texto del LI contiene el nombre de la sección, activamos
+      if (li.textContent.includes(nombreSeccion)) {
+        li.classList.add("active");
+      } else {
+        li.classList.remove("active");
+      }
+    });
+  }
+  // fin initIncidencias
+}
+// LANZADOR
+document.addEventListener("DOMContentLoaded", initIncidencias)
