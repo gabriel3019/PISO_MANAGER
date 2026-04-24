@@ -1,217 +1,220 @@
-// ─── incidencias.js ───────────────────────────────────────────────────────────
+async function initIncidencias() {
 
-function initIncidencias() {
-
-  // ─── Helpers modales ────────────────────────────────────────────────────────
-
-  function abrirModal(id) {
-    const modal = document.getElementById(id);
-    if (!modal) return;
-    modal.classList.remove("modal--hidden");
-    document.body.style.overflow = "hidden";
-  }
-
-  function cerrarModal(id) {
-    const modal = document.getElementById(id);
-    if (!modal) return;
-    modal.classList.add("modal--hidden");
-    document.body.style.overflow = "";
-  }
-
-  // Cerrar al hacer clic en el overlay (fuera del cuadro blanco)
-  document.querySelectorAll(".modal-overlay").forEach((overlay) => {
-    overlay.addEventListener("click", (e) => {
-      if (e.target === overlay) cerrarModal(overlay.id);
-    });
-  });
-
-  // Cerrar con cualquier botón que tenga data-modal-close
-  document.querySelectorAll("[data-modal-close]").forEach((btn) => {
-    btn.addEventListener("click", () => cerrarModal(btn.dataset.modalClose));
-  });
-
-  // Cerrar con Escape
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-      document.querySelectorAll(".modal-overlay:not(.modal--hidden)").forEach((m) => {
-        cerrarModal(m.id);
-      });
+    // ─── Helpers modales ────────────────────────────────────────────────────────
+    function abrirModal(id) {
+        const modal = document.getElementById(id);
+        if (!modal) return;
+        modal.classList.remove("modal--hidden");
+        document.body.style.overflow = "hidden";
     }
-  });
 
+    function cerrarModal(id) {
+        const modal = document.getElementById(id);
+        if (!modal) return;
+        modal.classList.add("modal--hidden");
+        document.body.style.overflow = "";
+    }
 
-  // ─── Abrir modal Nueva Incidencia ───────────────────────────────────────────
-
-  document.querySelectorAll(".btn-abrir-nueva").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      limpiarFormulario("modal-nueva-incidencia");
-      abrirModal("modal-nueva-incidencia");
+    document.querySelectorAll(".modal-overlay").forEach((overlay) => {
+        overlay.addEventListener("click", (e) => {
+            if (e.target === overlay) cerrarModal(overlay.id);
+        });
     });
-  });
 
-
-  // ─── Abrir modal Editar Incidencia ──────────────────────────────────────────
-
-  document.querySelectorAll(".btn-abrir-editar").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const item = btn.closest(".incident-item");
-      const id = item?.dataset.id ?? null;
-
-      const titulo = item?.querySelector(".incident-body__title")?.textContent ?? "";
-      const descripcion = item?.querySelector(".incident-body__desc")?.textContent ?? "";
-
-      document.getElementById("modal-editar-incidencia").dataset.incidenciaId = id;
-      document.getElementById("editar-titulo").value = titulo;
-      document.getElementById("editar-titulo-count").textContent = titulo.length;
-      document.getElementById("editar-desc").value = descripcion;
-      document.getElementById("editar-tipo").value = "";
-
-      document.querySelectorAll("#modal-editar-incidencia .modal__urgencia-btn")
-        .forEach((b) => b.classList.remove("modal__urgencia-btn--active"));
-
-      abrirModal("modal-editar-incidencia");
+    document.querySelectorAll("[data-modal-close]").forEach((btn) => {
+        btn.addEventListener("click", () => cerrarModal(btn.dataset.modalClose));
     });
-  });
 
+    // ─── Cargar Datos de la BBDD ────────────────────────────────────────────────
 
-  // ─── Abrir modal Eliminar Incidencia ────────────────────────────────────────
+    async function cargarIncidencias() {
+        try {
+            const resp = await fetch(`../php/incidencias.php?accion=listar&id_piso=1`);
+            const data = await resp.json();
 
-  document.querySelectorAll(".btn-abrir-eliminar").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const item = btn.closest(".incident-item");
-      const id = item?.dataset.id ?? null;
-      document.getElementById("modal-eliminar-incidencia").dataset.incidenciaId = id;
-      abrirModal("modal-eliminar-incidencia");
+            const incidencias = Array.isArray(data) ? data : [];
+
+            const listaActivas = document.getElementById("lista-activas");
+            const listaResueltas = document.getElementById("lista-resueltas");
+
+            listaActivas.innerHTML = "";
+            listaResueltas.innerHTML = "";
+
+            let contadores = { creada: 0, en_proceso: 0, finalizada: 0 };
+
+            incidencias.forEach(inc => {
+                if (contadores.hasOwnProperty(inc.estado)) contadores[inc.estado]++;
+
+                const icono = {
+                    'fontaneria': '💧', 'electricidad': '⚡',
+                    'climatizacion': '❄️', 'otros': '📋'
+                }[inc.tipo] || '📋';
+
+                const html = `
+                    <li class="incident-item" data-id="${inc.id}" data-tipo="${inc.tipo}" data-urgencia="${inc.urgencia}">
+                      <div class="incident-icon">${icono}</div>
+                      <div class="incident-body">
+                        <p class="incident-body__title">${inc.titulo}</p>
+                        <p class="incident-body__desc">${inc.descripcion}</p>
+                        <p class="incident-body__meta">Reportado · ${inc.fecha_creacion || 'Hoy'} · ${inc.tipo}</p>
+                      </div>
+                      <div class="incident-status">
+                        <span class="status-badge status-badge--${inc.estado === 'creada' ? 'open' : (inc.estado === 'en_proceso' ? 'progress' : 'done')}">
+                            ${inc.estado}
+                        </span>
+                        <span class="priority-dot priority-dot--${inc.urgencia === 'alta' ? 'high' : (inc.urgencia === 'media' ? 'medium' : 'low')}">
+                            ${inc.urgencia}
+                        </span>
+                      </div>
+                      <div class="incident-actions">
+                        <button class="incident-actions__btn incident-actions__btn--edit btn-abrir-editar">✏️</button>
+                        <button class="incident-actions__btn incident-actions__btn--delete btn-abrir-eliminar">🗑️</button>
+                      </div>
+                    </li>`;
+
+                if (inc.estado === 'finalizada') listaResueltas.innerHTML += html;
+                else listaActivas.innerHTML += html;
+            });
+
+            document.getElementById("stat-abiertas").textContent = contadores.creada;
+            document.getElementById("stat-curso").textContent = contadores.en_proceso;
+            document.getElementById("stat-resueltas").textContent = contadores.finalizada;
+            document.getElementById("stat-total").textContent = incidencias.length;
+            document.getElementById("badge-incidencias").textContent = contadores.creada + contadores.en_proceso;
+
+        } catch (error) {
+            console.error("Error al cargar:", error);
+        }
+    }
+
+    cargarIncidencias();
+
+    // ─── Lógica para Abrir Modales (Delegación) ────────────────────────────────
+
+    document.querySelectorAll(".btn-abrir-nueva").forEach(btn => {
+        btn.addEventListener("click", () => {
+            limpiarFormulario("modal-nueva-incidencia");
+            abrirModal("modal-nueva-incidencia");
+        });
     });
-  });
 
+    document.addEventListener("click", (e) => {
+        const btnEditar = e.target.closest(".btn-abrir-editar");
+        const btnEliminar = e.target.closest(".btn-abrir-eliminar");
 
-  // ─── Contador de caracteres ─────────────────────────────────────────────────
+        if (btnEditar) {
+            const item = btnEditar.closest(".incident-item");
+            const modal = document.getElementById("modal-editar-incidencia");
+            modal.dataset.incidenciaId = item.dataset.id;
+            document.getElementById("editar-titulo").value = item.querySelector(".incident-body__title").textContent;
+            document.getElementById("editar-desc").value = item.querySelector(".incident-body__desc").textContent;
+            document.getElementById("editar-tipo").value = item.dataset.tipo;
+            abrirModal("modal-editar-incidencia");
+        }
 
-  function iniciarContador(inputId, counterId) {
-    const input = document.getElementById(inputId);
-    const counter = document.getElementById(counterId);
-    if (!input || !counter) return;
-    input.addEventListener("input", () => (counter.textContent = input.value.length));
-  }
-
-  iniciarContador("nueva-titulo", "nueva-titulo-count");
-  iniciarContador("editar-titulo", "editar-titulo-count");
-
-
-  // ─── Botones de urgencia ────────────────────────────────────────────────────
-
-  document.querySelectorAll(".modal__urgencia-row").forEach((row) => {
-    row.querySelectorAll(".modal__urgencia-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        row.querySelectorAll(".modal__urgencia-btn")
-          .forEach((b) => b.classList.remove("modal__urgencia-btn--active"));
-        btn.classList.add("modal__urgencia-btn--active");
-      });
+        if (btnEliminar) {
+            const item = btnEliminar.closest(".incident-item");
+            document.getElementById("modal-eliminar-incidencia").dataset.incidenciaId = item.dataset.id;
+            abrirModal("modal-eliminar-incidencia");
+        }
     });
-  });
 
+    // ─── Acciones API ──────────────────────────────────────────────────────────
 
-  // ─── Limpiar formulario ─────────────────────────────────────────────────────
+    // Crear
+    document.getElementById("btn-enviar-incidencia")?.addEventListener("click", async () => {
+        const datos = getDatosFormulario("nueva");
+        if (!validarFormulario(datos)) return;
 
-  function limpiarFormulario(modalId) {
-    const modal = document.getElementById(modalId);
-    if (!modal) return;
-    modal.querySelectorAll("input[type=text], textarea").forEach((el) => (el.value = ""));
-    modal.querySelectorAll("select").forEach((el) => (el.value = ""));
-    modal.querySelectorAll(".modal__urgencia-btn")
-      .forEach((btn) => btn.classList.remove("modal__urgencia-btn--active"));
-    modal.querySelectorAll(".modal__char-count span").forEach((s) => (s.textContent = "0"));
-    modal.removeAttribute("data-incidencia-id");
-  }
+        const formData = new FormData();
+        formData.append("accion", "crear");
+        formData.append("id_piso", 1);
+        formData.append("id_usuario", 1);
+        formData.append("titulo", datos.titulo);
+        formData.append("descripcion", datos.descripcion);
+        formData.append("tipo", datos.tipo);
+        formData.append("urgencia", datos.urgencia);
 
+        const res = await fetch("../php/incidencias.php", { method: "POST", body: formData });
+        const result = await res.json();
 
-  // ─── Recoger datos del formulario ───────────────────────────────────────────
-
-  function getDatosFormulario(prefix) {
-    const urgenciaActiva = document.querySelector(
-      `#modal-${prefix}-incidencia .modal__urgencia-btn--active`
-    );
-    return {
-      tipo: document.getElementById(`${prefix}-tipo`)?.value ?? "",
-      titulo: document.getElementById(`${prefix}-titulo`)?.value ?? "",
-      descripcion: document.getElementById(`${prefix}-desc`)?.value ?? "",
-      urgencia: urgenciaActiva?.dataset.urgencia ?? "",
-    };
-  }
-
-
-  // ─── Validación ─────────────────────────────────────────────────────────────
-
-  function validarFormulario(datos) {
-    if (!datos.tipo)               { alert("Selecciona un tipo de incidencia."); return false; }
-    if (!datos.titulo.trim())      { alert("El título es obligatorio.");         return false; }
-    if (!datos.descripcion.trim()) { alert("La descripción es obligatoria.");    return false; }
-    if (!datos.urgencia)           { alert("Selecciona el nivel de urgencia.");  return false; }
-    return true;
-  }
-
-
-  // ─── Acción: Enviar nueva incidencia ────────────────────────────────────────
-
-  document.getElementById("btn-enviar-incidencia")?.addEventListener("click", async () => {
-    const datos = getDatosFormulario("nueva");
-    if (!validarFormulario(datos)) return;
-    // TODO: await fetch("/api/incidencias", { method: "POST", body: JSON.stringify(datos) });
-    console.log("✅ Crear incidencia:", datos);
-    cerrarModal("modal-nueva-incidencia");
-  });
-
-
-  // ─── Acción: Confirmar edición ──────────────────────────────────────────────
-
-  document.getElementById("btn-confirmar-editar")?.addEventListener("click", async () => {
-    const id = document.getElementById("modal-editar-incidencia").dataset.incidenciaId;
-    const datos = getDatosFormulario("editar");
-    if (!validarFormulario(datos)) return;
-    // TODO: await fetch(`/api/incidencias/${id}`, { method: "PUT", body: JSON.stringify(datos) });
-    console.log("✏️ Editar incidencia:", id, datos);
-    cerrarModal("modal-editar-incidencia");
-  });
-
-
-  // ─── Acción: Confirmar eliminación ──────────────────────────────────────────
-
-  document.getElementById("btn-confirmar-eliminar")?.addEventListener("click", async () => {
-    const id = document.getElementById("modal-eliminar-incidencia").dataset.incidenciaId;
-    // TODO: await fetch(`/api/incidencias/${id}`, { method: "DELETE" });
-    console.log("🗑️ Eliminar incidencia:", id);
-    cerrarModal("modal-eliminar-incidencia");
-  });
-
-
-  // ─── Sidebar: marcar ítem activo según página ────────────────────────────────
-
-  // ─── Sidebar: Lógica de Selección ──────────────────────────────────────────
-  const rutaActual = window.location.pathname.split("/").pop().replace(".html", "");
-  
-  const mapaRutas = {
-    "incidenciasUser": "Incidencias",
-    "tareas":          "Tareas",
-    "calendario":      "Calendario",
-    "inicio":          "Inicio",
-    "companyeros":     "Compañeros",
-    "ajustes":         "Ajustes",
-  };
-
-  const nombreSeccion = mapaRutas[rutaActual];
-
-  if (nombreSeccion) {
-    document.querySelectorAll(".sidebar li").forEach((li) => {
-      // Si el texto del LI contiene el nombre de la sección, activamos
-      if (li.textContent.includes(nombreSeccion)) {
-        li.classList.add("active");
-      } else {
-        li.classList.remove("active");
-      }
+        if (result.success) {
+            cerrarModal("modal-nueva-incidencia");
+            cargarIncidencias();
+        } else {
+            alert("Error: " + (result.error || "Desconocido"));
+        }
     });
-  }
-  // fin initIncidencias
+
+    // Editar
+    document.getElementById("btn-confirmar-editar")?.addEventListener("click", async () => {
+        const modal = document.getElementById("modal-editar-incidencia");
+        const formData = new FormData();
+        formData.append("accion", "editar");
+        formData.append("id", modal.dataset.incidenciaId);
+        formData.append("titulo", document.getElementById("editar-titulo").value);
+        formData.append("descripcion", document.getElementById("editar-desc").value);
+        formData.append("tipo", document.getElementById("editar-tipo").value);
+
+        const urgActiva = modal.querySelector(".modal__urgencia-btn--active");
+        formData.append("urgencia", urgActiva ? urgActiva.dataset.urgencia : "media");
+
+        const res = await fetch("../php/incidencias.php", { method: "POST", body: formData });
+        const result = await res.json();
+        if (result.success) {
+            cerrarModal("modal-editar-incidencia");
+            cargarIncidencias();
+        }
+    });
+
+    // Eliminar
+    document.getElementById("btn-confirmar-eliminar")?.addEventListener("click", async () => {
+        const id = document.getElementById("modal-eliminar-incidencia").dataset.incidenciaId;
+        const formData = new FormData();
+        formData.append("accion", "eliminar");
+        formData.append("id", id);
+
+        const res = await fetch("../php/incidencias.php", { method: "POST", body: formData });
+        const result = await res.json();
+        if (result.success) {
+            cerrarModal("modal-eliminar-incidencia");
+            cargarIncidencias();
+        }
+    });
+
+    // ─── Helpers ────────────────────────────────────────────────────────────────
+
+    function getDatosFormulario(prefix) {
+        const urgenciaActiva = document.querySelector(`#modal-${prefix}-incidencia .modal__urgencia-btn--active`);
+        return {
+            tipo: document.getElementById(`${prefix}-tipo`)?.value ?? "",
+            titulo: document.getElementById(`${prefix}-titulo`)?.value ?? "",
+            descripcion: document.getElementById(`${prefix}-desc`)?.value ?? "",
+            urgencia: (urgenciaActiva?.dataset.urgencia ?? "media").replace("bajo", "baja").replace("medio", "media").replace("alto", "alta"),
+        };
+    }
+
+    function validarFormulario(datos) {
+        if (!datos.tipo || !datos.titulo.trim() || !datos.descripcion.trim()) {
+            alert("Por favor, rellena los campos obligatorios.");
+            return false;
+        }
+        return true;
+    }
+
+    function limpiarFormulario(modalId) {
+        const modal = document.getElementById(modalId);
+        if (!modal) return;
+        modal.querySelectorAll("input[type=text], textarea, select").forEach(el => el.value = "");
+        modal.querySelectorAll(".modal__urgencia-btn").forEach(btn => btn.classList.remove("modal__urgencia-btn--active"));
+    }
+
+    document.querySelectorAll(".modal__urgencia-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            btn.parentElement.querySelectorAll(".modal__urgencia-btn").forEach(b => b.classList.remove("modal__urgencia-btn--active"));
+            btn.classList.add("modal__urgencia-btn--active");
+        });
+    });
 }
-// LANZADOR
-document.addEventListener("DOMContentLoaded", initIncidencias)
+
+document.addEventListener("DOMContentLoaded", initIncidencias);

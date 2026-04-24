@@ -148,11 +148,14 @@ if ($resultado && $resultado->num_rows <= 0) {
 
     /* ===================== INCIDENCIAS ===================== */
 
-    INSERT INTO incidencias (id_piso,id_usuario,tipo,titulo,descripcion,urgencia,estado)
-    VALUES
-    (1,2,'fontaneria','Fuga baño','Pierde agua','alta','creada');
-
-    /* ===================== CALENDARIO (VINCULADO) ===================== */
+    INSERT INTO incidencias (id_piso, id_usuario, tipo, titulo, descripcion, urgencia, estado) VALUES
+    (1, 2, 'fontaneria','Fuga baño', 'Pierde agua por la junta del grifo del lavabo','alta', 'creada'),
+    (1, 3, 'electricidad', 'Enchufe quemado','El enchufe del salón tiene señales de quemado y no funciona','alta','en_proceso'),
+    (1, 4, 'calefaccion', 'Radiador no calienta','El radiador del dormitorio principal no emite calor desde hace 3 días','media', 'creada'),
+    (1, 1, 'cerrajeria','Cerradura puerta principal','La cerradura de la puerta de entrada cuesta mucho girar', 'media', 'creada'),
+    (1, 2, 'humedades','Mancha humedad techo cocina', 'Mancha de humedad en el techo de la cocina, posible fuga del piso de arriba', 'alta',  'en_proceso');
+    
+     /* ===================== CALENDARIO (VINCULADO) ===================== */
 
     INSERT INTO calendario_eventos (id_piso,id_incidencia,titulo,tipo,fecha_inicio,fecha_fin,estado)
     VALUES (1,1,'Fuga baño','incidencia','2026-04-10','2026-04-14','activa');
@@ -174,15 +177,14 @@ if ($resultado && $resultado->num_rows <= 0) {
     ";
 
     if ($conn->multi_query($sql)) {
-        while ($conn->next_result()) {}
+        while ($conn->next_result()) {
+        }
         echo "BBDD creada correctamente";
     } else {
         echo "Error: " . $conn->error;
     }
-
 } else {
     echo "La base de datos ya existe";
 }
 
 $conn->close();
-?>
