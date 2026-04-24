@@ -10,7 +10,6 @@
 </head>
 
 <body>
-  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div>
       <h3>Usuario 1</h3>
@@ -26,8 +25,7 @@
         <li>
           <a href="tareasUser.html" class="sidebar-link">
             <img src="../css/icons/layout-grid.svg" class="icon"> Tareas
-
-            <span class="badge">5</span>
+            <span class="badge" id="badge-tareas">5</span>
           </a>
         </li>
         <li>
@@ -52,7 +50,7 @@
         <li>
           <a href="incidenciasUser.html" class="sidebar-link">
             <img src="../css/icons/circle-alert.svg" class="icon"> Incidencias
-            <span class="badge gray">2</span>
+            <span class="badge gray" id="badge-incidencias">0</span>
           </a>
         </li>
       </ul>
@@ -89,28 +87,28 @@
       <div class="stat-card">
         <div class="stat-card__icon stat-card__icon--red">🔴</div>
         <div>
-          <div class="stat-card__value">2</div>
+          <div class="stat-card__value" id="stat-abiertas">0</div>
           <div class="stat-card__label">Abiertas</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-card__icon stat-card__icon--orange">🔧</div>
         <div>
-          <div class="stat-card__value">1</div>
+          <div class="stat-card__value" id="stat-curso">0</div>
           <div class="stat-card__label">En curso</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-card__icon stat-card__icon--green">✅</div>
         <div>
-          <div class="stat-card__value">5</div>
+          <div class="stat-card__value" id="stat-resueltas">0</div>
           <div class="stat-card__label">Resueltas</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-card__icon stat-card__icon--slate">📋</div>
         <div>
-          <div class="stat-card__value">8</div>
+          <div class="stat-card__value" id="stat-total">0</div>
           <div class="stat-card__label">Total</div>
         </div>
       </div>
@@ -121,69 +119,8 @@
         <h2 class="section__title">Incidencias Activas</h2>
         <button class="btn-new btn-abrir-nueva">+ Nueva Incidencia</button>
       </div>
-      <ul class="incident-list">
-
-        <li class="incident-item" data-id="1">
-          <div class="incident-icon">💧</div>
-          <div class="incident-body">
-            <p class="incident-body__title">Corte de agua — Edificio</p>
-            <p class="incident-body__desc">Mañana de 9h a 14h no habrá suministro de agua por obras en la red. Recordad
-              llenar depósitos y bidones esta noche.</p>
-            <p class="incident-body__meta">Reportado por Laura · Hoy 10:30 · Afecta a todo el piso</p>
-          </div>
-          <div class="incident-status">
-            <span class="status-badge status-badge--open">Abierta</span>
-            <span class="priority-dot priority-dot--high">Alta</span>
-          </div>
-          <div class="incident-actions">
-            <button class="incident-actions__btn incident-actions__btn--edit btn-abrir-editar"
-              aria-label="Editar incidencia">✏️</button>
-            <button class="incident-actions__btn incident-actions__btn--delete btn-abrir-eliminar"
-              aria-label="Eliminar incidencia">🗑️</button>
-          </div>
-        </li>
-
-        <li class="incident-item" data-id="2">
-          <div class="incident-icon">❄️</div>
-          <div class="incident-body">
-            <p class="incident-body__title">Aire acondicionado averiado — Salón</p>
-            <p class="incident-body__desc">El aire del salón hace un ruido extraño y no enfría bien. Puede que necesite
-              carga de gas o revisión técnica.</p>
-            <p class="incident-body__meta">Reportado por Pablo · Ayer 18:00 · Salón</p>
-          </div>
-          <div class="incident-status">
-            <span class="status-badge status-badge--open">Abierta</span>
-            <span class="priority-dot priority-dot--high">Alta</span>
-          </div>
-          <div class="incident-actions">
-            <button class="incident-actions__btn incident-actions__btn--edit btn-abrir-editar"
-              aria-label="Editar incidencia">✏️</button>
-            <button class="incident-actions__btn incident-actions__btn--delete btn-abrir-eliminar"
-              aria-label="Eliminar incidencia">🗑️</button>
-          </div>
-        </li>
-
-        <li class="incident-item" data-id="3">
-          <div class="incident-icon">⚡</div>
-          <div class="incident-body">
-            <p class="incident-body__title">Enchufe quemado — Habitación Marta</p>
-            <p class="incident-body__desc">El enchufe junto a la cama chispea al conectar el cargador. Se ha avisado al
-              casero, pendiente de respuesta.</p>
-            <p class="incident-body__meta">Reportado por Marta · Hace 2 días · Hab. Marta</p>
-          </div>
-          <div class="incident-status">
-            <span class="status-badge status-badge--progress">En curso</span>
-            <span class="priority-dot priority-dot--medium">Media</span>
-          </div>
-          <div class="incident-actions">
-            <button class="incident-actions__btn incident-actions__btn--edit btn-abrir-editar"
-              aria-label="Editar incidencia">✏️</button>
-            <button class="incident-actions__btn incident-actions__btn--delete btn-abrir-eliminar"
-              aria-label="Eliminar incidencia">🗑️</button>
-          </div>
-        </li>
-
-      </ul>
+      <ul class="incident-list" id="lista-activas">
+        </ul>
     </article>
 
     <article class="section">
@@ -191,58 +128,12 @@
         <h2 class="section__title">Incidencias Resueltas</h2>
         <button class="section__menu-btn">⋯</button>
       </div>
-      <ul class="incident-list">
-
-        <li class="incident-item" data-id="4">
-          <div class="incident-icon">🚿</div>
-          <div class="incident-body">
-            <p class="incident-body__title">Grifo gotea — Baño principal</p>
-            <p class="incident-body__desc">El grifo del lavabo goteaba constantemente. Reparado por el fontanero el
-              martes.</p>
-            <p class="incident-body__meta">Reportado por Laura · Hace 5 días · Baño</p>
-          </div>
-          <div class="incident-status">
-            <span class="status-badge status-badge--done">Resuelta</span>
-            <span class="priority-dot priority-dot--low">Baja</span>
-          </div>
-          <div class="incident-actions">
-            <button class="incident-actions__btn incident-actions__btn--edit btn-abrir-editar"
-              aria-label="Editar incidencia">✏️</button>
-            <button class="incident-actions__btn incident-actions__btn--delete btn-abrir-eliminar"
-              aria-label="Eliminar incidencia">🗑️</button>
-          </div>
-        </li>
-
-        <li class="incident-item" data-id="5">
-          <div class="incident-icon">💡</div>
-          <div class="incident-body">
-            <p class="incident-body__title">Bombilla fundida — Pasillo</p>
-            <p class="incident-body__desc">Bombilla LED del pasillo sustituida. Comprada nueva de 10W.</p>
-            <p class="incident-body__meta">Reportado por Pablo · Hace 1 semana · Pasillo</p>
-          </div>
-          <div class="incident-status">
-            <span class="status-badge status-badge--done">Resuelta</span>
-            <span class="priority-dot priority-dot--low">Baja</span>
-          </div>
-          <div class="incident-actions">
-            <button class="incident-actions__btn incident-actions__btn--edit btn-abrir-editar"
-              aria-label="Editar incidencia">✏️</button>
-            <button class="incident-actions__btn incident-actions__btn--delete btn-abrir-eliminar"
-              aria-label="Eliminar incidencia">🗑️</button>
-          </div>
-        </li>
-
-      </ul>
+      <ul class="incident-list" id="lista-resueltas">
+        </ul>
     </article>
 
-
-    <!-- ══════════════════════════════════════════════════════════
-         MODAL 1 · NUEVA INCIDENCIA
-    ═══════════════════════════════════════════════════════════ -->
-    <div class="modal-overlay modal--hidden" id="modal-nueva-incidencia" role="dialog" aria-modal="true"
-      aria-labelledby="modal-nueva-title">
+    <div class="modal-overlay modal--hidden" id="modal-nueva-incidencia" role="dialog" aria-modal="true" aria-labelledby="modal-nueva-title">
       <div class="modal">
-
         <div class="modal__header">
           <div class="modal__header-left">
             <span class="modal__icon modal__icon--warn" aria-hidden="true">⚠</span>
@@ -250,11 +141,9 @@
           </div>
           <button class="modal__close" aria-label="Cerrar" data-modal-close="modal-nueva-incidencia">✕</button>
         </div>
-
         <div class="modal__body">
           <div class="modal__field">
-            <label class="modal__label" for="nueva-tipo">TIPO DE INCIDENCIA<span
-                class="modal__required">*</span></label>
+            <label class="modal__label" for="nueva-tipo">TIPO DE INCIDENCIA<span class="modal__required">*</span></label>
             <div class="modal__select-wrapper">
               <select class="modal__select" id="nueva-tipo" name="tipo">
                 <option value="">Selecciona un tipo...</option>
@@ -265,20 +154,15 @@
               </select>
             </div>
           </div>
-
           <div class="modal__field">
             <label class="modal__label" for="nueva-titulo">TÍTULO<span class="modal__required">*</span></label>
-            <input class="modal__input" id="nueva-titulo" name="titulo" type="text"
-              placeholder="Ej: Grifo roto en el baño principal" maxlength="100" />
+            <input class="modal__input" id="nueva-titulo" name="titulo" type="text" placeholder="Ej: Grifo roto en el baño principal" maxlength="100" />
             <span class="modal__char-count"><span id="nueva-titulo-count">0</span>/100</span>
           </div>
-
           <div class="modal__field">
             <label class="modal__label" for="nueva-desc">DESCRIPCIÓN<span class="modal__required">*</span></label>
-            <textarea class="modal__textarea" id="nueva-desc" name="descripcion"
-              placeholder="Describe el problema con detalle: cuándo ocurrió, qué zona afecta, si has intentado solucionarlo..."></textarea>
+            <textarea class="modal__textarea" id="nueva-desc" name="descripcion" placeholder="Describe el problema con detalle..."></textarea>
           </div>
-
           <div class="modal__field">
             <label class="modal__label">NIVEL DE URGENCIA<span class="modal__required">*</span></label>
             <div class="modal__urgencia-row" role="group" aria-label="Nivel de urgencia">
@@ -293,36 +177,24 @@
               </button>
             </div>
           </div>
-
           <div class="modal__field">
             <label class="modal__label">IMAGEN <span class="modal__optional">(opcional)</span></label>
             <label class="modal__dropzone" for="nueva-imagen">
               <span class="modal__dropzone-icon" aria-hidden="true">📷</span>
               <span><span class="modal__dropzone-link">Haz clic para subir</span> o arrastra una imagen</span>
-              <span class="modal__dropzone-hint">PNG, JPG, WEBP · Máx. 10 MB</span>
               <input type="file" id="nueva-imagen" name="imagen" accept=".png,.jpg,.jpeg,.webp" hidden />
             </label>
           </div>
         </div>
-
         <div class="modal__footer">
-          <button type="button" class="modal__btn modal__btn--cancel"
-            data-modal-close="modal-nueva-incidencia">Cancelar</button>
-          <button type="button" class="modal__btn modal__btn--primary" id="btn-enviar-incidencia">Enviar
-            incidencia</button>
+          <button type="button" class="modal__btn modal__btn--cancel" data-modal-close="modal-nueva-incidencia">Cancelar</button>
+          <button type="button" class="modal__btn modal__btn--primary" id="btn-enviar-incidencia">Enviar incidencia</button>
         </div>
-
       </div>
     </div>
 
-
-    <!-- ══════════════════════════════════════════════════════════
-         MODAL 2 · EDITAR INCIDENCIA
-    ═══════════════════════════════════════════════════════════ -->
-    <div class="modal-overlay modal--hidden" id="modal-editar-incidencia" role="dialog" aria-modal="true"
-      aria-labelledby="modal-editar-title">
+    <div class="modal-overlay modal--hidden" id="modal-editar-incidencia" role="dialog" aria-modal="true" aria-labelledby="modal-editar-title">
       <div class="modal">
-
         <div class="modal__header">
           <div class="modal__header-left">
             <span class="modal__icon modal__icon--edit" aria-hidden="true">✏️</span>
@@ -330,7 +202,6 @@
           </div>
           <button class="modal__close" aria-label="Cerrar" data-modal-close="modal-editar-incidencia">✕</button>
         </div>
-
         <div class="modal__body">
           <div class="modal__field">
             <label class="modal__label" for="editar-tipo">TIPO DE INCIDENCIA</label>
@@ -344,20 +215,15 @@
               </select>
             </div>
           </div>
-
           <div class="modal__field">
             <label class="modal__label" for="editar-titulo">TÍTULO</label>
-            <input class="modal__input" id="editar-titulo" name="titulo" type="text"
-              placeholder="Ej: Grifo roto en el baño principal" maxlength="100" />
+            <input class="modal__input" id="editar-titulo" name="titulo" type="text" maxlength="100" />
             <span class="modal__char-count"><span id="editar-titulo-count">0</span>/100</span>
           </div>
-
           <div class="modal__field">
             <label class="modal__label" for="editar-desc">DESCRIPCIÓN</label>
-            <textarea class="modal__textarea" id="editar-desc" name="descripcion"
-              placeholder="Describe el problema con detalle: cuándo ocurrió, qué zona afecta, si has intentado solucionarlo..."></textarea>
+            <textarea class="modal__textarea" id="editar-desc" name="descripcion"></textarea>
           </div>
-
           <div class="modal__field">
             <label class="modal__label">NIVEL DE URGENCIA</label>
             <div class="modal__urgencia-row" role="group" aria-label="Nivel de urgencia">
@@ -372,64 +238,39 @@
               </button>
             </div>
           </div>
-
           <div class="modal__field">
             <label class="modal__label">IMAGEN <span class="modal__optional">(opcional)</span></label>
             <label class="modal__dropzone" for="editar-imagen">
               <span class="modal__dropzone-icon" aria-hidden="true">📷</span>
-              <span><span class="modal__dropzone-link">Haz clic para subir</span> o arrastra una imagen</span>
-              <span class="modal__dropzone-hint">PNG, JPG, WEBP · Máx. 10 MB</span>
               <input type="file" id="editar-imagen" name="imagen" accept=".png,.jpg,.jpeg,.webp" hidden />
             </label>
           </div>
         </div>
-
         <div class="modal__footer">
-          <button type="button" class="modal__btn modal__btn--cancel"
-            data-modal-close="modal-editar-incidencia">Cancelar</button>
-          <button type="button" class="modal__btn modal__btn--primary" id="btn-confirmar-editar">Editar
-            incidencia</button>
+          <button type="button" class="modal__btn modal__btn--cancel" data-modal-close="modal-editar-incidencia">Cancelar</button>
+          <button type="button" class="modal__btn modal__btn--primary" id="btn-confirmar-editar">Editar incidencia</button>
         </div>
-
       </div>
     </div>
 
-
-    <!-- ══════════════════════════════════════════════════════════
-         MODAL 3 · ELIMINAR INCIDENCIA
-    ═══════════════════════════════════════════════════════════ -->
-    <div class="modal-overlay modal--hidden" id="modal-eliminar-incidencia" role="dialog" aria-modal="true"
-      aria-labelledby="modal-eliminar-title">
+    <div class="modal-overlay modal--hidden" id="modal-eliminar-incidencia" role="dialog" aria-modal="true" aria-labelledby="modal-eliminar-title">
       <div class="modal modal--sm">
-
         <div class="modal__header">
           <h2 class="modal__title" id="modal-eliminar-title">Eliminar incidencia</h2>
           <button class="modal__close" aria-label="Cerrar" data-modal-close="modal-eliminar-incidencia">✕</button>
         </div>
-
         <hr class="modal__divider" />
-
         <div class="modal__body modal__body--center">
           <p class="modal__confirm-text">¿ESTAS SEGURO DE ELIMINAR ESTA INCIDENCIA?</p>
         </div>
-
         <hr class="modal__divider" />
-
         <div class="modal__footer">
-          <button type="button" class="modal__btn modal__btn--cancel"
-            data-modal-close="modal-eliminar-incidencia">Cancelar</button>
-          <button type="button" class="modal__btn modal__btn--danger" id="btn-confirmar-eliminar">Eliminar
-            incidencia</button>
+          <button type="button" class="modal__btn modal__btn--cancel" data-modal-close="modal-eliminar-incidencia">Cancelar</button>
+          <button type="button" class="modal__btn modal__btn--danger" id="btn-confirmar-eliminar">Eliminar incidencia</button>
         </div>
-
       </div>
     </div>
 
-  </div><!-- fin #page-body -->
-
-
-  <script src="../js/incidencias.js"></script>
-
+  </div><script src="../js/incidencias.js"></script>
 </body>
-
 </html>

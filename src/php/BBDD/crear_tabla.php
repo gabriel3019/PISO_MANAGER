@@ -5,11 +5,8 @@ if ($conn->connect_error) {
     die("Error de conexión: " . $conn->connect_error);
 }
 
-/* ===================== HASH PASSWORDS ===================== */
 $passAdmin = password_hash("admin123", PASSWORD_DEFAULT);
 $passUser = password_hash("1234", PASSWORD_DEFAULT);
-
-/* ===================== CREAR BBDD ===================== */
 
 $sqlVerificar = "SHOW DATABASES LIKE 'piso_manager'";
 $resultado = $conn->query($sqlVerificar);
@@ -70,7 +67,60 @@ if ($resultado && $resultado->num_rows <= 0) {
         FOREIGN KEY (id_piso) REFERENCES pisos(id_piso) ON DELETE CASCADE
     );
 
-    /* ===================== USUARIOS ===================== */
+    /* ===================== INCIDENCIAS ===================== */
+
+    CREATE TABLE incidencias (
+        id_incidencia INT AUTO_INCREMENT PRIMARY KEY,
+        id_piso INT,
+        id_usuario INT,
+        tipo VARCHAR(50),
+        titulo VARCHAR(100),
+        descripcion TEXT,
+        urgencia ENUM('baja','media','alta') DEFAULT 'media',
+        estado ENUM('creada','en_proceso','finalizada') DEFAULT 'creada',
+        imagen VARCHAR(255) NULL,
+        fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (id_piso) REFERENCES pisos(id_piso) ON DELETE CASCADE,
+        FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
+    );
+
+    CREATE TABLE mensajes_incidencia (
+        id_mensaje INT AUTO_INCREMENT PRIMARY KEY,
+        id_incidencia INT,
+        id_usuario INT,
+        mensaje TEXT,
+        fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (id_incidencia) REFERENCES incidencias(id_incidencia) ON DELETE CASCADE,
+        FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
+    );
+
+    /* ===================== CALENDARIO ===================== */
+
+    CREATE TABLE calendario_eventos (
+        id_evento INT AUTO_INCREMENT PRIMARY KEY,
+        id_piso INT NOT NULL,
+        id_incidencia INT NULL,
+        titulo VARCHAR(150) NOT NULL,
+        tipo ENUM('incidencia','tarea','evento') NOT NULL,
+        fecha DATE DEFAULT NULL,
+        fecha_inicio DATE DEFAULT NULL,
+        fecha_fin DATE DEFAULT NULL,
+        hora TIME DEFAULT NULL,
+        estado VARCHAR(30) DEFAULT NULL,
+        creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (id_piso) REFERENCES pisos(id_piso) ON DELETE CASCADE,
+        FOREIGN KEY (id_incidencia) REFERENCES incidencias(id_incidencia) ON DELETE CASCADE
+    );
+
+    CREATE TABLE calendario_evento_personas (
+        id_evento INT NOT NULL,
+        id_usuario INT NOT NULL,
+        PRIMARY KEY (id_evento, id_usuario),
+        FOREIGN KEY (id_evento) REFERENCES calendario_eventos(id_evento) ON DELETE CASCADE,
+        FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
+    );
+
+    /* ===================== DATOS ===================== */
 
     INSERT INTO usuarios (nombre, email, password) VALUES
     ('Admin', 'admin@mail.com', '$passAdmin'),
@@ -78,45 +128,63 @@ if ($resultado && $resultado->num_rows <= 0) {
     ('Celia Núñez', 'celia@mail.com', '$passUser'),
     ('Gabriel Elías', 'gabriel@mail.com', '$passUser');
 
-    /* ===================== PISO ===================== */
-
     INSERT INTO pisos (nombre, codigo_invitacion, creado_por)
     VALUES ('Piso Compartido Demo', 'ABC12345', 1);
 
-    /* ===================== RELACIONES ===================== */
+    INSERT INTO usuarios_pisos VALUES
+    (1,1,'admin'), (2,1,'miembro'), (3,1,'miembro'), (4,1,'miembro');
 
-    INSERT INTO usuarios_pisos (id_usuario, id_piso, rol) VALUES
-    (1,1,'admin'),
-    (2,1,'miembro'),
-    (3,1,'miembro'),
-    (4,1,'miembro');
+    INSERT INTO gastos VALUES
+    (NULL,1,'Compra supermercado',50.00),
+    (NULL,1,'Factura luz',30.00);
 
-    /* ===================== DATOS DEMO ===================== */
+    INSERT INTO tareas VALUES
+    (NULL,1,'Limpiar cocina','pendiente'),
+    (NULL,1,'Sacar basura','pendiente');
 
-    INSERT INTO gastos (id_piso, descripcion, monto) VALUES
-    (1,'Compra supermercado',50.00),
-    (1,'Factura luz',30.00);
+    INSERT INTO avisos VALUES
+    (NULL,1,'Reunión','Reunión el viernes a las 20:00'),
+    (NULL,1,'Compra','Hay que comprar papel higiénico');
 
-    INSERT INTO tareas (id_piso, titulo) VALUES
-    (1,'Limpiar cocina'),
-    (1,'Sacar basura');
+    /* ===================== INCIDENCIAS ===================== */
 
-    INSERT INTO avisos (id_piso, titulo, descripcion) VALUES
-    (1,'Reunión','Reunión el viernes a las 20:00'),
-    (1,'Compra','Hay que comprar papel higiénico');
+    INSERT INTO incidencias (id_piso, id_usuario, tipo, titulo, descripcion, urgencia, estado) VALUES
+    (1, 2, 'fontaneria','Fuga baño', 'Pierde agua por la junta del grifo del lavabo','alta', 'creada'),
+    (1, 3, 'electricidad', 'Enchufe quemado','El enchufe del salón tiene señales de quemado y no funciona','alta','en_proceso'),
+    (1, 4, 'calefaccion', 'Radiador no calienta','El radiador del dormitorio principal no emite calor desde hace 3 días','media', 'creada'),
+    (1, 1, 'cerrajeria','Cerradura puerta principal','La cerradura de la puerta de entrada cuesta mucho girar', 'media', 'creada'),
+    (1, 2, 'humedades','Mancha humedad techo cocina', 'Mancha de humedad en el techo de la cocina, posible fuga del piso de arriba', 'alta',  'en_proceso');
+    
+     /* ===================== CALENDARIO (VINCULADO) ===================== */
+
+    INSERT INTO calendario_eventos (id_piso,id_incidencia,titulo,tipo,fecha_inicio,fecha_fin,estado)
+    VALUES (1,1,'Fuga baño','incidencia','2026-04-10','2026-04-14','activa');
+
+    INSERT INTO calendario_eventos (id_piso,titulo,tipo,fecha,hora,estado)
+    VALUES (1,'Limpiar baño','tarea','2026-04-15','18:00:00','pendiente');
+
+    INSERT INTO calendario_eventos (id_piso,titulo,tipo,fecha,hora,estado)
+    VALUES (1,'Cena del piso','evento','2026-04-20','21:30:00','programado');
+
+    INSERT INTO calendario_evento_personas VALUES
+    (2,3),(3,2),(3,3),(3,4);
+
+    /* ===================== CHAT ===================== */
+
+    INSERT INTO mensajes_incidencia VALUES
+    (NULL,1,2,'Hay una fuga',CURRENT_TIMESTAMP),
+    (NULL,1,1,'Aviso al fontanero',CURRENT_TIMESTAMP);
     ";
 
     if ($conn->multi_query($sql)) {
-        while ($conn->next_result()) {;}
+        while ($conn->next_result()) {
+        }
         echo "BBDD creada correctamente";
     } else {
         echo "Error: " . $conn->error;
     }
-
 } else {
-    $conn->select_db("piso_manager");
     echo "La base de datos ya existe";
 }
 
 $conn->close();
-?>
