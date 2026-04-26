@@ -25,6 +25,33 @@ async function initIncidencias() {
         btn.addEventListener("click", () => cerrarModal(btn.dataset.modalClose));
     });
 
+    // ─── Preview de imagen en modal nueva ──────────────────────────────────────
+    document.getElementById("nueva-imagen")?.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        mostrarPreviewImagen(file, "nueva-imagen-preview");
+    });
+
+    // ─── Preview de imagen en modal editar ─────────────────────────────────────
+    document.getElementById("editar-imagen")?.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        mostrarPreviewImagen(file, "editar-imagen-preview");
+    });
+
+    function mostrarPreviewImagen(file, previewId) {
+        let preview = document.getElementById(previewId);
+        if (!preview) {
+            preview = document.createElement("img");
+            preview.id = previewId;
+            preview.style.cssText = "width:100%;max-height:180px;object-fit:cover;border-radius:8px;margin-top:8px;";
+            // Insertarlo después del dropzone
+            const inputFile = document.getElementById(previewId.replace("-preview", ""));
+            inputFile?.closest(".modal__dropzone")?.after(preview);
+        }
+        preview.src = URL.createObjectURL(file);
+    }
+
     // ─── Cargar Datos de la BBDD ────────────────────────────────────────────────
 
     async function cargarIncidencias() {
@@ -50,9 +77,14 @@ async function initIncidencias() {
                     'climatizacion': '❄️', 'otros': '📋'
                 }[inc.tipo] || '📋';
 
+                // ✅ Mostrar imagen si existe, si no el icono emoji
+                const iconoHTML = inc.imagen
+                    ? `<img src="${inc.imagen}" alt="imagen incidencia" class="incident-img" style="width:48px;height:48px;object-fit:cover;border-radius:8px;flex-shrink:0;">`
+                    : `<div class="incident-icon">${icono}</div>`;
+
                 const html = `
                     <li class="incident-item" data-id="${inc.id}" data-tipo="${inc.tipo}" data-urgencia="${inc.urgencia}">
-                      <div class="incident-icon">${icono}</div>
+                      ${iconoHTML}
                       <div class="incident-body">
                         <p class="incident-body__title">${inc.titulo}</p>
                         <p class="incident-body__desc">${inc.descripcion}</p>
@@ -109,6 +141,22 @@ async function initIncidencias() {
             document.getElementById("editar-titulo").value = item.querySelector(".incident-body__title").textContent;
             document.getElementById("editar-desc").value = item.querySelector(".incident-body__desc").textContent;
             document.getElementById("editar-tipo").value = item.dataset.tipo;
+
+            // ✅ Mostrar imagen actual en el modal de editar si existe
+            const imgActual = item.querySelector(".incident-img");
+            let preview = document.getElementById("editar-imagen-preview");
+            if (imgActual) {
+                if (!preview) {
+                    preview = document.createElement("img");
+                    preview.id = "editar-imagen-preview";
+                    preview.style.cssText = "width:100%;max-height:180px;object-fit:cover;border-radius:8px;margin-top:8px;";
+                    document.getElementById("editar-imagen")?.closest(".modal__dropzone")?.after(preview);
+                }
+                preview.src = imgActual.src;
+            } else if (preview) {
+                preview.src = "";
+            }
+
             abrirModal("modal-editar-incidencia");
         }
 
@@ -135,6 +183,12 @@ async function initIncidencias() {
         formData.append("tipo", datos.tipo);
         formData.append("urgencia", datos.urgencia);
 
+        // ✅ Adjuntar imagen si se seleccionó
+        const imagenInput = document.getElementById("nueva-imagen");
+        if (imagenInput?.files[0]) {
+            formData.append("imagen", imagenInput.files[0]);
+        }
+
         const res = await fetch("../php/incidencias.php", { method: "POST", body: formData });
         const result = await res.json();
 
@@ -158,6 +212,12 @@ async function initIncidencias() {
 
         const urgActiva = modal.querySelector(".modal__urgencia-btn--active");
         formData.append("urgencia", urgActiva ? urgActiva.dataset.urgencia : "media");
+
+        // ✅ Adjuntar imagen si se seleccionó una nueva
+        const imagenInput = document.getElementById("editar-imagen");
+        if (imagenInput?.files[0]) {
+            formData.append("imagen", imagenInput.files[0]);
+        }
 
         const res = await fetch("../php/incidencias.php", { method: "POST", body: formData });
         const result = await res.json();
@@ -207,6 +267,10 @@ async function initIncidencias() {
         if (!modal) return;
         modal.querySelectorAll("input[type=text], textarea, select").forEach(el => el.value = "");
         modal.querySelectorAll(".modal__urgencia-btn").forEach(btn => btn.classList.remove("modal__urgencia-btn--active"));
+        // ✅ Limpiar también el input de archivo y el preview
+        modal.querySelectorAll("input[type=file]").forEach(el => el.value = "");
+        const preview = modal.querySelector("[id$='-imagen-preview']");
+        if (preview) preview.src = "";
     }
 
     document.querySelectorAll(".modal__urgencia-btn").forEach(btn => {
