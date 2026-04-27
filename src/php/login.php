@@ -44,3 +44,11 @@ echo json_encode([
     'rol'      => $user['rol'],
     'nombre'   => $user['nombre']
 ]);
+
+
+//Cerrar sesión
+function cerrarSesion() {
+    session_unset();
+    session_destroy();
+    echo json_encode(["status" => "success", "message" => "Sesion cerrada correctamente"]);
+}
