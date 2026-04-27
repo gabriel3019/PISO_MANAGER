@@ -17,5 +17,6 @@ async function cerrarSesion() {
     }
 }
 
-// Evento — funciona para cualquier botón/elemento con id="btn-cerrar-sesion"
-document.getElementById('btn-cerrar-sesion').addEventListener('click', cerrarSesion);
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('btn-cerrar-sesion').addEventListener('click', cerrarSesion);
+});
