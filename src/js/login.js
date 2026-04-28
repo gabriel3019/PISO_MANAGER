@@ -11,14 +11,74 @@ function togglePw() {
            <circle cx="12" cy="12" r="3"/>`;
 }
 
+function showError(fieldId, message) {
+    const field = document.getElementById(fieldId).closest('.field');
+    clearError(fieldId);
+    field.querySelector('input').classList.add('input-error');
+    const msg = document.createElement('p');
+    msg.className = 'field-error';
+    msg.textContent = message;
+    field.appendChild(msg);
+}
+
+function clearError(fieldId) {
+    const field = document.getElementById(fieldId).closest('.field');
+    field.querySelector('input').classList.remove('input-error');
+    const existing = field.querySelector('.field-error');
+    if (existing) existing.remove();
+}
+
+function clearAllErrors() {
+    clearError('email');
+    clearError('password');
+    const general = document.getElementById('general-error');
+    if (general) general.remove();
+}
+
+function showGeneralError(message) {
+    const old = document.getElementById('general-error');
+    if (old) old.remove();
+    const btn = document.querySelector('.btn-primary');
+    const div = document.createElement('p');
+    div.id = 'general-error';
+    div.className = 'field-error general-error';
+    div.textContent = message;
+    btn.insertAdjacentElement('afterend', div);
+}
+
+function showSuccess(message) {
+    const old = document.getElementById('general-error');
+    if (old) old.remove();
+    const btn = document.querySelector('.btn-primary');
+    const div = document.createElement('p');
+    div.id = 'general-error';
+    div.className = 'general-success';
+    div.textContent = message;
+    btn.insertAdjacentElement('afterend', div);
+}
+
 document.querySelector('.btn-primary').addEventListener('click', async () => {
+    clearAllErrors();
+
     const email    = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value.trim();
 
-    if (!email || !password) {
-        alert('Por favor, rellena todos los campos.');
-        return;
+    let hasError = false;
+
+    if (!email) {
+        showError('email', 'El correo electrónico es obligatorio.');
+        hasError = true;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showError('email', 'Introduce un correo electrónico válido.');
+        hasError = true;
     }
+
+    if (!password) {
+        showError('password', 'La contraseña es obligatoria.');
+        hasError = true;
+    }
+
+    if (hasError) return;
 
     const formData = new FormData();
     formData.append('email', email);
@@ -29,16 +89,16 @@ document.querySelector('.btn-primary').addEventListener('click', async () => {
         const result = await res.json();
 
         if (result.success) {
-            if (result.rol === 'admin') {
-                window.location.href = 'homeAdmin.html';
-            } else {
-                window.location.href = 'homeUser.html';
-            }
+            showSuccess(`✓ Bienvenido/a, ${result.nombre}. Redirigiendo...`);
+            document.querySelector('.btn-primary').disabled = true;
+            setTimeout(() => {
+                window.location.href = result.rol === 'admin' ? 'homeAdmin.html' : 'homeUser.html';
+            }, 3000);
         } else {
-            alert('Error: ' + (result.error || 'Credenciales incorrectas'));
+            showGeneralError('Usuario o contraseña incorrectos.');
         }
     } catch (err) {
         console.error('Error en login:', err);
-        alert('Error de conexión con el servidor.');
+        showGeneralError('Error de conexión con el servidor. Inténtalo de nuevo.');
     }
 });

@@ -215,3 +215,43 @@ h1 {
   transition: opacity .2s;
 }
 .footer-text a:hover { opacity: .7; }
+
+/* ── Errores de validación ── */
+.input-error {
+    border-color: #ef4444 !important;
+    background: #fff5f5 !important;
+}
+
+.input-error:focus {
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, .12) !important;
+}
+
+.field-error {
+    margin-top: 6px;
+    padding-left: 2px;
+    font-size: .78rem;
+    font-weight: 600;
+    color: #ef4444;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.general-error {
+    margin-top: 12px;
+    display: block;
+    text-align: center;
+    font-size: .85rem;
+    padding-left: 0;
+    color: #ef4444;
+}
+
+.general-success {
+    margin-top: 12px;
+    display: block;
+    text-align: center;
+    font-size: .85rem;
+    font-weight: 600;
+    color: #16a34a;
+    padding-left: 0;
+}
