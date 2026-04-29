@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'BBDD/conecta.php'; // ajusta la ruta a tu archivo de conexión
+require_once 'BBDD/conecta.php';
 
 header('Content-Type: application/json');
 
@@ -9,6 +9,16 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+// Cerrar sesión
+$action = $_POST['action'] ?? '';
+if ($action === 'cerrarSesion') {
+    session_unset();
+    session_destroy();
+    echo json_encode(['status' => 'success', 'message' => 'Sesión cerrada correctamente']);
+    exit;
+}
+
+// Login normal
 $email    = trim($_POST['email'] ?? '');
 $password = trim($_POST['password'] ?? '');
 
@@ -34,13 +44,12 @@ if (!$user || !password_verify($password, $user['password'])) {
     exit;
 }
 
-// Guardar sesión
 $_SESSION['id_usuario'] = $user['id_usuario'];
 $_SESSION['nombre']     = $user['nombre'];
 $_SESSION['rol']        = $user['rol'];
 
 echo json_encode([
-    'success'  => true,
-    'rol'      => $user['rol'],
-    'nombre'   => $user['nombre']
+    'success' => true,
+    'rol'     => $user['rol'],
+    'nombre'  => $user['nombre']
 ]);

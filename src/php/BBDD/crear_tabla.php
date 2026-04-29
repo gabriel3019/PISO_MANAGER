@@ -179,12 +179,7 @@ if ($resultado && $resultado->num_rows <= 0) {
     if ($conn->multi_query($sql)) {
         while ($conn->next_result()) {
         }
-        echo "BBDD creada correctamente";
-    } else {
-        echo "Error: " . $conn->error;
     }
-} else {
-    echo "La base de datos ya existe";
 }
 
 $conn->close();
