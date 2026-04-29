@@ -35,7 +35,7 @@ const completeTaskBtn = document.getElementById("complete-task-btn");
 let currentDate = new Date(2026, 3, 1);
 let selectedEvent = null;
 
-const eventos = [
+let eventos = [
     {
         titulo: "Lavadora averiada",
         tipo: "incidencia",
@@ -119,6 +119,48 @@ function getMonthRange(year, month) {
     const lastDayNumber = new Date(year, month + 1, 0).getDate();
     const lastDay = `${year}-${monthString}-${String(lastDayNumber).padStart(2, "0")}`;
     return { firstDay, lastDay };
+}
+
+async function cargarEventos() {
+    try {
+        const response = await fetch("../php/calendario_obtener_eventos.php?id_piso=1");
+        const data = await response.json();
+
+        if (data.success) {
+            eventos = data.eventos;
+            renderCalendar(currentDate);
+        } else {
+            console.error("Error:", data.message);
+        }
+    } catch (error) {
+        console.error("Error al cargar eventos:", error);
+    }
+}
+
+async function guardarEventoEnBD(evento) {
+    try {
+        const response = await fetch("../php/calendario/crear_evento.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(evento)
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            closeModal(modalAdd);
+            await cargarEventos();
+        } else {
+            eventWarning.textContent = data.message || "No se pudo guardar el evento.";
+            eventWarning.classList.add("show");
+        }
+    } catch (error) {
+        console.error("Error al guardar evento:", error);
+        eventWarning.textContent = "Error de conexión con el servidor.";
+        eventWarning.classList.add("show");
+    }
 }
 
 function incidenciaVisibleEnMes(incidencia, year, month) {
@@ -437,7 +479,7 @@ document.getElementById("btn-details").addEventListener("click", () => {
     }
 });
 
-addEventForm.addEventListener("submit", (e) => {
+addEventForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const titulo = eventTitleInput.value.trim();
@@ -463,13 +505,16 @@ addEventForm.addEventListener("submit", (e) => {
             return;
         }
 
-        eventos.push({
+        const nuevoEvento = {
             titulo,
             tipo,
             fechaInicio,
             fechaFin,
-            estado: "activa"
-        });
+            estado: "activa",
+            personas: []
+        };
+
+        await guardarEventoEnBD(nuevoEvento);
 
         const fechaNueva = new Date(fechaInicio);
         currentDate = new Date(fechaNueva.getFullYear(), fechaNueva.getMonth(), 1);
@@ -507,14 +552,16 @@ addEventForm.addEventListener("submit", (e) => {
             return;
         }
 
-        eventos.push({
+        const nuevoEvento = {
             titulo,
             tipo,
             fecha,
             hora,
-            persona,
-            estado: "pendiente"
-        });
+            estado: "pendiente",
+            personas: personasSeleccionadas
+        };
+
+        await guardarEventoEnBD(nuevoEvento);
 
         const fechaNueva = new Date(fecha);
         currentDate = new Date(fechaNueva.getFullYear(), fechaNueva.getMonth(), 1);
@@ -549,13 +596,16 @@ addEventForm.addEventListener("submit", (e) => {
             return;
         }
 
-        eventos.push({
+        const nuevoEvento = {
             titulo,
             tipo,
             fecha,
             hora,
+            estado: "programado",
             personas: personasSeleccionadas
-        });
+        };
+
+        await guardarEventoEnBD(nuevoEvento);
 
         const fechaNueva = new Date(fecha);
         currentDate = new Date(fechaNueva.getFullYear(), fechaNueva.getMonth(), 1);
@@ -629,4 +679,4 @@ completeTaskBtn.addEventListener("click", () => {
 
 updateFormByType();
 setMinDates();
-renderCalendar(currentDate);
+cargarEventos();
