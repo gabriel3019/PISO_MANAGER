@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const fd = new FormData();
     fd.append("accion", "listar");
 
-    const res = await fetch("../php/gastos.php", {
+    const res = await fetch("../php/gastosComunes.php", {
       method: "POST",
       body: fd,
       credentials: "same-origin"
@@ -99,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
       fd.append("id_gasto", gastoEditando.id_gasto);
     }
 
-    const res = await fetch("../php/gastos.php", {
+    const res = await fetch("../php/gastosComunes.php", {
       method: "POST",
       body: fd,
       credentials: "same-origin"
@@ -121,7 +121,7 @@ document.addEventListener("DOMContentLoaded", () => {
     fd.append("accion", "eliminar");
     fd.append("id_gasto", gastoAEliminar.id_gasto);
 
-    await fetch("../php/gastos.php", {
+    await fetch("../php/gastosComunes.php", {
       method: "POST",
       body: fd,
       credentials: "same-origin"

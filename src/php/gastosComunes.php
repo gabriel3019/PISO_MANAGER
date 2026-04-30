@@ -1,28 +1,34 @@
+
 <?php
 session_start();
-require_once "../BBDD/crear_tabla.php";
-require_once "../BBDD/conecta.php";
 
+require_once __DIR__ . "/BBDD/conecta.php";
 header("Content-Type: application/json");
 
 /* ================= SEGURIDAD ================= */
-if (!isset($_SESSION['user'])) {
-    echo json_encode(["success" => false, "message" => "No autorizado"]);
+if (!isset($_SESSION['id_usuario'])) {
+    echo json_encode([
+        "success" => false,
+        "message" => "No autorizado"
+    ]);
     exit;
 }
 
-$id_usuario = $_SESSION['user']['id'];
-$id_piso = $_SESSION['piso_id'] ?? null;
+$id_usuario = $_SESSION['id_usuario'];
+$id_piso    = $_SESSION['piso_id'] ?? null;
 
 if (!$id_piso) {
-    echo json_encode(["success" => false, "message" => "No hay piso activo"]);
+    echo json_encode([
+        "success" => false,
+        "message" => "No hay piso activo"
+    ]);
     exit;
 }
 
 /* ================= DATOS ================= */
 $accion   = $_POST['accion'] ?? '';
 $id_gasto = $_POST['id_gasto'] ?? null;
-$titulo   = $_POST['titulo'] ?? '';
+$titulo   = trim($_POST['titulo'] ?? '');
 $importe  = $_POST['importe'] ?? null;
 
 /* ================= VALIDACIÓN ================= */
@@ -122,7 +128,10 @@ try {
         exit;
     }
 
-    echo json_encode(["success" => false, "message" => "Acción no válida"]);
+    echo json_encode([
+        "success" => false,
+        "message" => "Acción no válida"
+    ]);
 
 } catch (Exception $e) {
     echo json_encode([
