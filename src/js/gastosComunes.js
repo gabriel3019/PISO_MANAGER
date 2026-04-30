@@ -1,20 +1,22 @@
+
 document.addEventListener("DOMContentLoaded", () => {
 
   /* ================= ESTADO ================= */
-  let modoDivision = "igual";
   let gastos = [];
-
+  let usuarios = [];
   let gastoEditando = null;
   let gastoAEliminar = null;
-
-  const personasLista = ["Tú", "Laura", "Pablo", "Marta"];
 
   /* ================= DOM ================= */
   const modal = document.getElementById("gastoModal");
   const deleteModal = document.getElementById("deleteModal");
 
-  const detalleModal = document.getElementById("detalleModal");
-  const detalleContenido = document.getElementById("detalleContenido");
+  const tituloInput = document.getElementById("gastoTitulo");
+  const importeInput = document.getElementById("gastoImporte");
+  const selectPagador = document.getElementById("gastoPagador");
+
+  const btnGuardar = document.getElementById("guardarGasto");
+  const lista = document.getElementById("gastosContainer");
 
   const btnAbrir = document.querySelector(".add-btn");
   const btnCerrar = document.getElementById("closeGastoModal");
@@ -23,129 +25,77 @@ document.addEventListener("DOMContentLoaded", () => {
   const confirmDelete = document.getElementById("confirmDelete");
   const cancelDelete = document.getElementById("cancelDelete");
 
-  const tituloInput = document.getElementById("gastoTitulo");
-  const importeInput = document.getElementById("gastoImporte");
-
-  const btnGuardar = document.getElementById("guardarGasto");
-  const lista = document.getElementById("gastosContainer");
-
-  const divisionContainer = document.getElementById("divisionContainer");
-
-  /* ================= CARGAR DATOS ================= */
-  async function cargarGastos() {
-
-    const fd = new FormData();
-    fd.append("accion", "listar");
-
-    const res = await fetch("../php/gastosComunes.php", {
-      method: "POST",
-      body: fd,
-      credentials: "same-origin"
-    });
-
-    const data = await res.json();
-
-    if (data.success) {
-      gastos = data.gastos;
-      renderLista();
-    }
-  }
-
+  /* ================= INIT ================= */
+  cargarUsuarios();
   cargarGastos();
 
-  /* ================= MODAL ================= */
-  btnAbrir.onclick = () => {
-    modal.classList.remove("hidden");
-    renderDivision();
-  };
+  /* ================= USUARIOS ================= */
+  async function cargarUsuarios() {
+    try {
+      const res = await fetch("../php/usuariosPiso.php", {
+        method: "POST",
+        credentials: "same-origin"
+      });
 
-  btnCerrar.onclick = cerrarModal;
-  btnCancelar.onclick = cerrarModal;
+      const data = await res.json();
 
-  function cerrarModal() {
-    modal.classList.add("hidden");
-    limpiarFormulario();
-  }
+      if (!data.success) return;
 
-  cancelDelete.onclick = () => deleteModal.classList.add("hidden");
+      usuarios = data.usuarios;
+      renderSelectUsuarios();
 
-  /* ================= DIVISION ================= */
-  function renderDivision() {
-    divisionContainer.innerHTML = "";
-
-    const importe = parseFloat(importeInput.value) || 0;
-    const personas = 3;
-
-    if (modoDivision === "igual") {
-      const porPersona = (importe / personas || 0).toFixed(2);
-      divisionContainer.innerHTML = `<p>${personas} personas · ${porPersona}€</p>`;
+    } catch (err) {
+      console.error("Error usuarios:", err);
     }
   }
 
-  /* ================= GUARDAR ================= */
-  btnGuardar.onclick = async () => {
+  function renderSelectUsuarios() {
+    selectPagador.innerHTML = "";
 
-    const titulo = tituloInput.value.trim();
-    const importe = parseFloat(importeInput.value);
-
-    if (!titulo || !importe) return;
-
-    const fd = new FormData();
-    fd.append("accion", gastoEditando ? "editar" : "crear");
-    fd.append("titulo", titulo);
-    fd.append("importe", importe);
-
-    if (gastoEditando) {
-      fd.append("id_gasto", gastoEditando.id_gasto);
-    }
-
-    const res = await fetch("../php/gastosComunes.php", {
-      method: "POST",
-      body: fd,
-      credentials: "same-origin"
+    usuarios.forEach(u => {
+      const option = document.createElement("option");
+      option.value = u.id_usuario;
+      option.textContent = u.nombre;
+      selectPagador.appendChild(option);
     });
-
-    const data = await res.json();
-
-    if (data.success) {
-      gastoEditando = null;
-      cerrarModal();
-      cargarGastos();
-    }
-  };
-
-  /* ================= ELIMINAR ================= */
-  confirmDelete.onclick = async () => {
-
-    const fd = new FormData();
-    fd.append("accion", "eliminar");
-    fd.append("id_gasto", gastoAEliminar.id_gasto);
-
-    await fetch("../php/gastosComunes.php", {
-      method: "POST",
-      body: fd,
-      credentials: "same-origin"
-    });
-
-    deleteModal.classList.add("hidden");
-    cargarGastos();
-  };
-
-  /* ================= DETALLE ================= */
-  function abrirDetalle(gasto) {
-
-    detalleContenido.innerHTML = `
-      <h3>${gasto.titulo}</h3>
-      <p>Total: ${parseFloat(gasto.importe).toFixed(2)}€</p>
-    `;
-
-    detalleModal.classList.remove("hidden");
   }
 
-  /* ================= LISTA ================= */
+  /* ================= GASTOS ================= */
+  async function cargarGastos() {
+    try {
+      const fd = new FormData();
+      fd.append("accion", "listar");
+
+      const res = await fetch("../php/gastosComunes.php", {
+        method: "POST",
+        body: fd,
+        credentials: "same-origin"
+      });
+
+      const data = await res.json();
+
+      if (!data.success) {
+        console.error(data.message);
+        return;
+      }
+
+      gastos = data.gastos;
+      renderLista();
+
+    } catch (err) {
+      console.error("Error gastos:", err);
+    }
+  }
+
+  /* ================= RENDER ================= */
   function renderLista() {
 
     lista.innerHTML = "";
+
+    if (!gastos.length) {
+      lista.innerHTML = "<p>No hay gastos aún</p>";
+      return;
+    }
 
     gastos.forEach(gasto => {
 
@@ -157,6 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="icon-box">💸</div>
           <div>
             <div class="title">${gasto.titulo}</div>
+            <small>Pagado por ${gasto.pagador}</small>
           </div>
         </div>
 
@@ -167,22 +118,16 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       `;
 
-      /* DETALLE */
-      div.onclick = () => abrirDetalle(gasto);
-
-      /* EDITAR */
       div.querySelector(".edit-btn").onclick = (e) => {
         e.stopPropagation();
 
         gastoEditando = gasto;
-
         tituloInput.value = gasto.titulo;
         importeInput.value = gasto.importe;
 
         modal.classList.remove("hidden");
       };
 
-      /* ELIMINAR */
       div.querySelector(".delete-btn").onclick = (e) => {
         e.stopPropagation();
 
@@ -194,19 +139,83 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  /* ================= MODAL ================= */
+  btnAbrir.onclick = () => modal.classList.remove("hidden");
+  btnCerrar.onclick = cerrarModal;
+  btnCancelar.onclick = cerrarModal;
+
+  function cerrarModal() {
+    modal.classList.add("hidden");
+    limpiarFormulario();
+  }
+
+  cancelDelete.onclick = () => deleteModal.classList.add("hidden");
+
+  /* ================= GUARDAR ================= */
+  btnGuardar.onclick = async () => {
+
+    const titulo = tituloInput.value.trim();
+    const importe = parseFloat(importeInput.value);
+    const pagador = selectPagador.value;
+
+    if (!titulo || !importe) return;
+
+    try {
+
+      const fd = new FormData();
+      fd.append("accion", "crear");
+      fd.append("titulo", titulo);
+      fd.append("importe", importe);
+      fd.append("pagador", pagador); // 🔥 IMPORTANTE
+
+      const res = await fetch("../php/gastosComunes.php", {
+        method: "POST",
+        body: fd,
+        credentials: "same-origin"
+      });
+
+      const data = await res.json();
+
+      if (!data.success) {
+        console.error(data.message);
+        return;
+      }
+
+      cerrarModal();
+      cargarGastos();
+
+    } catch (err) {
+      console.error("Error guardar:", err);
+    }
+  };
+
+  /* ================= ELIMINAR ================= */
+  confirmDelete.onclick = async () => {
+
+    try {
+      const fd = new FormData();
+      fd.append("accion", "eliminar");
+      fd.append("id_gasto", gastoAEliminar.id_gasto);
+
+      await fetch("../php/gastosComunes.php", {
+        method: "POST",
+        body: fd,
+        credentials: "same-origin"
+      });
+
+      deleteModal.classList.add("hidden");
+      cargarGastos();
+
+    } catch (err) {
+      console.error("Error eliminar:", err);
+    }
+  };
+
   /* ================= LIMPIAR ================= */
   function limpiarFormulario() {
     tituloInput.value = "";
     importeInput.value = "";
   }
 
-  /* ================= UX ================= */
-  window.addEventListener("click", (e) => {
-    if (e.target === modal) cerrarModal();
-  });
-
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") cerrarModal();
-  });
-
 });
+
