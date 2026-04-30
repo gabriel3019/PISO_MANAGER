@@ -76,7 +76,9 @@ function showSuccess(message) {
 }
 
 /* ================= LOGIN ================= */
-document.querySelector('.btn-primary').addEventListener('click', async () => {
+document.querySelector('.btn-primary').addEventListener('click', async (e) => {
+
+    e.preventDefault(); // 🔥 evita recarga del form
 
     clearAllErrors();
 
@@ -114,12 +116,15 @@ document.querySelector('.btn-primary').addEventListener('click', async () => {
 
         const result = await res.json();
 
-        console.log(result); // 🔍 debug útil
+        console.log("RESPUESTA LOGIN:", result);
 
         /* ===== RESPUESTA ===== */
         if (result.success) {
 
-            const { usuario } = result; // 🔥 clave
+            const { usuario } = result;
+
+            // 🔥 guardar usuario
+            sessionStorage.setItem("usuario", JSON.stringify(usuario));
 
             showSuccess(`✓ Bienvenido/a, ${usuario.nombre}. Redirigiendo...`);
 
@@ -128,9 +133,9 @@ document.querySelector('.btn-primary').addEventListener('click', async () => {
             setTimeout(() => {
                 window.location.href =
                     usuario.rol === 'admin'
-                        ? 'homeAdmin.html'
-                        : 'homeUser.html';
-            }, 1500);
+                        ? '../html/homeAdmin.html'
+                        : '../html/homeUser.html';
+            }, 1200);
 
         } else {
             showGeneralError(result.message || 'Usuario o contraseña incorrectos.');
@@ -138,6 +143,7 @@ document.querySelector('.btn-primary').addEventListener('click', async () => {
 
     } catch (err) {
         console.error('Error en login:', err);
-        showGeneralError('Error de conexión con el servidor. Inténtalo de nuevo.');
+        showGeneralError('Error de conexión con el servidor.');
     }
 });
+
