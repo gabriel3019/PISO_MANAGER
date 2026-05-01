@@ -43,40 +43,13 @@ const detailStatus = document.getElementById("detail-status");
 const resolveIncidenciaBtn = document.getElementById("resolve-incidencia-btn");
 const completeTaskBtn = document.getElementById("complete-task-btn");
 
-let currentDate = new Date(2026, 3, 1);
-let selectedEvent = null;
+const modalDay = document.getElementById("modal-day");
+const dayModalTitle = document.getElementById("day-modal-title");
+const dayEventsList = document.getElementById("day-events-list");
 
-let eventos = [
-    {
-        titulo: "Lavadora averiada",
-        tipo: "incidencia",
-        fechaInicio: "2026-04-10",
-        fechaFin: "2026-04-14",
-        estado: "activa"
-    },
-    {
-        titulo: "Limpiar baño",
-        tipo: "tarea",
-        fecha: "2026-04-15",
-        hora: "18:00",
-        persona: "Celia",
-        estado: "pendiente"
-    },
-    {
-        titulo: "Cena del piso",
-        tipo: "evento",
-        fecha: "2026-04-20",
-        hora: "21:30",
-        personas: ["Celia", "Gabriel", "Carlos"]
-    },
-    {
-        titulo: "Comida con amigos",
-        tipo: "evento",
-        fecha: "2026-04-21",
-        hora: "14:00",
-        personas: ["Celia"]
-    }
-];
+let currentDate = new Date(2026, 4, 1);
+let selectedEvent = null;
+let eventos = [];
 
 const monthNames = [
     "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -129,6 +102,38 @@ function getMonthRange(year, month) {
     const lastDayNumber = new Date(year, month + 1, 0).getDate();
     const lastDay = `${year}-${monthString}-${String(lastDayNumber).padStart(2, "0")}`;
     return { firstDay, lastDay };
+}
+
+function openDayModal(fecha, eventosDelDia) {
+    dayModalTitle.textContent = `Eventos del ${formatDateText(fecha)}`;
+    dayEventsList.innerHTML = "";
+
+    if (eventosDelDia.length === 0) {
+        dayEventsList.innerHTML = "<p>No hay eventos este día.</p>";
+    } else {
+        eventosDelDia.forEach((evento) => {
+            const card = document.createElement("div");
+            card.className = `day-event-card ${evento.tipo}`;
+
+            card.innerHTML = `
+                <div class="day-event-title">${evento.titulo}</div>
+                <div class="day-event-meta">
+                    ${typeNames[evento.tipo]} ${evento.hora ? "· " + evento.hora : ""}
+                </div>
+            `;
+
+            card.addEventListener("click", (e) => {
+                e.stopPropagation();
+                closeModal(modalDay);
+                selectedEvent = evento;
+                showEventDetails(evento);
+            });
+
+            dayEventsList.appendChild(card);
+        });
+    }
+
+    openModal(modalDay);
 }
 
 async function cargarEventos() {
@@ -254,14 +259,18 @@ function renderCalendar(date) {
 
             if (evento.tipo === "incidencia") {
                 if (evento.estado === "resuelta") return false;
-                const fechaFin = evento.fechaFin || fullDate;
-                return fullDate >= evento.fechaInicio && fullDate <= fechaFin;
+                return evento.fechaInicio === fullDate;
             }
 
             return evento.fecha === fullDate;
         });
 
-        eventosDelDia.forEach((evento) => {
+
+
+        const eventosVisibles = eventosDelDia.slice(0, 1);
+        const eventosOcultos = eventosDelDia.length - eventosVisibles.length;
+
+        eventosVisibles.forEach((evento) => {
             let icono = "";
 
             if (evento.tipo === "evento" && evento.personas && evento.personas.length > 0) {
@@ -298,12 +307,20 @@ function renderCalendar(date) {
       data-person="${evento.persona || ""}"
       data-people='${JSON.stringify(evento.personas || [])}'
       data-status="${evento.estado || ""}">
-      ${evento.titulo}${icono}
+      <span class="event-text">${evento.titulo}</span>
+      <span class="event-icon">${icono}</span>
     </div>
 `;
         });
 
+        if (eventosOcultos > 0) {
+            html += `<div class="more-events">+${eventosOcultos} más</div>`;
+        }
+
         dayBox.innerHTML = html;
+        dayBox.addEventListener("click", () => {
+            openDayModal(fullDate, eventosDelDia);
+        });
         calendarGrid.appendChild(dayBox);
     }
 
@@ -404,7 +421,9 @@ function addEventClickListeners() {
     const eventElements = document.querySelectorAll(".event");
 
     eventElements.forEach((eventElement) => {
-        eventElement.addEventListener("click", () => {
+        eventElement.addEventListener("click", (e) => {
+            e.stopPropagation();
+
             const evento = {
                 id_evento: parseInt(eventElement.dataset.id, 10),
                 titulo: eventElement.dataset.title,
@@ -821,6 +840,10 @@ window.addEventListener("click", (e) => {
     if (e.target === modalDetails) {
         closeModal(modalDetails);
     }
+
+    if (e.target === modalDay) {
+        closeModal(modalDay);
+    }
 });
 
 resolveIncidenciaBtn.addEventListener("click", async () => {
@@ -839,7 +862,10 @@ completeTaskBtn.addEventListener("click", async () => {
     await actualizarEstadoEvento(selectedEvent.id_evento, nuevoEstado);
 });
 
+document.getElementById("close-day-modal").addEventListener("click", () => {
+    closeModal(modalDay);
+});
+
 updateFormByType();
 setMinDates();
-renderCalendar(currentDate);
 cargarEventos();

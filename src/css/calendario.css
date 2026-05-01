@@ -222,11 +222,14 @@ body {
 /* ================= CALENDAR LAYOUT ================= */
 .calendar-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 290px;
+    grid-template-columns: 1fr;
     gap: 16px;
     flex: 1;
     min-height: 0;
-    align-items: stretch;
+}
+
+.calendar-sidebar {
+    display: none;
 }
 
 .calendar-main,
@@ -295,15 +298,15 @@ body {
 }
 
 .legend-color.incidencia {
-    background: #ef4444;
+    background: #fee2e2;
 }
 
 .legend-color.tarea {
-    background: #22c55e;
+    background: #dcfce7;
 }
 
 .legend-color.evento {
-    background: #3b82f6;
+    background: #dbeafe;
 }
 
 /* ================= WEEKDAYS ================= */
@@ -341,7 +344,7 @@ body {
     min-height: 0;
     padding: 8px;
     box-sizing: border-box;
-    overflow: hidden;
+    overflow: visible;
     min-width: 0;
 }
 
@@ -363,12 +366,27 @@ body {
     margin-bottom: 6px;
     cursor: pointer;
 
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 6px;
 
-    display: block;
-    width: 100%;
+    overflow: hidden;
+    white-space: normal;
+}
+
+.event-text {
+    flex: 1;
+    min-width: 0;
+
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* máximo 2 líneas */
+    -webkit-box-orient: vertical;
+}
+
+.event-icon {
+    flex-shrink: 0;
 }
 
 .event.incidencia {
@@ -390,6 +408,57 @@ body {
     background: #e5e7eb !important;
     color: #6b7280 !important;
     text-decoration: line-through;
+}
+
+.more-events {
+    font-size: 12px;
+    font-weight: 700;
+    color: #64748b;
+    margin-top: 2px;
+    cursor: pointer;
+}
+
+/* ================= DAY MODAL ================= */
+
+.day-modal-content {
+    max-width: 650px;
+}
+
+.day-events-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.day-event-card {
+    padding: 14px;
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+    cursor: pointer;
+}
+
+.day-event-card.incidencia {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.day-event-card.tarea {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.day-event-card.evento {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.day-event-title {
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.day-event-meta {
+    font-size: 13px;
 }
 
 /* ================= REPEAT TASK ================= */
@@ -715,15 +784,6 @@ body {
         gap: 4px;
     }
 
-    .calendar-day {
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
-        min-height: 110px;
-        padding: 8px;
-        box-sizing: border-box;
-    }
-
     .calendar-day.other-month {
         background: #f9fafb;
         color: #9ca3af;
@@ -742,22 +802,24 @@ body {
         border-radius: 8px;
         margin-bottom: 6px;
         cursor: pointer;
-        color: #fff;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
     }
 
     .event.incidencia {
-        background: #ef4444;
+        background: #fee2e2;
+        color: #b91c1c;
     }
 
     .event.tarea {
-        background: #22c55e;
+        background: #dcfce7;
+        color: #15803d;
     }
 
     .event.evento {
-        background: #3b82f6;
+        background: #dbeafe;
+        color: #1d4ed8;
     }
 
     .details-grid {

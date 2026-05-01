@@ -122,7 +122,10 @@ CREATE TABLE IF NOT EXISTS calendario_eventos (
     titulo VARCHAR(150),
     tipo ENUM('incidencia','tarea','evento'),
     fecha DATE,
+    fecha_inicio DATE NULL,
+    fecha_fin DATE NULL,
     hora TIME,
+    estado VARCHAR(30) DEFAULT 'pendiente',
     FOREIGN KEY (id_piso) REFERENCES pisos(id_piso) ON DELETE CASCADE
 );
 
@@ -137,7 +140,8 @@ CREATE TABLE IF NOT EXISTS calendario_evento_personas (
 ";
 
 $conn->multi_query($sql);
-while ($conn->next_result()) {}
+while ($conn->next_result()) {
+}
 
 /* ================= DATOS ================= */
 $check = $conn->query("SELECT COUNT(*) as total FROM usuarios");
@@ -195,17 +199,23 @@ if ($row['total'] == 0) {
     (2,3,'Sigue sin funcionar');
 
     /* ===== CALENDARIO ===== */
-    INSERT INTO calendario_eventos VALUES
-    (NULL,1,'Cena del piso','evento','2026-04-20','21:30:00');
+    INSERT INTO calendario_eventos (id_piso, titulo, tipo, fecha, fecha_inicio, fecha_fin, hora, estado) VALUES
+    (1,'Cena del piso','evento','2026-04-20','2026-04-20',NULL,'21:30:00','pendiente');
 
-    INSERT INTO calendario_evento_personas VALUES
-    (1,2),(1,3),(1,4);
+   SET @id_evento_cena = LAST_INSERT_ID();
+
+    INSERT INTO calendario_evento_personas 
+    (id_evento, id_usuario) 
+    VALUES
+    (@id_evento_cena,2),
+    (@id_evento_cena,3),
+    (@id_evento_cena,4);
 
     ";
 
     $conn->multi_query($sqlDatos);
-    while ($conn->next_result()) {}
+    while ($conn->next_result()) {
+    }
 }
 
 $conn->close();
-
