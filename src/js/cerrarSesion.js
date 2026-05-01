@@ -1,12 +1,14 @@
 async function cerrarSesion() {
-    const formData = new FormData();
-    formData.append('action', 'cerrarSesion');
-
     try {
-        const res    = await fetch('../php/login.php', { method: 'POST', body: formData });
+        const res = await fetch('../php/logout.php', {
+            method: 'POST'
+        });
+
         const result = await res.json();
 
-        if (result.status === 'success') {
+        console.log(result);
+        if (result.success) {
+            sessionStorage.clear(); // limpiar datos cliente
             window.location.href = 'login.html';
         } else {
             alert('Error al cerrar sesión.');
@@ -18,5 +20,6 @@ async function cerrarSesion() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('btn-cerrar-sesion').addEventListener('click', cerrarSesion);
+    const btn = document.getElementById('btn-cerrar-sesion');
+    if (btn) btn.addEventListener('click', cerrarSesion);
 });

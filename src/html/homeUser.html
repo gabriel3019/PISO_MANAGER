@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -6,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Panel de Inicio</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/homeUser.css">
 </head>
 
@@ -14,37 +13,53 @@
 
 <div class="app">
 
-  <!-- ================= SIDEBAR ================= -->
+  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div>
-      <h3 id="nombreUsuario">Usuario</h3>
+      <h3 id="nombreUsuario"></h3>
       <span class="subtitle">Panel de inicio</span>
 
       <p class="section-title">PRINCIPAL</p>
       <ul>
-        <li class="active"><a href="#"><img src="../css/icons/house.svg" class="icon"> Inicio</a></li>
-        <li><a href="gastosComunesUser.html"><img src="../css/icons/euro.svg" class="icon"> Gastos</a></li>
-        <li><a href="tareasUser.html"><img src="../css/icons/square-check-big.svg" class="icon"> Tareas</a></li>
-        <li><a href="calendario.html"><img src="../css/icons/calendar.svg" class="icon"> Calendario</a></li>
+        <li class="active">
+          <a href="#"><img src="../css/icons/house.svg" class="icon"> Inicio</a>
+        </li>
+        <li>
+          <a href="gastosComunesUser.html"><img src="../css/icons/euro.svg" class="icon"> Gastos</a>
+        </li>
+        <li>
+          <a href="tareasUser.html"><img src="../css/icons/square-check-big.svg" class="icon"> Tareas</a>
+        </li>
+        <li>
+          <a href="calendario.html"><img src="../css/icons/calendar.svg" class="icon"> Calendario</a>
+        </li>
       </ul>
 
       <p class="section-title">PISO</p>
       <ul>
-        <li><a href="#"><img src="../css/icons/house.svg" class="icon"> Mi Piso</a></li>
-        <li><a href="#"><img src="../css/icons/users.svg" class="icon"> Compañeros</a></li>
-        <li><a href="incidenciasUser.html"><img src="../css/icons/circle-alert.svg" class="icon"> Incidencias</a></li>
+        <li>
+          <a href="#"><img src="../css/icons/house.svg" class="icon"> Mi Piso</a>
+        </li>
+        <li>
+          <a href="#"><img src="../css/icons/users.svg" class="icon"> Compañeros</a>
+        </li>
+        <li>
+          <a href="incidenciasUser.html"><img src="../css/icons/circle-alert.svg" class="icon"> Incidencias</a>
+        </li>
       </ul>
 
       <p class="section-title">CUENTA</p>
       <ul>
-        <li><a href="#"><img src="../css/icons/settings.svg" class="icon"> Ajustes</a></li>
+        <li>
+          <a href="#"><img src="../css/icons/settings.svg" class="icon"> Ajustes</a>
+        </li>
       </ul>
     </div>
 
     <div class="logout" id="btn-cerrar-sesion">Cerrar sesión</div>
   </aside>
 
-  <!-- ================= MAIN ================= -->
+  <!-- MAIN -->
   <main class="main">
 
     <div class="topbar">
@@ -56,9 +71,10 @@
 
     <div class="dashboard">
 
+      <!-- BALANCE -->
       <div class="card balance">
         <h3>Tu Balance</h3>
-        <div class="amount positive" id="balance">+0€</div>
+        <div class="amount positive" id="balance">0€</div>
 
         <div class="details">
           <p>Total gastos del piso <span id="totalPiso">0€</span></p>
@@ -69,38 +85,70 @@
         <button class="btn-primary">+ Añadir gasto</button>
       </div>
 
+      <!-- TAREAS -->
       <div class="card">
         <h3>Tareas de hoy</h3>
-        <ul class="tasks">
-          <li><input type="checkbox"> Sacar la basura</li>
-          <li><input type="checkbox" checked> Limpiar salón</li>
-          <li><input type="checkbox"> Comprar papel</li>
+
+        <ul class="tasks" id="listaTareas">
+          <!-- JS -->
         </ul>
+
+        <!-- PROGRESO -->
+        <div class="progress">
+          <div class="progress-bar" id="barraProgreso"></div>
+        </div>
+
+        <!-- CONTADOR -->
+        <div class="tareas-footer">
+          <span id="contadorTareas"></span>
+        </div>
       </div>
 
+      <!-- GASTOS -->
       <div class="card full">
         <h3>Gastos recientes</h3>
         <div id="gastosPreview"></div>
       </div>
 
+      <!-- REPARTO -->
       <div class="card">
         <h3>Reparto</h3>
-        <div class="reparto">
-          <p>Laura <span class="green">+35€</span></p>
-          <p>Pablo <span class="red">-12€</span></p>
-          <p>Marta <span class="red">-23€</span></p>
+
+        <div class="reparto" id="repartoPreview">
+          <!-- JS -->
+        </div>
+      </div>
+
+      <!-- AVISOS -->
+      <div class="card">
+        <h3>Avisos del piso</h3>
+
+        <div id="avisosPreview">
+          <!-- JS -->
         </div>
       </div>
 
     </div>
 
   </main>
+
 </div>
 
-<!-- JS EXTERNO -->
+
+<div id="modalConfirm" class="modal hidden">
+  <div class="modal-content">
+    <p id="modalText">¿Marcar tarea como completada?</p>
+
+    <div class="modal-actions">
+      <button id="cancelarBtn" class="btn-secondary">Cancelar</button>
+      <button id="confirmarBtn" class="btn-primary">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- JS -->
 <script src="../js/homeUser.js"></script>
 <script src="../js/cerrarSesion.js"></script>
 
 </body>
 </html>
-
