@@ -1,0 +1,244 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Inter", Arial, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background: #f4f4f3;
+    color: #1f2937;
+    display: flex;
+}
+
+/* SIDEBAR */
+.sidebar-admin {
+    width: 250px;
+    height: 100vh;
+    background: #ffffff;
+    border-right: 1px solid #e5e7eb;
+    padding: 28px 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid #eeeeee;
+}
+
+.avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: #222;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.admin-info h3 {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.admin-info p {
+    font-size: 10px;
+    color: #888;
+    font-weight: 700;
+}
+
+nav {
+    margin-top: 16px;
+}
+
+nav a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border-radius: 2px;
+    font-size: 14px;
+    color: #444;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+nav a.active {
+    background: #efede9;
+    color: #111;
+    font-weight: 700;
+    border-right: 4px solid #222;
+}
+
+nav a span {
+    background: #222;
+    color: white;
+    font-size: 11px;
+    padding: 2px 7px;
+    border-radius: 999px;
+}
+
+.logout {
+    margin-top: auto;
+    padding: 16px 12px;
+    border: none;
+    border-top: 1px solid #eee;
+    background: transparent;
+    color: #ef4444;
+    text-align: left;
+    cursor: pointer;
+}
+
+/* MAIN */
+.admin-main {
+    flex: 1;
+    padding: 32px;
+    background: #f5f5f4;
+}
+
+.admin-main header {
+    margin-bottom: 20px;
+}
+
+.admin-main header h1 {
+    font-size: 24px;
+    color: #111827;
+}
+
+.admin-main header p {
+    margin-top: 4px;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 18px;
+}
+
+.card h2 {
+    font-size: 18px;
+    margin-bottom: 18px;
+    color: #222;
+}
+
+.card label {
+    display: block;
+    margin: 14px 0 6px;
+    font-size: 11px;
+    color: #888;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.card input {
+    width: 100%;
+    height: 38px;
+    border: 1px solid #dedede;
+    border-radius: 8px;
+    padding: 0 12px;
+    background: #f7f7f6;
+    color: #333;
+}
+
+.row {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 14px;
+}
+
+/* REGLAS */
+.card p {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.card p::after {
+    content: "";
+    float: right;
+    width: 38px;
+    height: 22px;
+    background: #3f7f5f;
+    border-radius: 999px;
+}
+
+.card h3 {
+    margin-top: 18px;
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: #777;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.card button {
+    padding: 9px 16px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    cursor: pointer;
+    margin-right: 8px;
+    font-weight: 600;
+}
+
+.card button.active-btn {
+    background: #222;
+    color: white;
+}
+
+/* ZONA PELIGRO */
+.danger button:first-of-type {
+    background: #fee2e2;
+    color: #dc2626;
+    border: none;
+}
+
+.save-btn {
+    float: right;
+    margin-top: -4px;
+    padding: 14px 26px;
+    background: #222;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    body {
+        flex-direction: column;
+    }
+
+    .sidebar-admin {
+        width: 100%;
+        height: auto;
+    }
+
+    .admin-main {
+        padding: 18px;
+    }
+
+    .row {
+        grid-template-columns: 1fr;
+    }
+
+    .save-btn {
+        width: 100%;
+        float: none;
+    }
+}
