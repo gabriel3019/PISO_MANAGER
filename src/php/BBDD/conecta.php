@@ -2,7 +2,9 @@
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "piso_manager"; 
+$dbname = "piso_manager";
+
+require_once __DIR__ . '/crear_tabla.php';
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
