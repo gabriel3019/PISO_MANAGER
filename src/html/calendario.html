@@ -155,8 +155,12 @@
                         <label for="event-start-date">Fecha de inicio</label>
                         <input type="date" id="event-start-date">
 
-                        <label for="event-end-date">Fecha de fin</label>
+                        <label for="event-end-date">Fecha de fin opcional</label>
                         <input type="date" id="event-end-date">
+
+                        <small class="form-help">
+                            Si no sabes cuándo terminará, deja la fecha de fin vacía.
+                        </small>
                     </div>
 
                     <!-- BLOQUE TAREA / EVENTO -->
@@ -180,6 +184,39 @@
                                 <input type="checkbox" name="event-people" value="2">
                                 Carlos
                             </label>
+                        </div>
+                    </div>
+
+                    <div id="repeat-fields" class="conditional-fields hidden">
+                        <div class="repeat-box">
+                            <label class="repeat-main">
+                                <input type="checkbox" id="task-repeat">
+                                Repetir tarea
+                            </label>
+
+                            <div id="repeat-options" class="repeat-options hidden">
+                                <span class="repeat-options-title">Días de la semana</span>
+
+                                <div class="repeat-days-grid">
+                                    <label><input type="checkbox" name="repeat-days" value="1"> Lunes</label>
+                                    <label><input type="checkbox" name="repeat-days" value="2"> Martes</label>
+                                    <label><input type="checkbox" name="repeat-days" value="3"> Miércoles</label>
+                                    <label><input type="checkbox" name="repeat-days" value="4"> Jueves</label>
+                                    <label><input type="checkbox" name="repeat-days" value="5"> Viernes</label>
+                                    <label><input type="checkbox" name="repeat-days" value="6"> Sábado</label>
+                                    <label><input type="checkbox" name="repeat-days" value="0"> Domingo</label>
+                                </div>
+
+                                <div class="repeat-select-row">
+                                    <label for="repeat-weeks">Repetir durante</label>
+                                    <select id="repeat-weeks">
+                                        <option value="1">Solo esta semana</option>
+                                        <option value="2">2 semanas</option>
+                                        <option value="4">4 semanas</option>
+                                        <option value="8">8 semanas</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -285,23 +322,18 @@
                     </div>
 
                     <div class="detail-box">
-                        <span class="detail-label">Fecha / rango</span>
+                        <span id="detail-day-label" class="detail-label">Fecha / rango</span>
                         <span id="detail-day" class="detail-value"></span>
                     </div>
 
-                    <div class="detail-box">
+                    <div id="detail-time-box" class="detail-box">
                         <span class="detail-label">Hora</span>
                         <span id="detail-time" class="detail-value"></span>
                     </div>
 
                     <div class="detail-box">
-                        <span class="detail-label">Personas asignadas</span>
+                        <span id="detail-person-label" class="detail-label">Personas asignadas</span>
                         <span id="detail-person" class="detail-value"></span>
-                    </div>
-
-                    <div class="detail-box">
-                        <span class="detail-label">Color</span>
-                        <span id="detail-color" class="detail-value"></span>
                     </div>
 
                     <div class="detail-box">

@@ -146,6 +146,18 @@ body {
     cursor: pointer;
 }
 
+.btn-warning {
+    background: #f59e0b;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 14px;
+}
+
+.btn-warning:hover {
+    background: #d97706;
+}
+
 /* ================= BUTTONS ================= */
 .calendar-actions button {
     padding: 10px 14px;
@@ -178,7 +190,7 @@ body {
     background: #2563eb;
     color: white;
     border: none;
-    padding: 10px 16px; 
+    padding: 10px 16px;
     border-radius: 5px;
 }
 
@@ -322,23 +334,21 @@ body {
 }
 
 .calendar-day {
-    min-height: 0;
-    height: 100%;
-    padding: 6px;
-    border: 1px solid #eef2f7;
+    background: #fff;
+    border: 1px solid #e5e7eb;
     border-radius: 12px;
-    background: #ffffff;
-    display: flex;
-    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    padding: 8px;
+    box-sizing: border-box;
     overflow: hidden;
+    min-width: 0;
 }
 
 .calendar-day-number {
-    margin-bottom: 6px;
-    font-size: 13px;
-    font-weight: 500;
-    color: #334155;
-    flex-shrink: 0;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #111827;
 }
 
 .other-month {
@@ -347,15 +357,18 @@ body {
 
 /* ================= EVENTS ================= */
 .event {
-    margin-bottom: 4px;
-    padding: 4px 6px;
-    font-size: 11px;
+    font-size: 12px;
+    padding: 6px 8px;
     border-radius: 8px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+    margin-bottom: 6px;
     cursor: pointer;
-    flex-shrink: 0;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    display: block;
+    width: 100%;
 }
 
 .event.incidencia {
@@ -377,6 +390,57 @@ body {
     background: #e5e7eb !important;
     color: #6b7280 !important;
     text-decoration: line-through;
+}
+
+/* ================= REPEAT TASK ================= */
+
+.repeat-box {
+    margin-top: 8px;
+    padding: 14px;
+    border: 1px solid #dbeafe;
+    background: #f8fbff;
+    border-radius: 14px;
+}
+
+.repeat-main {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    color: #1e3a8a;
+    margin-bottom: 10px;
+}
+
+.repeat-options {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #dbeafe;
+}
+
+.repeat-options-title {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #334155;
+}
+
+.repeat-days-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.repeat-select-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.repeat-select-row label {
+    margin: 0;
+    white-space: nowrap;
 }
 
 /* ================= RIGHT SIDEBAR ================= */
@@ -601,6 +665,12 @@ body {
     margin-top: 20px;
 }
 
+.form-help {
+    font-size: 12px;
+    color: #64748b;
+    margin-top: -4px;
+}
+
 /* ================= RESPONSIVE ================= */
 @media (max-width: 1100px) {
     .calendar-layout {
@@ -646,17 +716,48 @@ body {
     }
 
     .calendar-day {
-        padding: 4px;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        min-height: 110px;
+        padding: 8px;
+        box-sizing: border-box;
     }
 
+    .calendar-day.other-month {
+        background: #f9fafb;
+        color: #9ca3af;
+    }
+
+
     .calendar-day-number {
-        font-size: 12px;
-        margin-bottom: 4px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: #111827;
     }
 
     .event {
-        font-size: 10px;
-        padding: 3px 4px;
+        font-size: 12px;
+        padding: 6px 8px;
+        border-radius: 8px;
+        margin-bottom: 6px;
+        cursor: pointer;
+        color: #fff;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .event.incidencia {
+        background: #ef4444;
+    }
+
+    .event.tarea {
+        background: #22c55e;
+    }
+
+    .event.evento {
+        background: #3b82f6;
     }
 
     .details-grid {

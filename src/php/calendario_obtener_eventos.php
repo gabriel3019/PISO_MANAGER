@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json');
-require_once '../BBDD/conecta.php';
+require_once __DIR__ . '/BBDD/conecta.php';
 
 $id_piso = isset($_GET['id_piso']) ? (int)$_GET['id_piso'] : 1;
 

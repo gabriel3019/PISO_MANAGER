@@ -12,7 +12,7 @@ const personasLista = ["Tú", "Laura", "Pablo", "Marta"];
 const modal = document.getElementById("gastoModal");
 const deleteModal = document.getElementById("deleteModal");
 
-// 🔥 NUEVO (DETALLE)
+// NUEVO (DETALLE)
 const detalleModal = document.getElementById("detalleModal");
 const detalleContenido = document.getElementById("detalleContenido");
 const closeDetalle = document.getElementById("closeDetalle");
