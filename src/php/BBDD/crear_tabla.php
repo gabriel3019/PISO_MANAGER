@@ -199,18 +199,86 @@ if ($row['total'] == 0) {
     (2,3,'Sigue sin funcionar');
 
     /* ===== CALENDARIO ===== */
-    INSERT INTO calendario_eventos (id_piso, titulo, tipo, fecha, fecha_inicio, fecha_fin, hora, estado) VALUES
-    (1,'Cena del piso','evento','2026-04-20','2026-04-20',NULL,'21:30:00','pendiente');
 
-   SET @id_evento_cena = LAST_INSERT_ID();
-
-    INSERT INTO calendario_evento_personas 
-    (id_evento, id_usuario) 
+    INSERT INTO calendario_eventos 
+    (id_piso, titulo, tipo, fecha, fecha_inicio, fecha_fin, hora, estado) 
     VALUES
-    (@id_evento_cena,2),
-    (@id_evento_cena,3),
-    (@id_evento_cena,4);
+    (1, 'Cena del piso', 'evento', '2026-04-20', '2026-04-20', NULL, '21:30:00', 'pendiente');
 
+    SET @id_evento_cena = LAST_INSERT_ID();
+
+    INSERT INTO calendario_evento_personas (id_evento, id_usuario) 
+    VALUES
+    (@id_evento_cena, 2),
+    (@id_evento_cena, 3),
+    (@id_evento_cena, 4);
+
+
+    /* ===== 3 EVENTOS EL MISMO DÍA ===== */
+
+    INSERT INTO calendario_eventos 
+    (id_piso, titulo, tipo, fecha, fecha_inicio, fecha_fin, hora, estado) 
+    VALUES
+    (1, 'Compra semanal', 'tarea', '2026-05-22', '2026-05-22', NULL, '10:00:00', 'pendiente');
+
+    SET @id_tarea_compra = LAST_INSERT_ID();
+
+    INSERT INTO calendario_evento_personas (id_evento, id_usuario) 
+    VALUES
+    (@id_tarea_compra, 2);
+
+
+    INSERT INTO calendario_eventos 
+    (id_piso, titulo, tipo, fecha, fecha_inicio, fecha_fin, hora, estado) 
+    VALUES
+    (1, 'Reunión de convivencia', 'evento', '2026-05-22', '2026-05-22', NULL, '18:00:00', 'pendiente');
+
+    SET @id_evento_reunion = LAST_INSERT_ID();
+
+    INSERT INTO calendario_evento_personas (id_evento, id_usuario) 
+    VALUES
+    (@id_evento_reunion, 2),
+    (@id_evento_reunion, 3),
+    (@id_evento_reunion, 4);
+
+
+    INSERT INTO calendario_eventos 
+    (id_piso, titulo, tipo, fecha, fecha_inicio, fecha_fin, hora, estado) 
+    VALUES
+    (1, 'Limpiar cocina', 'tarea', '2026-05-22', '2026-05-22', NULL, '20:00:00', 'pendiente');
+
+    SET @id_tarea_cocina = LAST_INSERT_ID();
+
+    INSERT INTO calendario_evento_personas (id_evento, id_usuario) 
+    VALUES
+    (@id_tarea_cocina, 3);
+
+
+    /* ===== INCIDENCIAS ===== */
+
+    INSERT INTO calendario_eventos 
+    (id_piso, titulo, tipo, fecha, fecha_inicio, fecha_fin, hora, estado) 
+    VALUES
+    (1, 'Fuga de agua en el baño', 'incidencia', '2026-05-24', '2026-05-26', NULL, NULL, 'pendiente');
+
+    SET @id_incidencia_agua = LAST_INSERT_ID();
+
+    INSERT INTO calendario_evento_personas (id_evento, id_usuario) 
+    VALUES
+    (@id_incidencia_agua, 2),
+    (@id_incidencia_agua, 4);
+
+
+    INSERT INTO calendario_eventos 
+    (id_piso, titulo, tipo, fecha, fecha_inicio, fecha_fin, hora, estado) 
+    VALUES
+    (1, 'Bombilla del pasillo fundida', 'incidencia', '2026-05-28', '2026-05-28', NULL, NULL, 'pendiente');
+
+    SET @id_incidencia_bombilla = LAST_INSERT_ID();
+
+    INSERT INTO calendario_evento_personas (id_evento, id_usuario) 
+    VALUES
+    (@id_incidencia_bombilla, 3);
     ";
 
     $conn->multi_query($sqlDatos);
@@ -219,3 +287,4 @@ if ($row['total'] == 0) {
 }
 
 $conn->close();
+?>

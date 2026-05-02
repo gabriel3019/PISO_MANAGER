@@ -259,7 +259,8 @@ function renderCalendar(date) {
 
             if (evento.tipo === "incidencia") {
                 if (evento.estado === "resuelta") return false;
-                return evento.fechaInicio === fullDate;
+
+                 return evento.fechaInicio === fullDate;
             }
 
             return evento.fecha === fullDate;
