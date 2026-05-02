@@ -1,12 +1,21 @@
-<!DOCTYPE html>
-<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Panel de Inicio</title>
 
+
+  <script>
+    if (localStorage.getItem("darkMode") === "true") {
+      document.documentElement.classList.add("dark");
+    }
+  </script>
+
+  <!-- FUENTE -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- CSS -->
   <link rel="stylesheet" href="../css/homeUser.css">
+  <link rel="stylesheet" href="../css/dark-mode.css">
 </head>
 
 <body>
@@ -22,7 +31,7 @@
       <p class="section-title">PRINCIPAL</p>
       <ul>
         <li class="active">
-          <a href="#"><img src="../css/icons/house.svg" class="icon"> Inicio</a>
+          <a href="homeUser.html"><img src="../css/icons/house.svg" class="icon"> Inicio</a>
         </li>
         <li>
           <a href="gastosComunesUser.html"><img src="../css/icons/euro.svg" class="icon"> Gastos</a>
@@ -51,7 +60,7 @@
       <p class="section-title">CUENTA</p>
       <ul>
         <li>
-          <a href="#"><img src="../css/icons/settings.svg" class="icon"> Ajustes</a>
+          <a href="ajustes.html"><img src="../css/icons/settings.svg" class="icon"> Ajustes</a>
         </li>
       </ul>
     </div>
@@ -147,6 +156,7 @@
 </div>
 
 <!-- JS -->
+ <script src="../js/dark-mode.js"></script>
 <script src="../js/homeUser.js"></script>
 <script src="../js/cerrarSesion.js"></script>
 

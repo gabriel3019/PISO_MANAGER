@@ -770,6 +770,53 @@ body {
   text-align: center;
 }
 
+
+/* ================= DARK MODE AJUSTES ================= */
+
+body.dark .settings {
+  color: #e5e7eb;
+}
+
+/* CARD */
+body.dark .card {
+  background: #020617;
+  border-color: #1e293b;
+}
+
+/* INPUTS */
+body.dark .form-group input {
+  background: #020617;
+  color: #e5e7eb;
+  border-color: #1e293b;
+}
+
+/* LABELS */
+body.dark label {
+  color: #cbd5f5;
+}
+
+/* AVATAR BUTTON */
+body.dark .avatar button {
+  background: #1e293b;
+  color: #e5e7eb;
+}
+
+/* SWITCH */
+body.dark .slider {
+  background: #374151;
+}
+
+body.dark input:checked + .slider {
+  background: #2563eb;
+}
+
+body,
+.card,
+input,
+.slider {
+  transition: all 0.3s ease;
+}
+
 /* ── Responsive básico ── */
 @media (max-width: 860px) {
   .stats-grid { grid-template-columns: repeat(2, 1fr); }

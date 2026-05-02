@@ -63,6 +63,15 @@ body {
   font-weight: 500;
 }
 
+.sidebar li a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ICONOS */
 .icon {
   width: 18px;
   opacity: 0.6;
@@ -72,6 +81,7 @@ body {
   opacity: 1;
 }
 
+/* BADGES */
 .badge {
   margin-left: auto;
   background: #2563eb;
@@ -90,6 +100,7 @@ body {
   color: #dc2626;
   padding: 12px;
   border-top: 1px solid #f1f5f9;
+  cursor: pointer;
 }
 
 /* ================= MAIN ================= */
@@ -243,36 +254,53 @@ h1 {
   margin-left: 5px;
 }
 
-/* TAGS */
+/* ================= TAG PRIORIDAD ================= */
 .tag {
   padding: 2px 7px;
   border-radius: 999px;
   font-size: 11px;
+  font-weight: 500;
 }
 
-.red { background: #fee2e2; color: #dc2626; }
-.yellow { background: #fef3c7; color: #d97706; }
-.blue { background: #dbeafe; color: #2563eb; }
+.tag.baja {
+  background: #dcfce7;
+  color: #059669;
+}
 
-/* RIGHT */
+.tag.media {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.tag.alta {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* ================= RIGHT ================= */
 .right {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.avatars span {
-  width: 22px;
-  height: 22px;
-  background: #e5e7eb;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 9px;
+/* ICONOS BOTONES */
+.edit-btn,
+.delete-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  opacity: 0.6;
 }
 
-/* COMPLETED */
+.edit-btn:hover,
+.delete-btn:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* ================= COMPLETED ================= */
 .completed {
   opacity: 0.5;
   text-decoration: line-through;
@@ -302,20 +330,11 @@ h1 {
   animation: fadeIn 0.2s ease;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* HEADER */
+/* HEADER MODAL */
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-.modal-header h2 {
-  font-size: 18px;
 }
 
 .close {
@@ -326,6 +345,11 @@ h1 {
 
 .close:hover {
   color: #111827;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* ================= FORM ================= */
@@ -342,16 +366,6 @@ h1 {
   gap: 4px;
 }
 
-/* 👇 CLAVE PARA QUE TODO SE VEA EN UNA FILA */
-.form-row {
-  display: flex;
-  gap: 10px;
-}
-
-.form-row .form-group {
-  flex: 1;
-}
-
 /* INPUTS */
 .modal-body input,
 .modal-body textarea,
@@ -361,16 +375,6 @@ h1 {
   border-radius: 8px;
   border: 1px solid #e5e7eb;
   background: #f9fafb;
-  transition: 0.2s;
-}
-
-.modal-body textarea {
-  resize: none;
-  min-height: 70px;
-}
-
-select[multiple] {
-  height: 80px;
 }
 
 /* FOCUS */
@@ -383,19 +387,7 @@ select[multiple] {
   box-shadow: 0 0 0 2px rgba(37,99,235,0.1);
 }
 
-/* ERRORES */
-.error-text {
-  font-size: 11px;
-  color: #dc2626;
-  min-height: 12px;
-}
-
-.input-error {
-  border-color: #dc2626 !important;
-  background: #fef2f2;
-}
-
-/* PRIORIDAD */
+/* ================= PRIORIDAD ================= */
 .priority-selector {
   display: flex;
   gap: 8px;
@@ -428,19 +420,13 @@ select[multiple] {
   color: #dc2626;
 }
 
-.edit-btn {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-/* MODAL ELIMINAR */
+/* ===== MODAL ELIMINAR ===== */
 .delete-modal {
   text-align: center;
-  max-width: 340px;
+  max-width: 360px;
 }
 
+/* icono */
 .delete-icon {
   width: 60px;
   height: 60px;
@@ -454,6 +440,7 @@ select[multiple] {
   margin: 0 auto 15px;
 }
 
+/* texto */
 .delete-modal h2 {
   margin-bottom: 10px;
 }
@@ -464,7 +451,20 @@ select[multiple] {
   margin-bottom: 20px;
 }
 
-/* botones */
+/* 🔥 BOTONES BIEN */
+.modal-footer.center {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* cancelar */
+.modal-footer.center .btn-light {
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+}
+
+/* eliminar */
 .btn-danger {
   background: #dc2626;
   color: white;
@@ -477,56 +477,79 @@ select[multiple] {
   background: #b91c1c;
 }
 
-.modal-footer.center {
-  justify-content: center;
+
+/* ================= DARK MODE AJUSTES ================= */
+
+body.dark .settings {
+  color: #e5e7eb;
 }
 
-.sidebar li a {
+/* CARD */
+body.dark .card {
+  background: #020617;
+  border-color: #1e293b;
+}
+
+/* INPUTS */
+body.dark .form-group input {
+  background: #020617;
+  color: #e5e7eb;
+  border-color: #1e293b;
+}
+
+/* LABELS */
+body.dark label {
+  color: #cbd5f5;
+}
+
+/* AVATAR BUTTON */
+body.dark .avatar button {
+  background: #1e293b;
+  color: #e5e7eb;
+}
+
+/* SWITCH */
+body.dark .slider {
+  background: #374151;
+}
+
+body.dark input:checked + .slider {
+  background: #2563eb;
+}
+
+body,
+.card,
+input,
+.slider {
+  transition: all 0.3s ease;
+}
+
+/* ================= FOOTER ================= */
+.modal-footer {
   display: flex;
+  justify-content: space-between; /* 🔥 clave */
   align-items: center;
-  gap: 10px;
-  width: 100%;
-  text-decoration: none;
-  color: inherit;
+  margin-top: 18px;
 }
 
-/* ================= TOAST CENTRADO ================= */
+/* ================= TOAST ================= */
 .toast {
   position: fixed;
   top: 20px;
   left: 50%;
   transform: translateX(-50%) translateY(-20px);
-
   background: #111827;
   color: white;
-
   padding: 10px 18px;
   border-radius: 10px;
-
   font-size: 13px;
   font-weight: 500;
-
   opacity: 0;
   transition: all 0.3s ease;
-
   z-index: 2000;
 }
 
-/* cuando aparece */
 .toast.show {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
-}
-
-/* FOOTER */
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 18px;
-}
-
-.modal-footer button {
-  font-size: 13px;
-  padding: 7px 12px;
 }

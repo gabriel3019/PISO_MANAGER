@@ -5,8 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calendario - PSIO Manager</title>
+
+      <script>
+    if (localStorage.getItem("darkMode") === "true") {
+      document.documentElement.classList.add("dark");
+    }
+  </script>
+
     <link rel="stylesheet" href="../css/general.css">
     <link rel="stylesheet" href="../css/calendario.css">
+    <link rel="stylesheet" href="../css/dark-mode.css">
 </head>
 
 <body>
@@ -318,6 +326,7 @@
             </div>
         </div>
 
+        <script src="../js/dark-mode.js"></script>
         <script src="../js/calendario.js"></script>
         <script src="../js/cerrarSesion.js"></script>
     </div>

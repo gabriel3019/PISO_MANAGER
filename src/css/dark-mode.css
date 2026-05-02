@@ -1,0 +1,88 @@
+/* ================= DARK MODE GLOBAL ================= */
+
+body.dark {
+  background: #020617;
+  color: #e5e7eb;
+}
+
+/* SIDEBAR */
+body.dark .sidebar {
+  background: #020617;
+  border-right: 1px solid #1e293b;
+}
+
+body.dark .sidebar a {
+  color: #cbd5f5;
+}
+
+body.dark .sidebar li.active a,
+body.dark .sidebar a:hover {
+  background: #1e293b;
+  color: #ffffff;
+}
+
+/* TEXTOS */
+body.dark p,
+body.dark span,
+body.dark li,
+body.dark h1,
+body.dark h2,
+body.dark h3 {
+  color: #e5e7eb;
+}
+
+body.dark .subtitle,
+body.dark .section-title {
+  color: #94a3b8;
+}
+
+/* MAIN */
+body.dark .main {
+  background: #020617;
+}
+
+/* CARDS */
+body.dark .card {
+  background: #020617;
+  border: 1px solid #1e293b;
+  box-shadow: none;
+}
+
+/* INPUTS */
+body.dark input,
+body.dark textarea,
+body.dark select {
+  background: #020617;
+  color: #e5e7eb;
+  border: 1px solid #1e293b;
+}
+
+/* LISTAS / BLOQUES */
+body.dark .gasto-item,
+body.dark .aviso {
+  background: #020617;
+  border: 1px solid #1e293b;
+}
+
+/* HOVER */
+body.dark .aviso:hover {
+  background: #1e293b;
+}
+
+/* PROGRESS */
+body.dark .progress {
+  background: #1e293b;
+}
+
+/* MODALES */
+body.dark .modal,
+body.dark .modal-content {
+  background: #020617;
+  color: #e5e7eb;
+}
+
+/* BOTONES */
+body.dark .btn-secondary {
+  background: #1e293b;
+  color: #e5e7eb;
+}

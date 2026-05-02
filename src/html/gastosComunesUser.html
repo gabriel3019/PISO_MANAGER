@@ -6,8 +6,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gastos Comunes</title>
 
+  <script>
+    if (localStorage.getItem("darkMode") === "true") {
+      document.documentElement.classList.add("dark");
+    }
+  </script>
+
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/gastosComunesUser.css">
+  <link rel="stylesheet" href="../css/dark-mode.css">
 </head>
 
 <body>
@@ -204,6 +211,7 @@
 
     </div>
   </div>
+  <script src="../js/dark-mode.js"></script>
   <script src="../js/gastosComunes.js"></script>
   <script src="../js/cerrarSesion.js"></script>
 

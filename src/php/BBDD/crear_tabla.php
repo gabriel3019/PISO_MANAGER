@@ -21,13 +21,21 @@ $conn->select_db("piso_manager");
 /* ================= TABLAS ================= */
 $sql = "
 
-/* ===== USUARIOS ===== */
-CREATE TABLE IF NOT EXISTS usuarios (
+/* ===== USUARIOS  ===== */
+    CREATE TABLE IF NOT EXISTS usuarios (
     id_usuario INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100),
+    apellidos VARCHAR(150),
     email VARCHAR(100) UNIQUE,
-    password VARCHAR(255)
+    password VARCHAR(255),
+
+    telefono VARCHAR(20),
+    direccion VARCHAR(255),
+    foto VARCHAR(255),
+
+    modo_oscuro BOOLEAN DEFAULT FALSE
 );
+
 
 /* ===== PISOS ===== */
 CREATE TABLE IF NOT EXISTS pisos (
@@ -72,10 +80,21 @@ CREATE TABLE IF NOT EXISTS gastos_participantes (
 /* ===== TAREAS ===== */
 CREATE TABLE IF NOT EXISTS tareas (
     id_tarea INT AUTO_INCREMENT PRIMARY KEY,
-    id_piso INT,
-    id_usuario INT,
-    titulo VARCHAR(100),
+    id_piso INT NOT NULL,
+    id_usuario INT NOT NULL,
+
+    titulo VARCHAR(150) NOT NULL,
+    descripcion TEXT,
+
     estado ENUM('pendiente','completada') DEFAULT 'pendiente',
+
+    prioridad ENUM('baja','media','alta') DEFAULT 'baja',
+
+    fecha DATE,
+    frecuencia ENUM('puntual','semanal','quincenal','mensual') DEFAULT 'puntual',
+
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
     FOREIGN KEY (id_piso) REFERENCES pisos(id_piso) ON DELETE CASCADE,
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
 );
@@ -151,11 +170,11 @@ if ($row['total'] == 0) {
     $sqlDatos = "
 
     /* ===== USUARIOS ===== */
-    INSERT INTO usuarios (nombre, email, password) VALUES
-    ('Admin','admin@mail.com','$passAdmin'),
-    ('Carlos','carlos@mail.com','$passUser'),
-    ('Celia','celia@mail.com','$passUser'),
-    ('Gabriel','gabriel@mail.com','$passUser');
+    INSERT INTO usuarios (nombre, apellidos, email, password, telefono, direccion) VALUES
+    ('Admin','Principal','admin@mail.com','$passAdmin','600000001','Calle Mayor 12 - Piso 1A'),
+    ('Carlos','Gomez','carlos@mail.com','$passUser','600000002','Calle Mayor 12 - Habitación 1'),
+    ('Celia','Lopez','celia@mail.com','$passUser','600000003','Calle Mayor 12 - Habitación 2'),
+    ('Gabriel','Gimenes','gabriel@mail.com','$passUser','600000004','Calle Mayor 12 - Habitación 3');
 
     /* ===== PISO ===== */
     INSERT INTO pisos (nombre, codigo_invitacion, creado_por)
@@ -175,8 +194,12 @@ if ($row['total'] == 0) {
     (1,4,15.00,0);
 
     /* ===== TAREAS ===== */
-    INSERT INTO tareas (id_piso,id_usuario,titulo)
-    VALUES (1,2,'Limpiar cocina'),(1,4,'Sacar basura');
+    INSERT INTO tareas 
+    (id_piso, id_usuario, titulo, descripcion, prioridad, fecha, frecuencia) VALUES 
+    (1, 2, 'Limpiar cocina', 'Fregar suelo y limpiar encimera', 'media', '2026-05-05', 'semanal'),
+    (1, 4, 'Sacar basura', 'Bajar bolsas al contenedor', 'baja', '2026-05-03', 'puntual'),
+    (1, 3, 'Limpiar baño', 'Limpiar ducha, lavabo y WC', 'alta', '2026-05-06', 'quincenal'),
+    (1, 1, 'Comprar papel higiénico', 'Reponer papel higiénico', 'media', '2026-05-04', 'puntual');
 
     /* ===== AVISOS ===== */
     INSERT INTO avisos VALUES
