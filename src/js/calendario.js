@@ -1,6 +1,14 @@
+const API_URL = "/PISO_MANAGER/src/php/calendario.php";
+
 const monthTitle = document.getElementById("month-title");
 const calendarGrid = document.getElementById("calendar-grid");
 const eventsList = document.getElementById("events-list");
+
+const repeatFields = document.getElementById("repeat-fields");
+const taskRepeatInput = document.getElementById("task-repeat");
+const repeatOptions = document.getElementById("repeat-options");
+const repeatDayInputs = document.querySelectorAll('input[name="repeat-days"]');
+const repeatWeeksInput = document.getElementById("repeat-weeks");
 
 const eventWarning = document.getElementById("event-warning");
 const modalAdd = document.getElementById("modal-add");
@@ -20,52 +28,29 @@ const peopleFields = document.getElementById("people-fields");
 const timeFields = document.getElementById("time-fields");
 const eventPeopleInputs = document.querySelectorAll('input[name="event-people"]');
 
+const detailDayLabel = document.getElementById("detail-day-label");
+const detailPersonLabel = document.getElementById("detail-person-label");
+const detailTimeBox = document.getElementById("detail-time-box");
+
 const detailBadge = document.getElementById("detail-badge");
 const detailTitle = document.getElementById("detail-title");
 const detailType = document.getElementById("detail-type");
 const detailDay = document.getElementById("detail-day");
 const detailTime = document.getElementById("detail-time");
 const detailPerson = document.getElementById("detail-person");
-const detailColor = document.getElementById("detail-color");
 const detailStatus = document.getElementById("detail-status");
 
 const resolveIncidenciaBtn = document.getElementById("resolve-incidencia-btn");
 const completeTaskBtn = document.getElementById("complete-task-btn");
 
-let currentDate = new Date(2026, 3, 1);
-let selectedEvent = null;
+const modalDay = document.getElementById("modal-day");
+const dayModalTitle = document.getElementById("day-modal-title");
+const dayEventsList = document.getElementById("day-events-list");
 
-let eventos = [
-    {
-        titulo: "Lavadora averiada",
-        tipo: "incidencia",
-        fechaInicio: "2026-04-10",
-        fechaFin: "2026-04-14",
-        estado: "activa"
-    },
-    {
-        titulo: "Limpiar baño",
-        tipo: "tarea",
-        fecha: "2026-04-15",
-        hora: "18:00",
-        persona: "Celia",
-        estado: "pendiente"
-    },
-    {
-        titulo: "Cena del piso",
-        tipo: "evento",
-        fecha: "2026-04-20",
-        hora: "21:30",
-        personas: ["Celia", "Gabriel", "Carlos"]
-    },
-    {
-        titulo: "Comida con amigos",
-        tipo: "evento",
-        fecha: "2026-04-21",
-        hora: "14:00",
-        personas: ["Celia"]
-    }
-];
+
+let currentDate = new Date(2026, 4, 1);
+let selectedEvent = null;
+let eventos = [];
 
 const monthNames = [
     "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -76,12 +61,6 @@ const typeNames = {
     incidencia: "Incidencia",
     tarea: "Tarea",
     evento: "Evento"
-};
-
-const typeColors = {
-    incidencia: "Rojo",
-    tarea: "Verde",
-    evento: "Azul"
 };
 
 function openModal(modal) {
@@ -103,9 +82,14 @@ function formatDateText(fecha) {
 }
 
 function formatRangeText(inicio, fin) {
+    if (!inicio && !fin) return "-";
+    if (inicio && !fin) return `${formatDateText(inicio)} - sin fecha de fin`;
+    if (!inicio && fin) return formatDateText(fin);
+
     if (inicio === fin) {
         return formatDateText(inicio);
     }
+
     return `${formatDateText(inicio)} - ${formatDateText(fin)}`;
 }
 
@@ -121,25 +105,64 @@ function getMonthRange(year, month) {
     return { firstDay, lastDay };
 }
 
+function openDayModal(fecha, eventosDelDia) {
+    dayModalTitle.textContent = `Eventos del ${formatDateText(fecha)}`;
+    dayEventsList.innerHTML = "";
+
+    if (eventosDelDia.length === 0) {
+        dayEventsList.innerHTML = "<p>No hay eventos este día.</p>";
+    } else {
+        eventosDelDia.forEach((evento) => {
+            const card = document.createElement("div");
+            card.className = `day-event-card ${evento.tipo}`;
+
+            card.innerHTML = `
+                <div class="day-event-title">${evento.titulo}</div>
+                <div class="day-event-meta">
+                    ${typeNames[evento.tipo]} ${evento.hora ? "· " + evento.hora : ""}
+                </div>
+            `;
+
+            card.addEventListener("click", (e) => {
+                e.stopPropagation();
+                closeModal(modalDay);
+                selectedEvent = evento;
+                showEventDetails(evento);
+            });
+
+            dayEventsList.appendChild(card);
+        });
+    }
+
+    openModal(modalDay);
+}
+
 async function cargarEventos() {
     try {
-        const response = await fetch("../php/calendario_obtener_eventos.php?id_piso=1");
-        const data = await response.json();
+        const response = await fetch(`${API_URL}?action=obtener&id_piso=1`);
+        const texto = await response.text();
+
+        console.log("Respuesta cruda del PHP:", texto);
+
+        const data = JSON.parse(texto);
 
         if (data.success) {
             eventos = data.eventos;
-            renderCalendar(currentDate);
         } else {
             console.error("Error:", data.message);
+            eventos = [];
         }
     } catch (error) {
         console.error("Error al cargar eventos:", error);
+        eventos = [];
     }
+
+    renderCalendar(currentDate);
 }
 
 async function guardarEventoEnBD(evento) {
     try {
-        const response = await fetch("../php/calendario/crear_evento.php", {
+        const response = await fetch(`${API_URL}?action=crear`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -163,11 +186,37 @@ async function guardarEventoEnBD(evento) {
     }
 }
 
+async function actualizarEstadoEvento(id_evento, estado) {
+    try {
+        const response = await fetch(`${API_URL}?action=actualizar_estado`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ id_evento, estado })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            closeModal(modalDetails);
+            await cargarEventos();
+        } else {
+            console.error(data.message);
+        }
+    } catch (error) {
+        console.error("Error al actualizar estado:", error);
+    }
+}
+
 function incidenciaVisibleEnMes(incidencia, year, month) {
     if (incidencia.estado === "resuelta") return false;
 
     const { firstDay, lastDay } = getMonthRange(year, month);
-    return incidencia.fechaInicio <= lastDay && incidencia.fechaFin >= firstDay;
+
+    const fechaFin = incidencia.fechaFin || lastDay;
+
+    return incidencia.fechaInicio <= lastDay && fechaFin >= firstDay;
 }
 
 function renderCalendar(date) {
@@ -205,25 +254,42 @@ function renderCalendar(date) {
         const fullDate = `${year}-${monthString}-${dayString}`;
 
         const eventosDelDia = eventos.filter((evento) => {
+            if (evento.tipo === "tarea" && evento.estado === "completada") {
+                return false;
+            }
+
             if (evento.tipo === "incidencia") {
                 if (evento.estado === "resuelta") return false;
-                return dateIsBetween(fullDate, evento.fechaInicio, evento.fechaFin);
+
+                 return evento.fechaInicio === fullDate;
             }
 
             return evento.fecha === fullDate;
         });
 
-        eventosDelDia.forEach((evento) => {
-            const subtitle =
-                evento.tipo === "tarea" && evento.persona
-                    ? ` · ${evento.persona}`
-                    : evento.tipo === "evento" && evento.personas && evento.personas.length > 0
-                        ? ` · ${evento.personas.join(", ")}`
-                        : evento.tipo === "evento" && evento.hora
-                            ? ` · ${evento.hora}`
-                            : evento.tipo === "incidencia"
-                                ? " · incidencia"
-                                : "";
+
+
+        const eventosVisibles = eventosDelDia.slice(0, 1);
+        const eventosOcultos = eventosDelDia.length - eventosVisibles.length;
+
+        eventosVisibles.forEach((evento) => {
+            let icono = "";
+
+            if (evento.tipo === "evento" && evento.personas && evento.personas.length > 0) {
+                icono = " 👥";
+            }
+
+            if (evento.tipo === "tarea" && evento.personas && evento.personas.length > 0) {
+                if (evento.personas.length === 1) {
+                    icono = " 👤";
+                } else {
+                    icono = " 👥";
+                }
+            }
+
+            if (evento.tipo === "incidencia") {
+                icono = " ⚠️";
+            }
 
             const completedClass =
                 evento.tipo === "tarea" && evento.estado === "completada"
@@ -231,23 +297,32 @@ function renderCalendar(date) {
                     : "";
 
             html += `
-        <div 
-          class="event ${evento.tipo} ${completedClass}"
-          data-title="${evento.titulo}"
-          data-type="${evento.tipo}"
-          data-date="${evento.fecha || ""}"
-          data-start="${evento.fechaInicio || ""}"
-          data-end="${evento.fechaFin || ""}"
-          data-time="${evento.hora || ""}"
-          data-person="${evento.persona || ""}"
-          data-people='${JSON.stringify(evento.personas || [])}'
-          data-status="${evento.estado || ""}">
-          ${evento.titulo}${subtitle}
-        </div>
-      `;
+    <div 
+      class="event ${evento.tipo} ${completedClass}"
+      data-id="${evento.id_evento || ""}"
+      data-title="${evento.titulo}"
+      data-type="${evento.tipo}"
+      data-date="${evento.fecha || ""}"
+      data-start="${evento.fechaInicio || ""}"
+      data-end="${evento.fechaFin || ""}"
+      data-time="${evento.hora || ""}"
+      data-person="${evento.persona || ""}"
+      data-people='${JSON.stringify(evento.personas || [])}'
+      data-status="${evento.estado || ""}">
+      <span class="event-text">${evento.titulo}</span>
+      <span class="event-icon">${icono}</span>
+    </div>
+`;
         });
 
+        if (eventosOcultos > 0) {
+            html += `<div class="more-events">+${eventosOcultos} más</div>`;
+        }
+
         dayBox.innerHTML = html;
+        dayBox.addEventListener("click", () => {
+            openDayModal(fullDate, eventosDelDia);
+        });
         calendarGrid.appendChild(dayBox);
     }
 
@@ -272,6 +347,9 @@ function renderUpcomingEvents() {
     const month = currentDate.getMonth();
 
     const eventosMes = eventos.filter((evento) => {
+
+        if (evento.tipo === "tarea" && evento.estado === "completada") return false;
+
         if (evento.tipo === "incidencia") {
             return incidenciaVisibleEnMes(evento, year, month);
         }
@@ -304,11 +382,20 @@ function renderUpcomingEvents() {
             item.className = `next-event ${evento.tipo === "tarea" && evento.estado === "completada" ? "completed-task" : ""}`;
 
             let meta = "";
-
             if (evento.tipo === "incidencia") {
-                meta = `${typeNames[evento.tipo]} · ${formatRangeText(evento.fechaInicio, evento.fechaFin)}`;
+                const textoFecha = evento.fechaFin
+                    ? formatRangeText(evento.fechaInicio, evento.fechaFin)
+                    : `${formatDateText(evento.fechaInicio)} - sin fecha de fin`;
+
+                meta = `${typeNames[evento.tipo]} · ${textoFecha}`;
             } else if (evento.tipo === "tarea") {
-                meta = `${typeNames[evento.tipo]} · ${formatDateText(evento.fecha)} · ${evento.hora} · ${evento.persona}`;
+                const personasTexto = evento.personas && evento.personas.length > 0
+                    ? ` · ${evento.personas.join(", ")}`
+                    : evento.persona
+                        ? ` · ${evento.persona}`
+                        : "";
+
+                meta = `${typeNames[evento.tipo]} · ${formatDateText(evento.fecha)}${personasTexto}`;
             } else {
                 const personasTexto = evento.personas && evento.personas.length > 0
                     ? ` · ${evento.personas.join(", ")}`
@@ -336,8 +423,11 @@ function addEventClickListeners() {
     const eventElements = document.querySelectorAll(".event");
 
     eventElements.forEach((eventElement) => {
-        eventElement.addEventListener("click", () => {
+        eventElement.addEventListener("click", (e) => {
+            e.stopPropagation();
+
             const evento = {
+                id_evento: parseInt(eventElement.dataset.id, 10),
                 titulo: eventElement.dataset.title,
                 tipo: eventElement.dataset.type,
                 fecha: eventElement.dataset.date,
@@ -354,7 +444,6 @@ function addEventClickListeners() {
         });
     });
 }
-
 function showEventDetails(evento) {
     selectedEvent = evento;
 
@@ -366,37 +455,77 @@ function showEventDetails(evento) {
 
     resolveIncidenciaBtn.classList.add("hidden");
     completeTaskBtn.classList.add("hidden");
+    completeTaskBtn.classList.remove("btn-warning");
+    completeTaskBtn.classList.add("btn-success");
+
+    detailTimeBox.classList.remove("hidden");
+    detailDayLabel.textContent = "Fecha / rango";
+    detailPersonLabel.textContent = "Personas asignadas";
 
     if (evento.tipo === "incidencia") {
-        detailDay.textContent = formatRangeText(evento.fechaInicio, evento.fechaFin);
-        detailTime.textContent = "No aplica";
+        detailDayLabel.textContent = "Fecha / rango";
+        detailDay.textContent = evento.fechaFin
+            ? formatRangeText(evento.fechaInicio, evento.fechaFin)
+            : `${formatDateText(evento.fechaInicio)} - sin fecha de fin`;
+        detailTimeBox.classList.add("hidden");
         detailPerson.textContent = "No aplica";
         detailStatus.textContent = evento.estado === "resuelta" ? "Resuelta" : "Activa";
         resolveIncidenciaBtn.classList.remove("hidden");
+
     } else if (evento.tipo === "tarea") {
+        detailDayLabel.textContent = "Fecha";
         detailDay.textContent = formatDateText(evento.fecha);
-        detailTime.textContent = evento.hora || "-";
-        detailPerson.textContent = evento.persona || "-";
+        detailTimeBox.classList.add("hidden");
+
+        const personas = evento.personas && evento.personas.length > 0
+            ? evento.personas
+            : evento.persona
+                ? [evento.persona]
+                : [];
+
+        detailPersonLabel.textContent = personas.length === 1
+            ? "Persona asignada"
+            : "Personas asignadas";
+
+        detailPerson.textContent = personas.length > 0
+            ? personas.join(", ")
+            : "-";
+
         detailStatus.textContent = evento.estado === "completada" ? "Completada" : "Pendiente";
 
-        if (evento.estado !== "completada") {
+        if (evento.estado === "completada") {
+            completeTaskBtn.textContent = "Marcar como no completada";
+            completeTaskBtn.classList.remove("btn-success");
+            completeTaskBtn.classList.add("btn-warning");
+            completeTaskBtn.classList.remove("hidden");
+        } else {
+            completeTaskBtn.textContent = "Completada";
+            completeTaskBtn.classList.remove("btn-warning");
+            completeTaskBtn.classList.add("btn-success");
             completeTaskBtn.classList.remove("hidden");
         }
+
     } else {
+        detailDayLabel.textContent = "Fecha";
         detailDay.textContent = formatDateText(evento.fecha);
+        detailTimeBox.classList.remove("hidden");
         detailTime.textContent = evento.hora || "-";
-        detailPerson.textContent =
-            evento.personas && evento.personas.length > 0
-                ? evento.personas.join(", ")
-                : "No asignadas";
+
+        const personas = evento.personas || [];
+
+        detailPersonLabel.textContent = personas.length === 1
+            ? "Persona asignada"
+            : "Personas asignadas";
+
+        detailPerson.textContent = personas.length > 0
+            ? personas.join(", ")
+            : "No asignadas";
+
         detailStatus.textContent = "Programado";
     }
 
-    detailColor.textContent = typeColors[evento.tipo];
-
     openModal(modalDetails);
 }
-
 function updateFormByType() {
     const tipo = eventTypeInput.value;
 
@@ -404,16 +533,55 @@ function updateFormByType() {
     generalFields.classList.add("hidden");
     peopleFields.classList.add("hidden");
     timeFields.classList.add("hidden");
+    repeatFields.classList.add("hidden");
 
     if (tipo === "incidencia") {
         incidenciaFields.classList.remove("hidden");
     }
 
-    if (tipo === "tarea" || tipo === "evento") {
+    if (tipo === "tarea") {
+        generalFields.classList.remove("hidden");
+        peopleFields.classList.remove("hidden");
+        repeatFields.classList.remove("hidden");
+    }
+
+    if (tipo === "evento") {
         generalFields.classList.remove("hidden");
         peopleFields.classList.remove("hidden");
         timeFields.classList.remove("hidden");
     }
+}
+
+taskRepeatInput.addEventListener("change", () => {
+    if (taskRepeatInput.checked) {
+        repeatOptions.classList.remove("hidden");
+    } else {
+        repeatOptions.classList.add("hidden");
+    }
+});
+
+function obtenerFechasRepetidas(fechaInicio, diasSemana, semanas) {
+    const fechas = [];
+
+    const [anio, mes, dia] = fechaInicio.split("-").map(Number);
+    const inicio = new Date(anio, mes - 1, dia);
+
+    for (let i = 0; i < semanas * 7; i++) {
+        const fecha = new Date(inicio);
+        fecha.setDate(inicio.getDate() + i);
+
+        const diaSemana = fecha.getDay();
+
+        if (diasSemana.includes(String(diaSemana))) {
+            const yyyy = fecha.getFullYear();
+            const mm = String(fecha.getMonth() + 1).padStart(2, "0");
+            const dd = String(fecha.getDate()).padStart(2, "0");
+
+            fechas.push(`${yyyy}-${mm}-${dd}`);
+        }
+    }
+
+    return fechas;
 }
 
 function resetAddForm() {
@@ -455,8 +623,8 @@ document.getElementById("btn-next").addEventListener("click", () => {
 });
 
 document.getElementById("btn-add").addEventListener("click", () => {
-    resetAddForm();
     setMinDates();
+    updateFormByType();
     openModal(modalAdd);
 });
 
@@ -479,6 +647,25 @@ document.getElementById("btn-details").addEventListener("click", () => {
     }
 });
 
+function normalizarTexto(texto) {
+    return texto
+        .trim()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/\s+/g, " ");
+}
+
+function existeTareaMismoDia(titulo, fecha) {
+    const tituloNormalizado = normalizarTexto(titulo);
+
+    return eventos.some((evento) =>
+        evento.tipo === "tarea" &&
+        evento.fecha === fecha &&
+        normalizarTexto(evento.titulo) === tituloNormalizado
+    );
+}
+
 addEventForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -495,11 +682,13 @@ addEventForm.addEventListener("submit", async (e) => {
         const fechaInicio = eventStartDateInput.value;
         const fechaFin = eventEndDateInput.value;
 
-        if (!fechaInicio || !fechaFin) {
+        if (!fechaInicio) {
+            eventWarning.textContent = "Selecciona la fecha de inicio de la incidencia.";
+            eventWarning.classList.add("show");
             return;
         }
 
-        if (fechaFin < fechaInicio) {
+        if (fechaFin && fechaFin < fechaInicio) {
             eventWarning.textContent = "La fecha de fin no puede ser anterior a la de inicio.";
             eventWarning.classList.add("show");
             return;
@@ -509,62 +698,75 @@ addEventForm.addEventListener("submit", async (e) => {
             titulo,
             tipo,
             fechaInicio,
-            fechaFin,
+            fechaFin: fechaFin || null,
             estado: "activa",
             personas: []
         };
 
         await guardarEventoEnBD(nuevoEvento);
 
-        const fechaNueva = new Date(fechaInicio);
-        currentDate = new Date(fechaNueva.getFullYear(), fechaNueva.getMonth(), 1);
+        const [anio, mes] = fechaInicio.split("-").map(Number);
+        currentDate = new Date(anio, mes - 1, 1);
     }
 
     if (tipo === "tarea") {
         const fecha = eventDateInput.value;
-        const hora = eventTimeInput.value;
+
         const personasSeleccionadas = Array.from(eventPeopleInputs)
             .filter((input) => input.checked)
             .map((input) => input.value);
 
-        if (!fecha || !hora) {
-            return;
-        }
-
-        if (personasSeleccionadas.length !== 1) {
-            eventWarning.textContent = "Para una tarea debes seleccionar solo una persona.";
+        if (!fecha) {
+            eventWarning.textContent = "Selecciona una fecha para la tarea.";
             eventWarning.classList.add("show");
             return;
         }
 
-        const persona = personasSeleccionadas[0];
-
-        const existeMismaTarea = eventos.some((evento) =>
-            evento.tipo === "tarea" &&
-            evento.fecha === fecha &&
-            evento.hora === hora &&
-            evento.persona === persona
-        );
-
-        if (existeMismaTarea) {
-            eventWarning.textContent = "Esa persona ya tiene una tarea asignada en esa fecha y a esa hora.";
+        if (personasSeleccionadas.length === 0) {
+            eventWarning.textContent = "Selecciona al menos una persona para la tarea.";
             eventWarning.classList.add("show");
             return;
         }
 
-        const nuevoEvento = {
-            titulo,
-            tipo,
-            fecha,
-            hora,
-            estado: "pendiente",
-            personas: personasSeleccionadas
-        };
+        let fechasTarea = [fecha];
 
-        await guardarEventoEnBD(nuevoEvento);
+        if (taskRepeatInput.checked) {
+            const diasSeleccionados = Array.from(repeatDayInputs)
+                .filter((input) => input.checked)
+                .map((input) => input.value);
 
-        const fechaNueva = new Date(fecha);
-        currentDate = new Date(fechaNueva.getFullYear(), fechaNueva.getMonth(), 1);
+            const semanas = parseInt(repeatWeeksInput.value, 10);
+
+            if (diasSeleccionados.length === 0) {
+                eventWarning.textContent = "Selecciona al menos un día de la semana para repetir la tarea.";
+                eventWarning.classList.add("show");
+                return;
+            }
+
+            fechasTarea = obtenerFechasRepetidas(fecha, diasSeleccionados, semanas);
+        }
+
+        for (const fechaTarea of fechasTarea) {
+            if (existeTareaMismoDia(titulo, fechaTarea)) {
+                eventWarning.textContent = `La tarea "${titulo}" ya está añadida para el día ${formatDateText(fechaTarea)}.`;
+                eventWarning.classList.add("show");
+                return;
+            }
+
+            const nuevoEvento = {
+                titulo,
+                tipo,
+                fecha: fechaTarea,
+                hora: null,
+                estado: "pendiente",
+                personas: personasSeleccionadas
+            };
+
+            await guardarEventoEnBD(nuevoEvento);
+        }
+
+        const [anio, mes] = fecha.split("-").map(Number);
+        currentDate = new Date(anio, mes - 1, 1);
     }
 
     if (tipo === "evento") {
@@ -607,10 +809,11 @@ addEventForm.addEventListener("submit", async (e) => {
 
         await guardarEventoEnBD(nuevoEvento);
 
-        const fechaNueva = new Date(fecha);
-        currentDate = new Date(fechaNueva.getFullYear(), fechaNueva.getMonth(), 1);
+        const [anio, mes] = fecha.split("-").map(Number);
+        currentDate = new Date(anio, mes - 1, 1);
     }
 
+    resetAddForm();
     closeModal(modalAdd);
     renderCalendar(currentDate);
 });
@@ -621,6 +824,7 @@ document.getElementById("close-add-modal").addEventListener("click", () => {
 });
 
 document.getElementById("cancel-add").addEventListener("click", () => {
+    resetAddForm();
     clearWarning();
     closeModal(modalAdd);
 });
@@ -638,43 +842,30 @@ window.addEventListener("click", (e) => {
     if (e.target === modalDetails) {
         closeModal(modalDetails);
     }
+
+    if (e.target === modalDay) {
+        closeModal(modalDay);
+    }
 });
 
-resolveIncidenciaBtn.addEventListener("click", () => {
+resolveIncidenciaBtn.addEventListener("click", async () => {
     if (!selectedEvent || selectedEvent.tipo !== "incidencia") return;
 
-    const index = eventos.findIndex((evento) =>
-        evento.tipo === "incidencia" &&
-        evento.titulo === selectedEvent.titulo &&
-        evento.fechaInicio === selectedEvent.fechaInicio &&
-        evento.fechaFin === selectedEvent.fechaFin
-    );
-
-    if (index !== -1) {
-        eventos[index].estado = "resuelta";
-    }
-
-    closeModal(modalDetails);
-    renderCalendar(currentDate);
+    await actualizarEstadoEvento(selectedEvent.id_evento, "resuelta");
 });
 
-completeTaskBtn.addEventListener("click", () => {
+completeTaskBtn.addEventListener("click", async () => {
     if (!selectedEvent || selectedEvent.tipo !== "tarea") return;
 
-    const index = eventos.findIndex((evento) =>
-        evento.tipo === "tarea" &&
-        evento.titulo === selectedEvent.titulo &&
-        evento.fecha === selectedEvent.fecha &&
-        evento.hora === selectedEvent.hora &&
-        evento.persona === selectedEvent.persona
-    );
+    const nuevoEstado = selectedEvent.estado === "completada"
+        ? "pendiente"
+        : "completada";
 
-    if (index !== -1) {
-        eventos[index].estado = "completada";
-    }
+    await actualizarEstadoEvento(selectedEvent.id_evento, nuevoEstado);
+});
 
-    closeModal(modalDetails);
-    renderCalendar(currentDate);
+document.getElementById("close-day-modal").addEventListener("click", () => {
+    closeModal(modalDay);
 });
 
 updateFormByType();

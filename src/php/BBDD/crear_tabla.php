@@ -40,10 +40,10 @@ $sql = "
 /* ===== PISOS ===== */
 CREATE TABLE IF NOT EXISTS pisos (
     id_piso INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100),
-    codigo_invitacion VARCHAR(20),
-    creado_por INT,
-    FOREIGN KEY (creado_por) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
+    nombre_casero VARCHAR(100),
+    calle VARCHAR(150),
+    ciudad VARCHAR(100),
+    codigo_postal VARCHAR(10)
 );
 
 CREATE TABLE IF NOT EXISTS usuarios_pisos (
@@ -117,7 +117,7 @@ CREATE TABLE IF NOT EXISTS incidencias (
     titulo VARCHAR(100),
     descripcion TEXT,
     urgencia ENUM('baja','media','alta') DEFAULT 'media',
-    estado ENUM('creada','en_proceso','finalizada') DEFAULT 'creada',
+    estado ENUM('abierta','en_curso','resuelta') DEFAULT 'abierta',
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_piso) REFERENCES pisos(id_piso) ON DELETE CASCADE,
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
@@ -141,7 +141,10 @@ CREATE TABLE IF NOT EXISTS calendario_eventos (
     titulo VARCHAR(150),
     tipo ENUM('incidencia','tarea','evento'),
     fecha DATE,
+    fecha_inicio DATE NULL,
+    fecha_fin DATE NULL,
     hora TIME,
+    estado VARCHAR(30) DEFAULT 'pendiente',
     FOREIGN KEY (id_piso) REFERENCES pisos(id_piso) ON DELETE CASCADE
 );
 
@@ -156,7 +159,8 @@ CREATE TABLE IF NOT EXISTS calendario_evento_personas (
 ";
 
 $conn->multi_query($sql);
-while ($conn->next_result()) {}
+while ($conn->next_result()) {
+}
 
 /* ================= DATOS ================= */
 $check = $conn->query("SELECT COUNT(*) as total FROM usuarios");
@@ -177,8 +181,8 @@ if ($row['total'] == 0) {
     ('Gabriel','Gimenes','gabriel@mail.com','$passUser','600000004','Calle Mayor 12 - Habitación 3');
 
     /* ===== PISO ===== */
-    INSERT INTO pisos (nombre, codigo_invitacion, creado_por)
-    VALUES ('Piso Demo','ABC12345',1);
+    INSERT INTO pisos (nombre_casero, calle, ciudad, codigo_postal)
+    VALUES ('Juan Gonzalez', 'Calle Mayor 12', 'Madrid', '28001');
 
     INSERT INTO usuarios_pisos VALUES
     (1,1,'admin'),(2,1,'miembro'),(3,1,'miembro'),(4,1,'miembro');
@@ -218,17 +222,92 @@ if ($row['total'] == 0) {
     (2,3,'Sigue sin funcionar');
 
     /* ===== CALENDARIO ===== */
-    INSERT INTO calendario_eventos VALUES
-    (NULL,1,'Cena del piso','evento','2026-04-20','21:30:00');
 
-    INSERT INTO calendario_evento_personas VALUES
-    (1,2),(1,3),(1,4);
+    INSERT INTO calendario_eventos 
+    (id_piso, titulo, tipo, fecha, fecha_inicio, fecha_fin, hora, estado) 
+    VALUES
+    (1, 'Cena del piso', 'evento', '2026-04-20', '2026-04-20', NULL, '21:30:00', 'pendiente');
 
+    SET @id_evento_cena = LAST_INSERT_ID();
+
+    INSERT INTO calendario_evento_personas (id_evento, id_usuario) 
+    VALUES
+    (@id_evento_cena, 2),
+    (@id_evento_cena, 3),
+    (@id_evento_cena, 4);
+
+
+    /* ===== 3 EVENTOS EL MISMO DÍA ===== */
+
+    INSERT INTO calendario_eventos 
+    (id_piso, titulo, tipo, fecha, fecha_inicio, fecha_fin, hora, estado) 
+    VALUES
+    (1, 'Compra semanal', 'tarea', '2026-05-22', '2026-05-22', NULL, '10:00:00', 'pendiente');
+
+    SET @id_tarea_compra = LAST_INSERT_ID();
+
+    INSERT INTO calendario_evento_personas (id_evento, id_usuario) 
+    VALUES
+    (@id_tarea_compra, 2);
+
+
+    INSERT INTO calendario_eventos 
+    (id_piso, titulo, tipo, fecha, fecha_inicio, fecha_fin, hora, estado) 
+    VALUES
+    (1, 'Reunión de convivencia', 'evento', '2026-05-22', '2026-05-22', NULL, '18:00:00', 'pendiente');
+
+    SET @id_evento_reunion = LAST_INSERT_ID();
+
+    INSERT INTO calendario_evento_personas (id_evento, id_usuario) 
+    VALUES
+    (@id_evento_reunion, 2),
+    (@id_evento_reunion, 3),
+    (@id_evento_reunion, 4);
+
+
+    INSERT INTO calendario_eventos 
+    (id_piso, titulo, tipo, fecha, fecha_inicio, fecha_fin, hora, estado) 
+    VALUES
+    (1, 'Limpiar cocina', 'tarea', '2026-05-22', '2026-05-22', NULL, '20:00:00', 'pendiente');
+
+    SET @id_tarea_cocina = LAST_INSERT_ID();
+
+    INSERT INTO calendario_evento_personas (id_evento, id_usuario) 
+    VALUES
+    (@id_tarea_cocina, 3);
+
+
+    /* ===== INCIDENCIAS ===== */
+
+    INSERT INTO calendario_eventos 
+    (id_piso, titulo, tipo, fecha, fecha_inicio, fecha_fin, hora, estado) 
+    VALUES
+    (1, 'Fuga de agua en el baño', 'incidencia', '2026-05-24', '2026-05-26', NULL, NULL, 'pendiente');
+
+    SET @id_incidencia_agua = LAST_INSERT_ID();
+
+    INSERT INTO calendario_evento_personas (id_evento, id_usuario) 
+    VALUES
+    (@id_incidencia_agua, 2),
+    (@id_incidencia_agua, 4);
+
+
+    INSERT INTO calendario_eventos 
+    (id_piso, titulo, tipo, fecha, fecha_inicio, fecha_fin, hora, estado) 
+    VALUES
+    (1, 'Bombilla del pasillo fundida', 'incidencia', '2026-05-28', '2026-05-28', NULL, NULL, 'pendiente');
+
+    SET @id_incidencia_bombilla = LAST_INSERT_ID();
+
+    INSERT INTO calendario_evento_personas (id_evento, id_usuario) 
+    VALUES
+    (@id_incidencia_bombilla, 3);
     ";
 
     $conn->multi_query($sqlDatos);
-    while ($conn->next_result()) {}
+    while ($conn->next_result()) {
+    }
 }
 
 $conn->close();
-
+?>

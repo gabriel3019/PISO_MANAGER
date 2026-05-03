@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Incidencias</title>
+    <link rel="stylesheet" href="../css/incidenciasAdmin.css">
+</head>
+
+<body>
+
+    <div class="app">
+
+        <aside class="sidebar-admin">
+            <div class="admin-info">
+                <div class="avatar">AD</div>
+                <div>
+                    <h3>Admin Piso</h3>
+                    <p>ADMINISTRADOR</p>
+                </div>
+            </div>
+
+            <nav>
+                <a href="../html/homeAdmin.html"><img src="../css/icons/settings.svg" class="icon">
+                    <strong>Home</strong></a>
+                <a class="active" href="../html/incidenciasAdmin.html"><img src="../css/icons/circle-alert.svg"
+                        class="icon"><strong>Incidencias</strong></a>
+            </nav>
+
+            <button class="logout">Cerrar sesión</button>
+        </aside>
+
+        <main class="main">
+            <header class="header">
+                <div>
+                    <h1>Incidencias</h1>
+                    <p>Gestión de problemas y avisos del piso</p>
+                </div>
+            </header>
+
+            <section class="stats">
+                <div class="card">
+                    <h2 id="count-abiertas">0</h2>
+                    <p>Abiertas</p>
+                </div>
+
+                <div class="card">
+                    <h2 id="countEnCurso">0</h2>
+                    <p>En proceso</p>
+                </div>
+
+                <div class="card">
+                    <h2 id="count-resueltas">0</h2>
+                    <p>Resueltas</p>
+                </div>
+            </section>
+
+            <section class="content">
+                <div class="top-content">
+                    <h3>Todas las incidencias</h3>
+
+                    <input type="text" id="searchInput" placeholder="Buscar incidencia...">
+                </div>
+
+                <div class="filters">
+                    <button class="filter active" data-filter="todas">Todas</button>
+                    <button class="filter" data-filter="creada">Abiertas</button>
+                    <button class="filter" data-filter="en_proceso">En proceso</button>
+                    <button class="filter" data-filter="finalizada">Resueltas</button>
+                </div>
+
+                <div id="incidenciasList" class="incidencias-list"></div>
+            </section>
+        </main>
+
+    </div>
+
+    <script src="../js/incidenciasAdmin.js"></script>
+</body>
+
+</html>
