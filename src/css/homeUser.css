@@ -366,6 +366,11 @@ body {
   background: #d1d5db;
 }
 
+.btn-primary {
+  display: inline-block;
+  text-align: center;
+  text-decoration: none;
+}
 
 
 /* ================= RESPONSIVE ================= */
