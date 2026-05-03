@@ -4,46 +4,13 @@ require_once __DIR__ . "/BBDD/conecta.php";
 
 header("Content-Type: application/json");
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
 /* ================= SESSION ================= */
 if (!isset($_SESSION['id_usuario'])) {
-    echo json_encode([
-        "success" => false,
-        "error" => "No hay sesión"
-    ]);
+    echo json_encode(["success" => false, "error" => "No hay sesión"]);
     exit;
 }
 
 $id_usuario = $_SESSION['id_usuario'];
-
-/* ================= INPUT JSON ================= */
-$input = json_decode(file_get_contents("php://input"), true);
-
-/* ================= ACTUALIZAR TAREA ================= */
-if (isset($input['action']) && $input['action'] === 'actualizarTarea') {
-
-    if (!isset($input['id_tarea']) || !isset($input['estado'])) {
-        echo json_encode([
-            "success" => false,
-            "error" => "Datos incompletos"
-        ]);
-        exit;
-    }
-
-    $id_tarea = (int)$input['id_tarea'];
-    $estado   = $input['estado'];
-
-    $stmt = $conn->prepare("UPDATE tareas SET estado=? WHERE id_tarea=?");
-    $stmt->bind_param("si", $estado, $id_tarea);
-    $stmt->execute();
-
-    echo json_encode([
-        "success" => true
-    ]);
-    exit;
-}
 
 /* ================= OBTENER PISO ================= */
 $sql = "SELECT id_piso FROM usuarios_pisos WHERE id_usuario=? LIMIT 1";
@@ -53,10 +20,7 @@ $stmt->execute();
 $res = $stmt->get_result();
 
 if ($res->num_rows === 0) {
-    echo json_encode([
-        "success" => false,
-        "error" => "Usuario sin piso"
-    ]);
+    echo json_encode(["success" => false, "error" => "Usuario sin piso"]);
     exit;
 }
 
@@ -71,23 +35,23 @@ $data = [
     "reparto" => []
 ];
 
-/* ================= BALANCE ================= */
+/* ================= BALANCE PRO ================= */
 
-// total piso
+// TOTAL
 $sql = "SELECT COALESCE(SUM(monto_total),0) as total FROM gastos WHERE id_piso=?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $id_piso);
 $stmt->execute();
 $total = $stmt->get_result()->fetch_assoc()["total"];
 
-// pagado
+// PAGADO
 $sql = "SELECT COALESCE(SUM(monto_total),0) as pagado FROM gastos WHERE id_pagador=? AND id_piso=?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("ii", $id_usuario, $id_piso);
 $stmt->execute();
 $pagado = $stmt->get_result()->fetch_assoc()["pagado"];
 
-// debido
+// DEBIDO
 $sql = "
 SELECT COALESCE(SUM(gp.importe),0) as debido
 FROM gastos_participantes gp
@@ -99,15 +63,34 @@ $stmt->bind_param("ii", $id_usuario, $id_piso);
 $stmt->execute();
 $debido = $stmt->get_result()->fetch_assoc()["debido"];
 
+// PAGOS RECIBIDOS
+$sql = "SELECT COALESCE(SUM(importe),0) as recibido FROM pagos WHERE id_receptor=? AND id_piso=?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("ii", $id_usuario, $id_piso);
+$stmt->execute();
+$recibido = $stmt->get_result()->fetch_assoc()["recibido"];
+
+// PAGOS ENVIADOS
+$sql = "SELECT COALESCE(SUM(importe),0) as enviado FROM pagos WHERE id_pagador=? AND id_piso=?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("ii", $id_usuario, $id_piso);
+$stmt->execute();
+$enviado = $stmt->get_result()->fetch_assoc()["enviado"];
+
+/* BALANCE REAL */
+$deuda_real = $debido - $enviado;
+$credito_real = $pagado - $recibido;
+
 $data["balance"] = [
     "total" => (float)$total,
     "pagado" => (float)$pagado,
     "debido" => (float)$debido,
-    "neto" => (float)($pagado - $debido)
+    "recibido" => (float)$recibido,
+    "enviado" => (float)$enviado,
+    "neto" => (float)($credito_real - $deuda_real)
 ];
 
 /* ================= GASTOS ================= */
-
 $sql = "
 SELECT g.descripcion, g.monto_total, u.nombre as pagador
 FROM gastos g
@@ -116,7 +99,6 @@ WHERE g.id_piso=?
 ORDER BY g.id_gasto DESC
 LIMIT 3
 ";
-
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $id_piso);
 $stmt->execute();
@@ -127,7 +109,6 @@ while ($row = $res->fetch_assoc()) {
 }
 
 /* ================= TAREAS ================= */
-
 $sql = "
 SELECT 
     t.id_tarea,
@@ -140,7 +121,6 @@ WHERE t.id_piso=?
 ORDER BY t.id_tarea DESC
 LIMIT 5
 ";
-
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $id_piso);
 $stmt->execute();
@@ -151,7 +131,6 @@ while ($row = $res->fetch_assoc()) {
 }
 
 /* ================= AVISOS ================= */
-
 $sql = "
 SELECT titulo, descripcion
 FROM avisos
@@ -159,7 +138,6 @@ WHERE id_piso=?
 ORDER BY id_aviso DESC
 LIMIT 3
 ";
-
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $id_piso);
 $stmt->execute();
@@ -170,7 +148,6 @@ while ($row = $res->fetch_assoc()) {
 }
 
 /* ================= REPARTO ================= */
-
 $sql = "
 SELECT 
     u.nombre, 
@@ -181,7 +158,6 @@ JOIN gastos g ON gp.id_gasto = g.id_gasto
 WHERE g.id_piso=?
 GROUP BY u.id_usuario
 ";
-
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $id_piso);
 $stmt->execute();
@@ -192,7 +168,6 @@ while ($row = $res->fetch_assoc()) {
 }
 
 /* ================= RESPONSE ================= */
-
 echo json_encode([
     "success" => true,
     "data" => $data

@@ -414,6 +414,43 @@ h1 {
   border-color: #4f46e5;
 }
 
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 20px;
+}
+
+.balance .amount {
+  font-size: 36px;
+  font-weight: 700;
+}
+
+.balance .amount.positive {
+  color: #16a34a;
+}
+
+.balance .amount.negative {
+  color: #dc2626;
+}
+
+.balance .details {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.balance .details span {
+  float: right;
+  font-weight: 500;
+  color: #111;
+}
+
+.balance .details p {
+  display: flex;
+  justify-content: space-between;
+}
 /* ================= ERRORES ================= */
 
 .field {

@@ -67,6 +67,19 @@ CREATE TABLE IF NOT EXISTS gastos (
     FOREIGN KEY (id_pagador) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS pagos (
+    id_pago INT AUTO_INCREMENT PRIMARY KEY,
+    id_piso INT,
+    id_pagador INT,
+    id_receptor INT,
+    importe DECIMAL(10,2),
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (id_piso) REFERENCES pisos(id_piso) ON DELETE CASCADE,
+    FOREIGN KEY (id_pagador) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
+    FOREIGN KEY (id_receptor) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS gastos_participantes (
     id_gasto INT,
     id_usuario INT,
