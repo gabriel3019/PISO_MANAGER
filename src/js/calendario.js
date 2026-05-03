@@ -47,6 +47,7 @@ const modalDay = document.getElementById("modal-day");
 const dayModalTitle = document.getElementById("day-modal-title");
 const dayEventsList = document.getElementById("day-events-list");
 
+
 let currentDate = new Date(2026, 4, 1);
 let selectedEvent = null;
 let eventos = [];

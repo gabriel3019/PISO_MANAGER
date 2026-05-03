@@ -1,0 +1,277 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Inter", Arial, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background: #f4f4f3;
+    color: #1f2937;
+    display: flex;
+}
+
+.app {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+}
+
+.main {
+    flex: 1;
+    padding: 32px;
+    overflow-y: auto;
+}
+
+/* SIDEBAR */
+.sidebar-admin {
+    width: 250px;
+    height: 100vh;
+    background: #ffffff;
+    border-right: 1px solid #e5e7eb;
+    padding: 28px 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid #eeeeee;
+}
+
+.avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: #222;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.admin-info h3 {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.admin-info p {
+    font-size: 10px;
+    color: #888;
+    font-weight: 700;
+}
+
+nav {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+nav a {
+    height: 52px;
+    display: grid;
+    grid-template-columns: 32px 1fr auto;
+    align-items: center;
+    gap: 12px;
+
+    padding: 0 14px;
+    border-radius: 2px;
+    font-size: 14px;
+    color: #444;
+    text-decoration: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+nav a.active {
+    background: #efede9;
+    color: #111;
+    font-weight: 700;
+    border-right: 4px solid #222;
+}
+
+nav a span {
+    background: #222;
+    color: white;
+    font-size: 11px;
+    padding: 2px 7px;
+    border-radius: 999px;
+}
+
+.logout {
+    margin-top: auto;
+    padding: 16px 12px;
+    border: none;
+    border-top: 1px solid #eee;
+    background: transparent;
+    color: #ef4444;
+    text-align: left;
+    cursor: pointer;
+}
+
+/* MAIN */
+.main {
+    flex: 1;
+    padding: 32px;
+    overflow-y: auto;
+}
+
+.header h1 {
+    font-size: 28px;
+}
+
+.header p {
+    color: #777;
+    margin-top: 6px;
+}
+
+/* STATS */
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin: 28px 0;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #e5e5e5;
+}
+
+.card h2 {
+    font-size: 28px;
+}
+
+.card p {
+    font-size: 13px;
+    color: #777;
+    text-transform: uppercase;
+}
+
+/* CONTENT */
+.content {
+    background: white;
+    border-radius: 14px;
+    padding: 22px;
+    border: 1px solid #e5e5e5;
+}
+
+.top-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+#searchInput {
+    width: 260px;
+    padding: 10px 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.filters {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.filter {
+    border: 1px solid #ddd;
+    background: white;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.filter.active {
+    background: #222;
+    color: white;
+}
+
+/* INCIDENCIAS */
+.incidencias-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.incidencia {
+    display: grid;
+    grid-template-columns: 45px 1fr auto;
+    gap: 14px;
+    align-items: center;
+    padding: 18px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.info h4 {
+    font-size: 15px;
+    margin-bottom: 4px;
+}
+
+.meta {
+    font-size: 12px;
+    color: #777;
+    margin-bottom: 6px;
+}
+
+.descripcion {
+    font-size: 13px;
+    color: #444;
+}
+
+.prioridad {
+    font-size: 11px;
+    margin-top: 6px;
+    text-transform: uppercase;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.estado {
+    font-size: 11px;
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.estado.abiertas {
+    background: #ffe1e1;
+    color: #c62828;
+}
+
+.estado.en_proceso {
+    background: #fff2cc;
+    color: #b77900;
+}
+
+.estado.resueltas {
+    background: #ddf7e6;
+    color: #1b7f3a;
+}
+
+select {
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.empty {
+    text-align: center;
+    color: #777;
+    padding: 30px;
+}

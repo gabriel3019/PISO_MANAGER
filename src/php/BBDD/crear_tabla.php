@@ -32,10 +32,10 @@ CREATE TABLE IF NOT EXISTS usuarios (
 /* ===== PISOS ===== */
 CREATE TABLE IF NOT EXISTS pisos (
     id_piso INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100),
-    codigo_invitacion VARCHAR(20),
-    creado_por INT,
-    FOREIGN KEY (creado_por) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
+    nombre_casero VARCHAR(100),
+    calle VARCHAR(150),
+    ciudad VARCHAR(100),
+    codigo_postal VARCHAR(10)
 );
 
 CREATE TABLE IF NOT EXISTS usuarios_pisos (
@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS incidencias (
     titulo VARCHAR(100),
     descripcion TEXT,
     urgencia ENUM('baja','media','alta') DEFAULT 'media',
-    estado ENUM('creada','en_proceso','finalizada') DEFAULT 'creada',
+    estado ENUM('abierta','en_curso','resuelta') DEFAULT 'abierta',
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_piso) REFERENCES pisos(id_piso) ON DELETE CASCADE,
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
@@ -162,8 +162,8 @@ if ($row['total'] == 0) {
     ('Gabriel','gabriel@mail.com','$passUser');
 
     /* ===== PISO ===== */
-    INSERT INTO pisos (nombre, codigo_invitacion, creado_por)
-    VALUES ('Piso Demo','ABC12345',1);
+    INSERT INTO pisos (nombre_casero, calle, ciudad, codigo_postal)
+    VALUES ('Juan Gonzalez', 'Calle Mayor 12', 'Madrid', '28001');
 
     INSERT INTO usuarios_pisos VALUES
     (1,1,'admin'),(2,1,'miembro'),(3,1,'miembro'),(4,1,'miembro');

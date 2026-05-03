@@ -19,8 +19,10 @@
         </div>
 
         <nav>
-            <a class="active">⚙️ Ajustes del Piso</a>
-            <a>ⓘ Incidencias <span>3</span></a>
+            <a class="active" href="../html/homeAdmin.html"><img src="../css/icons/settings.svg" class="icon">
+                <strong>Home</strong></a>
+            <a href="../html/incidenciasAdmin.html"><img src="../css/icons/circle-alert.svg"
+                    class="icon"><strong>Incidencias</strong></a>
         </nav>
 
         <button class="logout">Cerrar sesión</button>
@@ -35,44 +37,46 @@
         <section class="card">
             <h2>Información del piso</h2>
 
-            <label>Nombre del piso</label>
-            <input value="Admin Piso">
-
             <label>Dirección</label>
-            <input value="Calle Mayor, 12">
+            <input id="calle" type="text">
 
             <div class="row">
                 <div>
                     <label>Ciudad</label>
-                    <input value="Madrid">
+                    <input id="ciudad" type="text">
                 </div>
                 <div>
                     <label>Código postal</label>
-                    <input value="28001">
+                    <input id="codigo_postal" type="text">
                 </div>
             </div>
         </section>
 
-        <section class="card">
+        <section class="card reglas-card">
             <h2>Reglas y configuración</h2>
-            <p>Notificaciones automáticas</p>
-            <p>Aprobación de gastos</p>
 
-            <h3>Rotación de limpieza</h3>
-            <button>Diaria</button>
-            <button class="active-btn">Semanal</button>
-            <button>Quincenal</button>
+            <div class="setting-row">
+                <div>
+                    <p>Notificaciones automáticas</p>
+                    <span>Incidencias</span>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="notificaciones" checked>
+                    <span></span>
+                </label>
+            </div>
         </section>
 
         <section class="card danger">
             <h2>Zona de peligro</h2>
             <button>Eliminar piso</button>
-            <button>Exportar datos</button>
-            <button>Transferir administración</button>
+            <button>Descargarse contrato</button>
         </section>
 
         <button class="save-btn">Guardar cambios</button>
     </main>
+
+    <script src="../js/homeAdmin.js"></script>
 </body>
 
 </html>
