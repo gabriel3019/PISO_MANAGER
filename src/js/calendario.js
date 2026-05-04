@@ -7,8 +7,6 @@ const eventsList = document.getElementById("events-list");
 const repeatFields = document.getElementById("repeat-fields");
 const taskRepeatInput = document.getElementById("task-repeat");
 const repeatOptions = document.getElementById("repeat-options");
-const repeatDayInputs = document.querySelectorAll('input[name="repeat-days"]');
-const repeatWeeksInput = document.getElementById("repeat-weeks");
 
 const eventWarning = document.getElementById("event-warning");
 const modalAdd = document.getElementById("modal-add");
@@ -47,7 +45,14 @@ const modalDay = document.getElementById("modal-day");
 const dayModalTitle = document.getElementById("day-modal-title");
 const dayEventsList = document.getElementById("day-events-list");
 
+const repeatWeeksInput = document.getElementById("repeat-end");
+const repeatTypeInput = document.getElementById("repeat-type");
+const customRepeatBox = document.getElementById("custom-repeat-box");
+const repeatIntervalInput = document.getElementById("repeat-interval");
+const repeatFrequencyInput = document.getElementById("repeat-frequency");
+const customWeekDays = document.getElementById("custom-week-days");
 
+let repeatDayInputs = document.querySelectorAll('input[name="repeat-days"]');
 let currentDate = new Date(2026, 4, 1);
 let selectedEvent = null;
 let eventos = [];
@@ -556,29 +561,116 @@ function updateFormByType() {
 taskRepeatInput.addEventListener("change", () => {
     if (taskRepeatInput.checked) {
         repeatOptions.classList.remove("hidden");
+        repeatTypeInput.value = "weekly";
     } else {
         repeatOptions.classList.add("hidden");
+        repeatTypeInput.value = "weekly";
+        customRepeatBox.classList.add("hidden");
     }
 });
 
-function obtenerFechasRepetidas(fechaInicio, diasSemana, semanas) {
+repeatTypeInput.addEventListener("change", () => {
+    if (repeatTypeInput.value === "custom") {
+        customRepeatBox.classList.remove("hidden");
+    } else {
+        customRepeatBox.classList.add("hidden");
+    }
+});
+
+repeatFrequencyInput.addEventListener("change", () => {
+    if (repeatFrequencyInput.value === "week") {
+        customWeekDays.classList.remove("hidden");
+    } else {
+        customWeekDays.classList.add("hidden");
+    }
+});
+
+function formatearFecha(date) {
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
+    const dd = String(date.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+}
+
+function obtenerFechasRepetidas(fechaInicio) {
     const fechas = [];
+    const tipoRepeticion = repeatTypeInput.value;
+    const semanasDuracion = parseInt(repeatWeeksInput.value, 10);
 
     const [anio, mes, dia] = fechaInicio.split("-").map(Number);
     const inicio = new Date(anio, mes - 1, dia);
 
-    for (let i = 0; i < semanas * 7; i++) {
-        const fecha = new Date(inicio);
-        fecha.setDate(inicio.getDate() + i);
+    const fin = new Date(inicio);
+    fin.setDate(fin.getDate() + semanasDuracion * 7);
 
-        const diaSemana = fecha.getDay();
+    if (tipoRepeticion === "daily") {
+        for (let fecha = new Date(inicio); fecha <= fin; fecha.setDate(fecha.getDate() + 1)) {
+            fechas.push(formatearFecha(fecha));
+        }
+    }
 
-        if (diasSemana.includes(String(diaSemana))) {
-            const yyyy = fecha.getFullYear();
-            const mm = String(fecha.getMonth() + 1).padStart(2, "0");
-            const dd = String(fecha.getDate()).padStart(2, "0");
+    if (tipoRepeticion === "weekly") {
+        for (let fecha = new Date(inicio); fecha <= fin; fecha.setDate(fecha.getDate() + 7)) {
+            fechas.push(formatearFecha(fecha));
+        }
+    }
 
-            fechas.push(`${yyyy}-${mm}-${dd}`);
+    if (tipoRepeticion === "biweekly") {
+        for (let fecha = new Date(inicio); fecha <= fin; fecha.setDate(fecha.getDate() + 14)) {
+            fechas.push(formatearFecha(fecha));
+        }
+    }
+
+    if (tipoRepeticion === "monthly") {
+        for (let fecha = new Date(inicio); fecha <= fin; fecha.setMonth(fecha.getMonth() + 1)) {
+            fechas.push(formatearFecha(fecha));
+        }
+    }
+
+    if (tipoRepeticion === "yearly") {
+        for (let fecha = new Date(inicio); fecha <= fin; fecha.setFullYear(fecha.getFullYear() + 1)) {
+            fechas.push(formatearFecha(fecha));
+        }
+    }
+
+    if (tipoRepeticion === "custom") {
+        const intervalo = parseInt(repeatIntervalInput.value, 10);
+        const frecuencia = repeatFrequencyInput.value;
+
+        if (frecuencia === "day") {
+            for (let fecha = new Date(inicio); fecha <= fin; fecha.setDate(fecha.getDate() + intervalo)) {
+                fechas.push(formatearFecha(fecha));
+            }
+        }
+
+        if (frecuencia === "week") {
+            const diasSeleccionados = Array.from(document.querySelectorAll('input[name="repeat-days"]:checked'))
+                .map(input => input.value);
+
+            if (diasSeleccionados.length === 0) {
+                return [];
+            }
+
+            for (let fecha = new Date(inicio); fecha <= fin; fecha.setDate(fecha.getDate() + 1)) {
+                const diferenciaDias = Math.floor((fecha - inicio) / (1000 * 60 * 60 * 24));
+                const semanaActual = Math.floor(diferenciaDias / 7);
+
+                if (semanaActual % intervalo === 0 && diasSeleccionados.includes(String(fecha.getDay()))) {
+                    fechas.push(formatearFecha(fecha));
+                }
+            }
+        }
+
+        if (frecuencia === "month") {
+            for (let fecha = new Date(inicio); fecha <= fin; fecha.setMonth(fecha.getMonth() + intervalo)) {
+                fechas.push(formatearFecha(fecha));
+            }
+        }
+
+        if (frecuencia === "year") {
+            for (let fecha = new Date(inicio); fecha <= fin; fecha.setFullYear(fecha.getFullYear() + intervalo)) {
+                fechas.push(formatearFecha(fecha));
+            }
         }
     }
 
@@ -732,19 +824,13 @@ addEventForm.addEventListener("submit", async (e) => {
         let fechasTarea = [fecha];
 
         if (taskRepeatInput.checked) {
-            const diasSeleccionados = Array.from(repeatDayInputs)
-                .filter((input) => input.checked)
-                .map((input) => input.value);
+            fechasTarea = obtenerFechasRepetidas(fecha);
 
-            const semanas = parseInt(repeatWeeksInput.value, 10);
-
-            if (diasSeleccionados.length === 0) {
-                eventWarning.textContent = "Selecciona al menos un día de la semana para repetir la tarea.";
+            if (fechasTarea.length === 0) {
+                eventWarning.textContent = "Selecciona al menos un día para la repetición personalizada.";
                 eventWarning.classList.add("show");
                 return;
             }
-
-            fechasTarea = obtenerFechasRepetidas(fecha, diasSeleccionados, semanas);
         }
 
         for (const fechaTarea of fechasTarea) {

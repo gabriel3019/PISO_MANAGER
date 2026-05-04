@@ -197,33 +197,64 @@
 
                     <div id="repeat-fields" class="conditional-fields hidden">
                         <div class="repeat-box">
+
                             <label class="repeat-main">
                                 <input type="checkbox" id="task-repeat">
                                 Repetir tarea
                             </label>
 
                             <div id="repeat-options" class="repeat-options hidden">
-                                <span class="repeat-options-title">Días de la semana</span>
 
-                                <div class="repeat-days-grid">
-                                    <label><input type="checkbox" name="repeat-days" value="1"> Lunes</label>
-                                    <label><input type="checkbox" name="repeat-days" value="2"> Martes</label>
-                                    <label><input type="checkbox" name="repeat-days" value="3"> Miércoles</label>
-                                    <label><input type="checkbox" name="repeat-days" value="4"> Jueves</label>
-                                    <label><input type="checkbox" name="repeat-days" value="5"> Viernes</label>
-                                    <label><input type="checkbox" name="repeat-days" value="6"> Sábado</label>
-                                    <label><input type="checkbox" name="repeat-days" value="0"> Domingo</label>
+                                <label for="repeat-type">Se repite</label>
+                                <select id="repeat-type">
+                                    <option value="daily">Cada día</option>
+                                    <option value="weekly">Cada semana</option>
+                                    <option value="biweekly">Cada 2 semanas</option>
+                                    <option value="monthly">Cada mes</option>
+                                    <option value="yearly">Cada año</option>
+                                    <option value="custom">Personalizado</option>
+                                </select>
+
+                                <div id="custom-repeat-box" class="custom-repeat-box hidden">
+                                    <label>Frecuencia</label>
+
+                                    <div class="repeat-frequency-row">
+                                        <span>Cada</span>
+                                        <input type="number" id="repeat-interval" min="1" value="1">
+                                        <select id="repeat-frequency">
+                                            <option value="day">día</option>
+                                            <option value="week">semana</option>
+                                            <option value="month">mes</option>
+                                            <option value="year">año</option>
+                                        </select>
+                                    </div>
+
+                                    <div id="custom-week-days" class="custom-week-days hidden">
+                                        <span class="repeat-options-title">Repetir el</span>
+
+                                        <div class="repeat-days-grid">
+                                            <label><input type="checkbox" name="repeat-days" value="1"> Lunes</label>
+                                            <label><input type="checkbox" name="repeat-days" value="2"> Martes</label>
+                                            <label><input type="checkbox" name="repeat-days" value="3">
+                                                Miércoles</label>
+                                            <label><input type="checkbox" name="repeat-days" value="4"> Jueves</label>
+                                            <label><input type="checkbox" name="repeat-days" value="5"> Viernes</label>
+                                            <label><input type="checkbox" name="repeat-days" value="6"> Sábado</label>
+                                            <label><input type="checkbox" name="repeat-days" value="0"> Domingo</label>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="repeat-select-row">
-                                    <label for="repeat-weeks">Repetir durante</label>
-                                    <select id="repeat-weeks">
-                                        <option value="1">Solo esta semana</option>
-                                        <option value="2">2 semanas</option>
-                                        <option value="4">4 semanas</option>
-                                        <option value="8">8 semanas</option>
+                                    <label for="repeat-end">Finaliza</label>
+                                    <select id="repeat-end">
+                                        <option value="4">Después de 1 mes</option>
+                                        <option value="12">Después de 3 meses</option>
+                                        <option value="24">Después de 6 meses</option>
+                                        <option value="52">Después de 1 año</option>
                                     </select>
                                 </div>
+
                             </div>
                         </div>
                     </div>
