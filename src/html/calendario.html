@@ -6,11 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calendario - PSIO Manager</title>
 
-      <script>
-    if (localStorage.getItem("darkMode") === "true") {
-      document.documentElement.classList.add("dark");
-    }
-  </script>
+    <script>
+        if (localStorage.getItem("darkMode") === "true") {
+            document.documentElement.classList.add("dark");
+        }
+    </script>
 
     <link rel="stylesheet" href="../css/general.css">
     <link rel="stylesheet" href="../css/calendario.css">
@@ -52,7 +52,8 @@
 
                 <p class="section-title">PISO</p>
                 <ul>
-                    <li><a href="../html/companerosUser.html"><img src="../css/icons/users.svg" class="icon"> Compañeros</a>
+                    <li><a href="../html/companerosUser.html"><img src="../css/icons/users.svg" class="icon">
+                            Compañeros</a>
                     </li>
 
                     <li>
@@ -354,6 +355,18 @@
                         resuelta</button>
                     <button id="complete-task-btn" type="button" class="btn-success hidden">Completada</button>
                 </div>
+            </div>
+        </div>
+
+        <!-- MODAL EVENTOS DEL DÍA -->
+        <div id="modal-day" class="modal hidden">
+            <div class="modal-content details-card">
+                <div class="modal-header">
+                    <h3 id="day-modal-title">Eventos del día</h3>
+                    <button id="close-day-modal" class="modal-close">&times;</button>
+                </div>
+
+                <div id="day-events-list" class="events-list"></div>
             </div>
         </div>
 

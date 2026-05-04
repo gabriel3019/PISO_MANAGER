@@ -261,7 +261,7 @@ function renderCalendar(date) {
             if (evento.tipo === "incidencia") {
                 if (evento.estado === "resuelta") return false;
 
-                 return evento.fechaInicio === fullDate;
+                return evento.fechaInicio === fullDate;
             }
 
             return evento.fecha === fullDate;
@@ -864,9 +864,13 @@ completeTaskBtn.addEventListener("click", async () => {
     await actualizarEstadoEvento(selectedEvent.id_evento, nuevoEstado);
 });
 
-document.getElementById("close-day-modal").addEventListener("click", () => {
-    closeModal(modalDay);
-});
+const closeDayModalBtn = document.getElementById("close-day-modal");
+
+if (closeDayModalBtn) {
+    closeDayModalBtn.addEventListener("click", () => {
+        closeModal(modalDay);
+    });
+}
 
 updateFormByType();
 setMinDates();
