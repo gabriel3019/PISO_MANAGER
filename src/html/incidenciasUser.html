@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Incidencias</title>
 
-    <script>
+  <script>
     if (localStorage.getItem("darkMode") === "true") {
       document.documentElement.classList.add("dark");
     }
@@ -20,7 +20,7 @@
 <body>
   <aside class="sidebar">
     <div>
-      <h3>Usuario 1</h3>
+      <h3 id="nombreUsuario"></h3>
       <span class="subtitle">Panel de inicio</span>
 
       <p class="section-title">PRINCIPAL</p>
@@ -31,8 +31,13 @@
           </a>
         </li>
         <li>
+          <a href="gastosComunesUser.html" class="sidebar-link">
+            <img src="../css/icons/euro.svg" class="icon"> Gastos Comunes
+          </a>
+        </li>
+        <li>
           <a href="tareasUser.html" class="sidebar-link">
-            <img src="../css/icons/layout-grid.svg" class="icon"> Tareas
+            <img src="../css/icons/square-check-big.svg" class="icon"> Tareas
             <span class="badge" id="badge-tareas">5</span>
           </a>
         </li>
@@ -80,10 +85,6 @@
         <h1>Incidencias</h1>
         <p class="address">Piso Calle Mayor, 12 &middot; 3 compañeros</p>
       </div>
-      <div class="page-header__actions">
-        <div class="avatar">U1</div>
-        <span class="username">Usuario 1</span>
-      </div>
     </header>
 
     <section class="stats-grid">
@@ -123,7 +124,7 @@
         <button class="btn-new btn-abrir-nueva">+ Nueva Incidencia</button>
       </div>
       <ul class="incident-list" id="lista-activas">
-        </ul>
+      </ul>
     </article>
 
     <article class="section">
@@ -132,10 +133,11 @@
         <button class="section__menu-btn">⋯</button>
       </div>
       <ul class="incident-list" id="lista-resueltas">
-        </ul>
+      </ul>
     </article>
 
-    <div class="modal-overlay modal--hidden" id="modal-nueva-incidencia" role="dialog" aria-modal="true" aria-labelledby="modal-nueva-title">
+    <div class="modal-overlay modal--hidden" id="modal-nueva-incidencia" role="dialog" aria-modal="true"
+      aria-labelledby="modal-nueva-title">
       <div class="modal">
         <div class="modal__header">
           <div class="modal__header-left">
@@ -146,7 +148,8 @@
         </div>
         <div class="modal__body">
           <div class="modal__field">
-            <label class="modal__label" for="nueva-tipo">TIPO DE INCIDENCIA<span class="modal__required">*</span></label>
+            <label class="modal__label" for="nueva-tipo">TIPO DE INCIDENCIA<span
+                class="modal__required">*</span></label>
             <div class="modal__select-wrapper">
               <select class="modal__select" id="nueva-tipo" name="tipo">
                 <option value="">Selecciona un tipo...</option>
@@ -159,12 +162,14 @@
           </div>
           <div class="modal__field">
             <label class="modal__label" for="nueva-titulo">TÍTULO<span class="modal__required">*</span></label>
-            <input class="modal__input" id="nueva-titulo" name="titulo" type="text" placeholder="Ej: Grifo roto en el baño principal" maxlength="100" />
+            <input class="modal__input" id="nueva-titulo" name="titulo" type="text"
+              placeholder="Ej: Grifo roto en el baño principal" maxlength="100" />
             <span class="modal__char-count"><span id="nueva-titulo-count">0</span>/100</span>
           </div>
           <div class="modal__field">
             <label class="modal__label" for="nueva-desc">DESCRIPCIÓN<span class="modal__required">*</span></label>
-            <textarea class="modal__textarea" id="nueva-desc" name="descripcion" placeholder="Describe el problema con detalle..."></textarea>
+            <textarea class="modal__textarea" id="nueva-desc" name="descripcion"
+              placeholder="Describe el problema con detalle..."></textarea>
           </div>
           <div class="modal__field">
             <label class="modal__label">NIVEL DE URGENCIA<span class="modal__required">*</span></label>
@@ -190,13 +195,16 @@
           </div>
         </div>
         <div class="modal__footer">
-          <button type="button" class="modal__btn modal__btn--cancel" data-modal-close="modal-nueva-incidencia">Cancelar</button>
-          <button type="button" class="modal__btn modal__btn--primary" id="btn-enviar-incidencia">Enviar incidencia</button>
+          <button type="button" class="modal__btn modal__btn--cancel"
+            data-modal-close="modal-nueva-incidencia">Cancelar</button>
+          <button type="button" class="modal__btn modal__btn--primary" id="btn-enviar-incidencia">Enviar
+            incidencia</button>
         </div>
       </div>
     </div>
 
-    <div class="modal-overlay modal--hidden" id="modal-editar-incidencia" role="dialog" aria-modal="true" aria-labelledby="modal-editar-title">
+    <div class="modal-overlay modal--hidden" id="modal-editar-incidencia" role="dialog" aria-modal="true"
+      aria-labelledby="modal-editar-title">
       <div class="modal">
         <div class="modal__header">
           <div class="modal__header-left">
@@ -250,13 +258,16 @@
           </div>
         </div>
         <div class="modal__footer">
-          <button type="button" class="modal__btn modal__btn--cancel" data-modal-close="modal-editar-incidencia">Cancelar</button>
-          <button type="button" class="modal__btn modal__btn--primary" id="btn-confirmar-editar">Editar incidencia</button>
+          <button type="button" class="modal__btn modal__btn--cancel"
+            data-modal-close="modal-editar-incidencia">Cancelar</button>
+          <button type="button" class="modal__btn modal__btn--primary" id="btn-confirmar-editar">Editar
+            incidencia</button>
         </div>
       </div>
     </div>
 
-    <div class="modal-overlay modal--hidden" id="modal-eliminar-incidencia" role="dialog" aria-modal="true" aria-labelledby="modal-eliminar-title">
+    <div class="modal-overlay modal--hidden" id="modal-eliminar-incidencia" role="dialog" aria-modal="true"
+      aria-labelledby="modal-eliminar-title">
       <div class="modal modal--sm">
         <div class="modal__header">
           <h2 class="modal__title" id="modal-eliminar-title">Eliminar incidencia</h2>
@@ -268,14 +279,18 @@
         </div>
         <hr class="modal__divider" />
         <div class="modal__footer">
-          <button type="button" class="modal__btn modal__btn--cancel" data-modal-close="modal-eliminar-incidencia">Cancelar</button>
-          <button type="button" class="modal__btn modal__btn--danger" id="btn-confirmar-eliminar">Eliminar incidencia</button>
+          <button type="button" class="modal__btn modal__btn--cancel"
+            data-modal-close="modal-eliminar-incidencia">Cancelar</button>
+          <button type="button" class="modal__btn modal__btn--danger" id="btn-confirmar-eliminar">Eliminar
+            incidencia</button>
         </div>
       </div>
     </div>
 
-  <script src="../js/dark-mode.js"></script>
-  </div><script src="../js/incidencias.js"></script>
+    <script src="../js/dark-mode.js"></script>
+  </div>
+  <script src="../js/incidencias.js"></script>
   <script src="../js/cerrarSesion.js"></script>
 </body>
+
 </html>
