@@ -247,11 +247,11 @@ function renderCalendar(date) {
         const dayBox = document.createElement("div");
         dayBox.className = "calendar-day";
 
-        let html = `<div class="calendar-day-number">${day}</div>`;
-
         const dayString = String(day).padStart(2, "0");
         const monthString = String(month + 1).padStart(2, "0");
         const fullDate = `${year}-${monthString}-${dayString}`;
+
+        dayBox.innerHTML = `<div class="calendar-day-number">${day}</div>`;
 
         const eventosDelDia = eventos.filter((evento) => {
             if (evento.tipo === "tarea" && evento.estado === "completada") {
@@ -260,19 +260,16 @@ function renderCalendar(date) {
 
             if (evento.tipo === "incidencia") {
                 if (evento.estado === "resuelta") return false;
-
                 return evento.fechaInicio === fullDate;
             }
 
             return evento.fecha === fullDate;
         });
 
+        const eventsContainer = document.createElement("div");
+        eventsContainer.classList.add("day-events");
 
-
-        const eventosVisibles = eventosDelDia.slice(0, 1);
-        const eventosOcultos = eventosDelDia.length - eventosVisibles.length;
-
-        eventosVisibles.forEach((evento) => {
+        eventosDelDia.slice(0, 1).forEach((evento) => {
             let icono = "";
 
             if (evento.tipo === "evento" && evento.personas && evento.personas.length > 0) {
@@ -280,11 +277,7 @@ function renderCalendar(date) {
             }
 
             if (evento.tipo === "tarea" && evento.personas && evento.personas.length > 0) {
-                if (evento.personas.length === 1) {
-                    icono = " 👤";
-                } else {
-                    icono = " 👥";
-                }
+                icono = evento.personas.length === 1 ? " 👤" : " 👥";
             }
 
             if (evento.tipo === "incidencia") {
@@ -296,33 +289,42 @@ function renderCalendar(date) {
                     ? "completed-task"
                     : "";
 
-            html += `
-    <div 
-      class="event ${evento.tipo} ${completedClass}"
-      data-id="${evento.id_evento || ""}"
-      data-title="${evento.titulo}"
-      data-type="${evento.tipo}"
-      data-date="${evento.fecha || ""}"
-      data-start="${evento.fechaInicio || ""}"
-      data-end="${evento.fechaFin || ""}"
-      data-time="${evento.hora || ""}"
-      data-person="${evento.persona || ""}"
-      data-people='${JSON.stringify(evento.personas || [])}'
-      data-status="${evento.estado || ""}">
-      <span class="event-text">${evento.titulo}</span>
-      <span class="event-icon">${icono}</span>
-    </div>
-`;
+            const eventDiv = document.createElement("div");
+            eventDiv.className = `event ${evento.tipo} ${completedClass}`;
+
+            eventDiv.innerHTML = `
+                <span class="event-text">${evento.titulo}</span>
+                <span class="event-icon">${icono}</span>
+            `;
+
+            eventDiv.addEventListener("click", (e) => {
+                e.stopPropagation();
+                selectedEvent = evento;
+                showEventDetails(evento);
+            });
+
+            eventsContainer.appendChild(eventDiv);
         });
 
-        if (eventosOcultos > 0) {
-            html += `<div class="more-events">+${eventosOcultos} más</div>`;
+        if (eventosDelDia.length > 1) {
+            const moreDiv = document.createElement("div");
+            moreDiv.classList.add("more-events");
+            moreDiv.textContent = `+${eventosDelDia.length - 1} más`;
+
+            moreDiv.addEventListener("click", (e) => {
+                e.stopPropagation();
+                openDayModal(fullDate, eventosDelDia);
+            });
+
+            eventsContainer.appendChild(moreDiv);
         }
 
-        dayBox.innerHTML = html;
+        dayBox.appendChild(eventsContainer);
+
         dayBox.addEventListener("click", () => {
             openDayModal(fullDate, eventosDelDia);
         });
+
         calendarGrid.appendChild(dayBox);
     }
 
@@ -337,7 +339,6 @@ function renderCalendar(date) {
     }
 
     renderUpcomingEvents();
-    addEventClickListeners();
 }
 
 function renderUpcomingEvents() {

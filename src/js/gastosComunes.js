@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
   cargarUsuarios();
   cargarGastos();
   cargarBalance();
-  cargarResumen(); // 🔥 NUEVO
+  cargarResumen(); 
 
   initEventos();
 });

@@ -330,7 +330,7 @@ body {
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
-    grid-template-rows: repeat(6, 1fr);
+    grid-template-rows: repeat(6, minmax(0, 1fr));
     gap: 6px;
     flex: 1;
     min-height: 0;
@@ -340,18 +340,22 @@ body {
     background: #fff;
     border: 1px solid #e5e7eb;
     border-radius: 12px;
-    height: 100%;
-    min-height: 0;
     padding: 8px;
-    box-sizing: border-box;
-    overflow: visible;
+    overflow: hidden;
     min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
 }
 
 .calendar-day-number {
+    font-size: 16px;
     font-weight: 700;
-    margin-bottom: 8px;
     color: #111827;
+    line-height: 1;
+    margin-bottom: 6px;
+    flex-shrink: 0;
 }
 
 .other-month {
@@ -359,34 +363,42 @@ body {
 }
 
 /* ================= EVENTS ================= */
-.event {
-    font-size: 12px;
-    padding: 6px 8px;
-    border-radius: 8px;
-    margin-bottom: 6px;
-    cursor: pointer;
-
+.day-events {
     display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 6px;
+    flex-direction: column;
+    gap: 3px;
+    width: 100%;
+    margin-top: 2px;
+    overflow: visible;
+}
 
+.event {
+    width: 100%;
+    height: 22px;
+    padding: 3px 7px;
+    border-radius: 7px;
+    font-size: 11px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
     overflow: hidden;
-    white-space: normal;
+    flex-shrink: 0;
 }
 
 .event-text {
     flex: 1;
     min-width: 0;
-
     overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 2; /* máximo 2 líneas */
-    -webkit-box-orient: vertical;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .event-icon {
     flex-shrink: 0;
+    font-size: 12px;
 }
 
 .event.incidencia {
@@ -411,54 +423,130 @@ body {
 }
 
 .more-events {
-    font-size: 12px;
+    height: 18px;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: #e5e7eb;
+    color: #111827;
+    font-size: 10px;
     font-weight: 700;
-    color: #64748b;
-    margin-top: 2px;
+    line-height: 14px;
     cursor: pointer;
+    width: fit-content;
+    flex-shrink: 0;
+}
+
+.more-events:hover {
+    background: #d1d5db;
 }
 
 /* ================= DAY MODAL ================= */
 
 .day-modal-content {
-    max-width: 650px;
+    max-width: 620px;
+    padding: 0;
+    overflow: hidden;
+    border-radius: 22px;
+}
+
+.day-modal-content .modal-header {
+    padding: 24px 28px 18px;
+    margin-bottom: 0;
+    border-bottom: 1px solid #eef2f7;
+}
+
+.day-modal-content .modal-header h3 {
+    font-size: 22px;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.day-modal-content .modal-close {
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    font-size: 24px;
+    background: #f8fafc;
+}
+
+.day-modal-content .modal-close:hover {
+    background: #e5e7eb;
 }
 
 .day-events-list {
+    padding: 20px 28px 28px;
     display: flex;
     flex-direction: column;
     gap: 12px;
 }
 
+.day-events {
+    margin-top: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 100%;
+    min-height: 0;
+}
+
+.calendar-event {
+    width: 100%;
+    min-height: 34px;
+    padding: 7px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.2;
+    overflow: hidden;
+}
+
 .day-event-card {
-    padding: 14px;
-    border-radius: 14px;
-    border: 1px solid #e5e7eb;
+    padding: 16px 18px;
+    border-radius: 16px;
+    border: 1px solid transparent;
     cursor: pointer;
+    transition: 0.2s ease;
+    margin: 0;
+    height: auto;
+    min-height: unset;
+}
+
+.day-event-card+.day-event-card {
+    margin-top: 10px;
+}
+
+.day-event-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.10);
 }
 
 .day-event-card.incidencia {
-    background: #fee2e2;
-    color: #b91c1c;
+    background: #fff1f2;
+    color: #991b1b;
+    border-color: #fecdd3;
 }
 
 .day-event-card.tarea {
-    background: #dcfce7;
-    color: #15803d;
+    background: #ecfdf5;
+    color: #166534;
+    border-color: #bbf7d0;
 }
 
 .day-event-card.evento {
-    background: #dbeafe;
+    background: #eff6ff;
     color: #1d4ed8;
+    border-color: #bfdbfe;
 }
 
 .day-event-title {
-    font-weight: 700;
-    margin-bottom: 4px;
+    font-size: 17px;
+    font-weight: 800;
+    margin-bottom: 6px;
 }
 
 .day-event-meta {
     font-size: 13px;
+    font-weight: 600;
+    opacity: 0.85;
 }
 
 /* ================= REPEAT TASK ================= */
@@ -738,47 +826,47 @@ body {
 /* ================= DARK MODE AJUSTES ================= */
 
 body.dark .settings {
-  color: #e5e7eb;
+    color: #e5e7eb;
 }
 
 /* CARD */
 body.dark .card {
-  background: #020617;
-  border-color: #1e293b;
+    background: #020617;
+    border-color: #1e293b;
 }
 
 /* INPUTS */
 body.dark .form-group input {
-  background: #020617;
-  color: #e5e7eb;
-  border-color: #1e293b;
+    background: #020617;
+    color: #e5e7eb;
+    border-color: #1e293b;
 }
 
 /* LABELS */
 body.dark label {
-  color: #cbd5f5;
+    color: #cbd5f5;
 }
 
 /* AVATAR BUTTON */
 body.dark .avatar button {
-  background: #1e293b;
-  color: #e5e7eb;
+    background: #1e293b;
+    color: #e5e7eb;
 }
 
 /* SWITCH */
 body.dark .slider {
-  background: #374151;
+    background: #374151;
 }
 
-body.dark input:checked + .slider {
-  background: #2563eb;
+body.dark input:checked+.slider {
+    background: #2563eb;
 }
 
 body,
 .card,
 input,
 .slider {
-  transition: all 0.3s ease;
+    transition: all 0.3s ease;
 }
 
 /* ================= RESPONSIVE ================= */
@@ -833,19 +921,8 @@ input,
 
     .calendar-day-number {
         font-weight: 700;
-        margin-bottom: 8px;
+        margin-bottom: 3px;
         color: #111827;
-    }
-
-    .event {
-        font-size: 12px;
-        padding: 6px 8px;
-        border-radius: 8px;
-        margin-bottom: 6px;
-        cursor: pointer;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
     }
 
     .event.incidencia {
