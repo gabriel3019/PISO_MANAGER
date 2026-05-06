@@ -194,6 +194,12 @@ body {
     border-radius: 5px;
 }
 
+.btn-primary,
+.btn-secondary {
+    padding: 8px 12px;
+    font-size: 13px;
+}
+
 #btn-add:hover,
 .btn-primary:hover {
     background: #1d4ed8;
@@ -258,7 +264,6 @@ body {
     border: 1px solid #e5e7eb;
     box-shadow: 0 4px 18px rgba(15, 23, 42, 0.06);
     padding: 16px;
-    overflow-y: auto;
     min-height: 0;
 }
 
@@ -363,13 +368,15 @@ body {
 }
 
 /* ================= EVENTS ================= */
+/* Merged: second declaration (DAY MODAL section) wins on gap/margin-top, first keeps overflow + min-height added */
 .day-events {
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 5px;
     width: 100%;
-    margin-top: 2px;
+    margin-top: 6px;
     overflow: visible;
+    min-height: 0;
 }
 
 .event {
@@ -441,7 +448,6 @@ body {
 }
 
 /* ================= DAY MODAL ================= */
-
 .day-modal-content {
     max-width: 620px;
     padding: 0;
@@ -478,15 +484,6 @@ body {
     display: flex;
     flex-direction: column;
     gap: 12px;
-}
-
-.day-events {
-    margin-top: 6px;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    width: 100%;
-    min-height: 0;
 }
 
 .calendar-event {
@@ -547,57 +544,6 @@ body {
     font-size: 13px;
     font-weight: 600;
     opacity: 0.85;
-}
-
-/* ================= REPEAT TASK ================= */
-
-.repeat-box {
-    margin-top: 8px;
-    padding: 14px;
-    border: 1px solid #dbeafe;
-    background: #f8fbff;
-    border-radius: 14px;
-}
-
-.repeat-main {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 700;
-    color: #1e3a8a;
-    margin-bottom: 10px;
-}
-
-.repeat-options {
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px solid #dbeafe;
-}
-
-.repeat-options-title {
-    display: block;
-    margin-bottom: 8px;
-    font-size: 13px;
-    font-weight: 700;
-    color: #334155;
-}
-
-.repeat-days-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-bottom: 12px;
-}
-
-.repeat-select-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.repeat-select-row label {
-    margin: 0;
-    white-space: nowrap;
 }
 
 /* ================= RIGHT SIDEBAR ================= */
@@ -682,7 +628,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 18px;
+    margin-bottom: 16px;
 }
 
 .modal-header h3 {
@@ -705,14 +651,16 @@ body {
 }
 
 .modal-form label {
-    font-size: 14px;
+    margin-bottom: 2px;
+    font-size: 13px;
     font-weight: 600;
     color: #334155;
 }
 
 .modal-form input,
 .modal-form select {
-    padding: 11px 12px;
+    height: 42px;
+    padding: 9px 11px;
     border: 1px solid #dbe3ef;
     border-radius: 10px;
     outline: none;
@@ -724,17 +672,11 @@ body {
     border-color: #3b82f6;
 }
 
-.modal-body p {
-    margin: 12px 0;
-    font-size: 15px;
-    color: #334155;
-}
-
 .modal-buttons {
     display: flex;
     justify-content: flex-end;
-    gap: 10px;
-    margin-top: 18px;
+    gap: 12px;
+    margin-top: 16px;
 }
 
 .conditional-fields {
@@ -747,7 +689,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    padding: 6px 0;
+    padding: 4px 0;
 }
 
 .checkbox-item {
@@ -756,6 +698,171 @@ body {
     gap: 8px;
     font-size: 14px;
     color: #334155;
+}
+
+/* ================= MODAL ADD EVENT ================= */
+#modal-add {
+    align-items: center;
+    padding: 20px;
+}
+
+/* Merged: second declaration wins on max-width (500px) and padding (28px 32px) */
+#modal-add .modal-content {
+    max-width: 500px;
+    max-height: 92vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 28px 32px;
+}
+
+#modal-add select {
+    max-height: 34px;
+    font-size: 13px;
+}
+
+/* Merged: second declaration wins on gap (6px) */
+#modal-add .modal-form {
+    gap: 6px;
+}
+
+/* Merged: second declaration wins on height (34px) and padding (6px 10px) */
+#modal-add .modal-form input,
+#modal-add .modal-form select {
+    height: 34px;
+    padding: 6px 10px;
+    font-size: 13px;
+}
+
+#modal-add .modal-form > label {
+    margin-top: 10px;
+    margin-bottom: 4px;
+}
+
+#modal-add .modal-form > label:first-child {
+    margin-top: 0;
+}
+
+#people-fields {
+    gap: 6px;
+}
+
+#people-fields .checkbox-group {
+    gap: 6px;
+    padding: 4px 0 2px;
+    margin-bottom: 4px;
+}
+
+#people-fields .checkbox-item {
+    min-height: 24px;
+    gap: 8px;
+}
+
+#repeat-fields {
+    margin-top: 6px;
+}
+
+/* Merged: second declaration wins on margin-top (8px), margin-bottom added, padding (10px), border-radius (18px) */
+#modal-add .modal-buttons {
+    margin-top: 14px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    background: white;
+}
+
+/* ================= REPEAT TASK ================= */
+/* Merged: second declaration wins on margin-top (8px), margin-bottom, padding (10px), border-radius (18px) */
+.repeat-box {
+    margin-top: 8px;
+    margin-bottom: 18px;
+    padding: 10px;
+    border: 1px solid #dbeafe;
+    background: #f8fbff;
+    border-radius: 18px;
+}
+
+/* Merged: second declaration wins on margin-bottom (12px) */
+.repeat-main {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-weight: 700;
+    color: #1e3a8a;
+}
+
+/* Merged: second declaration wins on margin-top (12px), padding-top (8px), display (grid), gap (6px) */
+.repeat-options {
+    margin-top: 12px;
+    padding-top: 8px;
+    border-top: 1px solid #dbeafe;
+    display: grid;
+    gap: 6px;
+}
+
+/* Merged: second declaration wins on grid-template-columns (120px 1fr) and gap (14px) */
+.repeat-select-row {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    align-items: center;
+    gap: 14px;
+}
+
+/* Merged: second declaration wins on font-weight (700) */
+.repeat-select-row label {
+    margin: 0;
+    font-weight: 700;
+}
+
+/* Merged: second declaration adds max-width: none */
+.repeat-select-row select {
+    width: 100%;
+    max-width: none;
+}
+
+.custom-repeat-box,
+.repeat-end-custom-box {
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: 12px;
+    background: #ffffff;
+    border: 1px solid #dbeafe;
+}
+
+.repeat-frequency-row {
+    display: grid;
+    grid-template-columns: auto 70px 1fr;
+    gap: 8px;
+    align-items: center;
+    margin-top: 8px;
+}
+
+.repeat-frequency-row input,
+.repeat-frequency-row select,
+#repeat-type {
+    padding: 10px 12px;
+    border: 1px solid #dbe3ef;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+#repeat-end,
+#repeat-type {
+    position: relative;
+    z-index: 20;
+}
+
+/* Merged: second declaration wins on margin-top (14px) */
+.custom-week-days {
+    margin-top: 14px;
+}
+
+.repeat-days-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 18px;
+    margin-top: 8px;
 }
 
 /* ================= DETAILS ================= */
@@ -822,38 +929,31 @@ body {
     margin-top: 20px;
 }
 
-
-/* ================= DARK MODE AJUSTES ================= */
-
+/* ================= DARK MODE ================= */
 body.dark .settings {
     color: #e5e7eb;
 }
 
-/* CARD */
 body.dark .card {
     background: #020617;
     border-color: #1e293b;
 }
 
-/* INPUTS */
 body.dark .form-group input {
     background: #020617;
     color: #e5e7eb;
     border-color: #1e293b;
 }
 
-/* LABELS */
 body.dark label {
     color: #cbd5f5;
 }
 
-/* AVATAR BUTTON */
 body.dark .avatar button {
     background: #1e293b;
     color: #e5e7eb;
 }
 
-/* SWITCH */
 body.dark .slider {
     background: #374151;
 }
@@ -867,42 +967,6 @@ body,
 input,
 .slider {
     transition: all 0.3s ease;
-}
-
-.custom-repeat-box {
-    margin-top: 12px;
-    padding: 12px;
-    border-radius: 12px;
-    background: #ffffff;
-    border: 1px solid #dbeafe;
-}
-
-.repeat-frequency-row {
-    display: grid;
-    grid-template-columns: auto 70px 1fr;
-    gap: 8px;
-    align-items: center;
-    margin-top: 8px;
-}
-
-.repeat-frequency-row input,
-.repeat-frequency-row select,
-#repeat-type {
-    padding: 10px 12px;
-    border: 1px solid #dbe3ef;
-    border-radius: 10px;
-    font-size: 14px;
-}
-
-.custom-week-days {
-    margin-top: 14px;
-}
-
-.repeat-days-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px 18px;
-    margin-top: 8px;
 }
 
 /* ================= RESPONSIVE ================= */
@@ -953,7 +1017,6 @@ input,
         background: #f9fafb;
         color: #9ca3af;
     }
-
 
     .calendar-day-number {
         font-weight: 700;

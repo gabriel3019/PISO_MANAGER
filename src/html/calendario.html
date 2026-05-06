@@ -205,15 +205,17 @@
 
                             <div id="repeat-options" class="repeat-options hidden">
 
-                                <label for="repeat-type">Se repite</label>
-                                <select id="repeat-type">
-                                    <option value="daily">Cada día</option>
-                                    <option value="weekly">Cada semana</option>
-                                    <option value="biweekly">Cada 2 semanas</option>
-                                    <option value="monthly">Cada mes</option>
-                                    <option value="yearly">Cada año</option>
-                                    <option value="custom">Personalizado</option>
-                                </select>
+                                <div class="repeat-select-row">
+                                    <label for="repeat-type">Se repite</label>
+                                    <select id="repeat-type">
+                                        <option value="daily">Cada día</option>
+                                        <option value="weekly">Cada semana</option>
+                                        <option value="biweekly">Cada 2 semanas</option>
+                                        <option value="monthly">Cada mes</option>
+                                        <option value="yearly">Cada año</option>
+                                        <option value="custom">Personalizado</option>
+                                    </select>
+                                </div>
 
                                 <div id="custom-repeat-box" class="custom-repeat-box hidden">
                                     <label>Frecuencia</label>
@@ -252,7 +254,13 @@
                                         <option value="12">Después de 3 meses</option>
                                         <option value="24">Después de 6 meses</option>
                                         <option value="52">Después de 1 año</option>
+                                        <option value="custom">Personalizado</option>
                                     </select>
+                                </div>
+
+                                <div id="repeat-end-custom-box" class="repeat-end-custom-box hidden">
+                                    <label for="repeat-end-date">Fecha de finalización</label>
+                                    <input type="date" id="repeat-end-date">
                                 </div>
 
                             </div>

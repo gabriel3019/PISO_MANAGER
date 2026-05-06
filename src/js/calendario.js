@@ -52,6 +52,10 @@ const repeatIntervalInput = document.getElementById("repeat-interval");
 const repeatFrequencyInput = document.getElementById("repeat-frequency");
 const customWeekDays = document.getElementById("custom-week-days");
 
+const repeatEndInput = document.getElementById("repeat-end");
+const repeatEndCustomBox = document.getElementById("repeat-end-custom-box");
+const repeatEndDateInput = document.getElementById("repeat-end-date");
+
 let repeatDayInputs = document.querySelectorAll('input[name="repeat-days"]');
 let currentDate = new Date(2026, 4, 1);
 let selectedEvent = null;
@@ -585,6 +589,14 @@ repeatFrequencyInput.addEventListener("change", () => {
     }
 });
 
+repeatEndInput.addEventListener("change", () => {
+    if (repeatEndInput.value === "custom") {
+        repeatEndCustomBox.classList.remove("hidden");
+    } else {
+        repeatEndCustomBox.classList.add("hidden");
+    }
+});
+
 function formatearFecha(date) {
     const yyyy = date.getFullYear();
     const mm = String(date.getMonth() + 1).padStart(2, "0");
@@ -595,13 +607,24 @@ function formatearFecha(date) {
 function obtenerFechasRepetidas(fechaInicio) {
     const fechas = [];
     const tipoRepeticion = repeatTypeInput.value;
-    const semanasDuracion = parseInt(repeatWeeksInput.value, 10);
 
     const [anio, mes, dia] = fechaInicio.split("-").map(Number);
     const inicio = new Date(anio, mes - 1, dia);
 
-    const fin = new Date(inicio);
-    fin.setDate(fin.getDate() + semanasDuracion * 7);
+    let fin;
+
+    if (repeatEndInput.value === "custom") {
+        if (!repeatEndDateInput.value) {
+            return [];
+        }
+
+        const [anioFin, mesFin, diaFin] = repeatEndDateInput.value.split("-").map(Number);
+        fin = new Date(anioFin, mesFin - 1, diaFin);
+    } else {
+        const semanasDuracion = parseInt(repeatEndInput.value, 10);
+        fin = new Date(inicio);
+        fin.setDate(fin.getDate() + semanasDuracion * 7);
+    }
 
     if (tipoRepeticion === "daily") {
         for (let fecha = new Date(inicio); fecha <= fin; fecha.setDate(fecha.getDate() + 1)) {
