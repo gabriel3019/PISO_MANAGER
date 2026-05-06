@@ -1,8 +1,10 @@
 const API_URL = "/PISO_MANAGER/src/php/calendario.php";
 
 const monthTitle = document.getElementById("month-title");
+const pageTitle = document.getElementById("page-title");
 const calendarGrid = document.getElementById("calendar-grid");
 const eventsList = document.getElementById("events-list");
+const calendarViewSelect = document.getElementById("calendar-view");
 
 const repeatFields = document.getElementById("repeat-fields");
 const taskRepeatInput = document.getElementById("task-repeat");
@@ -56,10 +58,60 @@ const repeatEndInput = document.getElementById("repeat-end");
 const repeatEndCustomBox = document.getElementById("repeat-end-custom-box");
 const repeatEndDateInput = document.getElementById("repeat-end-date");
 
+const btnToday = document.getElementById("btn-today");
+const btnSearch = document.getElementById("btn-search");
+const modalSearch = document.getElementById("modal-search");
+const closeSearchModal = document.getElementById("close-search-modal");
+const searchInput = document.getElementById("search-input");
+const searchResults = document.getElementById("search-results");
+
+const repeatStep = document.getElementById("repeat-step");
+const nextRepeatBtn = document.getElementById("next-repeat");
+const backRepeatBtn = document.getElementById("back-repeat");
+const saveEventBtn = document.getElementById("save-event");
+
+const deleteEventBtn = document.getElementById("delete-event-btn");
+const modalDeleteRepeat = document.getElementById("modal-delete-repeat");
+const closeDeleteRepeatBtn = document.getElementById("close-delete-repeat");
+const deleteOnlyOneBtn = document.getElementById("delete-only-one");
+const deleteFutureTasksBtn = document.getElementById("delete-future-tasks");
+
+const modalDeleteConfirm = document.getElementById("modal-delete-confirm");
+const closeDeleteConfirmBtn = document.getElementById("close-delete-confirm");
+const cancelDeleteConfirmBtn = document.getElementById("cancel-delete-confirm");
+const confirmDeleteEventBtn = document.getElementById("confirm-delete-event");
+const deleteConfirmText = document.getElementById("delete-confirm-text");
+
+nextRepeatBtn.addEventListener("click", () => {
+    generalFields.classList.add("hidden");
+    peopleFields.classList.add("hidden");
+    repeatFields.classList.add("hidden");
+
+    repeatStep.classList.remove("hidden");
+    repeatOptions.classList.remove("hidden");
+
+    nextRepeatBtn.classList.add("hidden");
+    backRepeatBtn.classList.remove("hidden");
+    saveEventBtn.classList.remove("hidden");
+});
+
+backRepeatBtn.addEventListener("click", () => {
+    repeatStep.classList.add("hidden");
+
+    generalFields.classList.remove("hidden");
+    peopleFields.classList.remove("hidden");
+    repeatFields.classList.remove("hidden");
+
+    nextRepeatBtn.classList.remove("hidden");
+    backRepeatBtn.classList.add("hidden");
+    saveEventBtn.classList.add("hidden");
+});
+
 let repeatDayInputs = document.querySelectorAll('input[name="repeat-days"]');
 let currentDate = new Date(2026, 4, 1);
 let selectedEvent = null;
 let eventos = [];
+let currentView = "month";
 
 const monthNames = [
     "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -218,6 +270,64 @@ async function actualizarEstadoEvento(id_evento, estado) {
     }
 }
 
+async function eliminarEvento(id_evento) {
+    try {
+        const response = await fetch(`${API_URL}?action=eliminar`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ id_evento })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+
+            closeModal(modalDetails);
+            closeModal(modalDeleteRepeat);
+            closeModal(modalDeleteConfirm);
+
+            await cargarEventos();
+
+        } else {
+            alert(data.message || "No se pudo eliminar.");
+        }
+
+    } catch (error) {
+        console.error("Error al eliminar:", error);
+    }
+}
+
+async function eliminarTareasFuturas(evento) {
+    try {
+        const response = await fetch(`${API_URL}?action=eliminar_futuras`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                titulo: evento.titulo,
+                tipo: evento.tipo,
+                fecha: evento.fecha
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            closeModal(modalDetails);
+            closeModal(modalDeleteRepeat);
+            closeModal(modalDeleteConfirm);
+            await cargarEventos();
+        } else {
+            alert(data.message || "No se pudieron eliminar las tareas futuras.");
+        }
+    } catch (error) {
+        console.error("Error al eliminar futuras:", error);
+    }
+}
+
 function incidenciaVisibleEnMes(incidencia, year, month) {
     if (incidencia.estado === "resuelta") return false;
 
@@ -228,13 +338,94 @@ function incidenciaVisibleEnMes(incidencia, year, month) {
     return incidencia.fechaInicio <= lastDay && fechaFin >= firstDay;
 }
 
+function getEventMainDate(evento) {
+    if (evento.tipo === "incidencia") return evento.fechaInicio;
+    return evento.fecha;
+}
+
+function getVisibleEventsForDate(fullDate) {
+    return eventos.filter((evento) => {
+        if (evento.tipo === "tarea" && evento.estado === "completada") return false;
+
+        if (evento.tipo === "incidencia") {
+            if (evento.estado === "resuelta") return false;
+            const fechaFin = evento.fechaFin || fullDate;
+            return fullDate >= evento.fechaInicio && fullDate <= fechaFin;
+        }
+
+        return evento.fecha === fullDate;
+    });
+}
+
+function paintEventsInDay(dayBox, fullDate, maxEvents = 1) {
+    const eventosDelDia = getVisibleEventsForDate(fullDate);
+    const eventsContainer = document.createElement("div");
+    eventsContainer.classList.add("day-events");
+
+    eventosDelDia.slice(0, maxEvents).forEach((evento) => {
+        let icono = "";
+
+        if (evento.tipo === "evento" && evento.personas && evento.personas.length > 0) icono = " 👥";
+        if (evento.tipo === "tarea" && evento.personas && evento.personas.length > 0) icono = evento.personas.length === 1 ? " 👤" : " 👥";
+        if (evento.tipo === "incidencia") icono = " ⚠️";
+
+        const completedClass = evento.tipo === "tarea" && evento.estado === "completada" ? "completed-task" : "";
+        const eventDiv = document.createElement("div");
+        eventDiv.className = `event ${evento.tipo} ${completedClass}`;
+
+        eventDiv.innerHTML = `
+            <span class="event-text">${evento.titulo}</span>
+            <span class="event-icon">${icono}</span>
+        `;
+
+        eventDiv.addEventListener("click", (e) => {
+            e.stopPropagation();
+            selectedEvent = evento;
+            showEventDetails(evento);
+        });
+
+        eventsContainer.appendChild(eventDiv);
+    });
+
+    if (eventosDelDia.length > maxEvents) {
+        const moreDiv = document.createElement("div");
+        moreDiv.classList.add("more-events");
+        moreDiv.textContent = `+${eventosDelDia.length - maxEvents} más`;
+
+        moreDiv.addEventListener("click", (e) => {
+            e.stopPropagation();
+            openDayModal(fullDate, eventosDelDia);
+        });
+
+        eventsContainer.appendChild(moreDiv);
+    }
+
+    dayBox.appendChild(eventsContainer);
+    dayBox.addEventListener("click", () => openDayModal(fullDate, eventosDelDia));
+}
+
 function renderCalendar(date) {
     calendarGrid.innerHTML = "";
+    calendarGrid.className = "calendar-grid";
 
+    if (currentView === "week") {
+        renderWeekCalendar(date);
+    } else if (currentView === "year") {
+        renderYearCalendar(date);
+    } else {
+        renderMonthCalendar(date);
+    }
+
+    renderUpcomingEvents();
+}
+
+function renderMonthCalendar(date) {
     const year = date.getFullYear();
     const month = date.getMonth();
 
     monthTitle.textContent = `${monthNames[month]} de ${year}`;
+    pageTitle.textContent = monthTitle.textContent;
+    calendarGrid.classList.add("month-view");
 
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
@@ -261,79 +452,7 @@ function renderCalendar(date) {
         const fullDate = `${year}-${monthString}-${dayString}`;
 
         dayBox.innerHTML = `<div class="calendar-day-number">${day}</div>`;
-
-        const eventosDelDia = eventos.filter((evento) => {
-            if (evento.tipo === "tarea" && evento.estado === "completada") {
-                return false;
-            }
-
-            if (evento.tipo === "incidencia") {
-                if (evento.estado === "resuelta") return false;
-                return evento.fechaInicio === fullDate;
-            }
-
-            return evento.fecha === fullDate;
-        });
-
-        const eventsContainer = document.createElement("div");
-        eventsContainer.classList.add("day-events");
-
-        eventosDelDia.slice(0, 1).forEach((evento) => {
-            let icono = "";
-
-            if (evento.tipo === "evento" && evento.personas && evento.personas.length > 0) {
-                icono = " 👥";
-            }
-
-            if (evento.tipo === "tarea" && evento.personas && evento.personas.length > 0) {
-                icono = evento.personas.length === 1 ? " 👤" : " 👥";
-            }
-
-            if (evento.tipo === "incidencia") {
-                icono = " ⚠️";
-            }
-
-            const completedClass =
-                evento.tipo === "tarea" && evento.estado === "completada"
-                    ? "completed-task"
-                    : "";
-
-            const eventDiv = document.createElement("div");
-            eventDiv.className = `event ${evento.tipo} ${completedClass}`;
-
-            eventDiv.innerHTML = `
-                <span class="event-text">${evento.titulo}</span>
-                <span class="event-icon">${icono}</span>
-            `;
-
-            eventDiv.addEventListener("click", (e) => {
-                e.stopPropagation();
-                selectedEvent = evento;
-                showEventDetails(evento);
-            });
-
-            eventsContainer.appendChild(eventDiv);
-        });
-
-        if (eventosDelDia.length > 1) {
-            const moreDiv = document.createElement("div");
-            moreDiv.classList.add("more-events");
-            moreDiv.textContent = `+${eventosDelDia.length - 1} más`;
-
-            moreDiv.addEventListener("click", (e) => {
-                e.stopPropagation();
-                openDayModal(fullDate, eventosDelDia);
-            });
-
-            eventsContainer.appendChild(moreDiv);
-        }
-
-        dayBox.appendChild(eventsContainer);
-
-        dayBox.addEventListener("click", () => {
-            openDayModal(fullDate, eventosDelDia);
-        });
-
+        paintEventsInDay(dayBox, fullDate, 1);
         calendarGrid.appendChild(dayBox);
     }
 
@@ -346,8 +465,116 @@ function renderCalendar(date) {
         dayBox.innerHTML = `<div class="calendar-day-number">${i}</div>`;
         calendarGrid.appendChild(dayBox);
     }
+}
 
-    renderUpcomingEvents();
+function renderWeekCalendar(date) {
+    const baseDate = new Date(date);
+    const weekDay = baseDate.getDay() === 0 ? 6 : baseDate.getDay() - 1;
+    const monday = new Date(baseDate);
+    monday.setDate(baseDate.getDate() - weekDay);
+
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+
+    monthTitle.textContent = `Semana del ${monday.getDate()} de ${monthNames[monday.getMonth()]} al ${sunday.getDate()} de ${monthNames[sunday.getMonth()]} de ${sunday.getFullYear()}`;
+    pageTitle.textContent = monthTitle.textContent;
+    calendarGrid.classList.add("week-view");
+
+    for (let i = 0; i < 7; i++) {
+        const dayDate = new Date(monday);
+        dayDate.setDate(monday.getDate() + i);
+
+        const year = dayDate.getFullYear();
+        const month = String(dayDate.getMonth() + 1).padStart(2, "0");
+        const day = String(dayDate.getDate()).padStart(2, "0");
+        const fullDate = `${year}-${month}-${day}`;
+
+        const dayBox = document.createElement("div");
+        dayBox.className = "calendar-day week-day";
+        dayBox.innerHTML = `
+            <div class="calendar-day-number">${dayDate.getDate()}</div>
+            <div class="week-day-month">${monthNames[dayDate.getMonth()]}</div>
+        `;
+
+        paintEventsInDay(dayBox, fullDate, 4);
+        calendarGrid.appendChild(dayBox);
+    }
+}
+function renderYearCalendar() {
+
+    calendarGrid.innerHTML = "";
+
+    monthTitle.textContent = `Año ${currentDate.getFullYear()}`;
+    pageTitle.textContent = monthTitle.textContent;
+    const yearContainer = document.createElement("div");
+    yearContainer.className = "year-view";
+
+    const meses = [
+        "Enero", "Febrero", "Marzo", "Abril",
+        "Mayo", "Junio", "Julio", "Agosto",
+        "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    ];
+
+    meses.forEach((mes, index) => {
+
+        const monthCard = document.createElement("div");
+        monthCard.className = "year-month-card";
+
+        const firstDay = new Date(currentDate.getFullYear(), index, 1);
+        const lastDay = new Date(currentDate.getFullYear(), index + 1, 0);
+
+        let startDay = firstDay.getDay();
+        startDay = startDay === 0 ? 6 : startDay - 1;
+
+        const totalDays = lastDay.getDate();
+
+        let daysHTML = "";
+
+        // Espacios vacíos antes del día 1
+        for (let i = 0; i < startDay; i++) {
+            daysHTML += `<div class="year-day empty"></div>`;
+        }
+
+        // Días del mes
+        for (let day = 1; day <= totalDays; day++) {
+
+            const fechaCompleta =
+                `${currentDate.getFullYear()}-${String(index + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+
+            const tieneEvento = eventos.some(evento => {
+
+                if (evento.tipo === "incidencia") {
+
+                    if (evento.estado === "resuelta") return false;
+
+                    const fechaFin = evento.fechaFin || evento.fechaInicio;
+
+                    return fechaCompleta >= evento.fechaInicio &&
+                        fechaCompleta <= fechaFin;
+                }
+
+                return evento.fecha === fechaCompleta;
+            });
+
+            daysHTML += `
+                <div class="year-day ${tieneEvento ? "has-event" : ""}">
+                    ${day}
+                </div>
+            `;
+        }
+
+        monthCard.innerHTML = `
+            <h3>${mes}</h3>
+
+            <div class="year-days-grid">
+                ${daysHTML}
+            </div>
+        `;
+
+        yearContainer.appendChild(monthCard);
+    });
+
+    calendarGrid.appendChild(yearContainer);
 }
 
 function renderUpcomingEvents() {
@@ -564,12 +791,24 @@ function updateFormByType() {
 
 taskRepeatInput.addEventListener("change", () => {
     if (taskRepeatInput.checked) {
+        nextRepeatBtn.classList.remove("hidden");
+        saveEventBtn.classList.add("hidden");
+
         repeatOptions.classList.remove("hidden");
         repeatTypeInput.value = "weekly";
     } else {
+        nextRepeatBtn.classList.add("hidden");
+        backRepeatBtn.classList.add("hidden");
+        saveEventBtn.classList.remove("hidden");
+
+        repeatStep.classList.add("hidden");
         repeatOptions.classList.add("hidden");
-        repeatTypeInput.value = "weekly";
         customRepeatBox.classList.add("hidden");
+        customWeekDays.classList.add("hidden");
+
+        generalFields.classList.remove("hidden");
+        peopleFields.classList.remove("hidden");
+        repeatFields.classList.remove("hidden");
     }
 });
 
@@ -708,6 +947,11 @@ function resetAddForm() {
         input.checked = false;
     });
 
+    repeatStep.classList.add("hidden");
+    nextRepeatBtn.classList.add("hidden");
+    backRepeatBtn.classList.add("hidden");
+    saveEventBtn.classList.remove("hidden");
+
     updateFormByType();
 }
 
@@ -729,38 +973,155 @@ eventStartDateInput.addEventListener("change", () => {
 eventTypeInput.addEventListener("change", updateFormByType);
 
 document.getElementById("btn-prev").addEventListener("click", () => {
-    currentDate.setMonth(currentDate.getMonth() - 1);
+    if (currentView === "week") {
+        currentDate.setDate(currentDate.getDate() - 7);
+    } else if (currentView === "year") {
+        currentDate.setFullYear(currentDate.getFullYear() - 1);
+    } else {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+    }
+
     renderCalendar(currentDate);
 });
 
 document.getElementById("btn-next").addEventListener("click", () => {
-    currentDate.setMonth(currentDate.getMonth() + 1);
+    if (currentView === "week") {
+        currentDate.setDate(currentDate.getDate() + 7);
+    } else if (currentView === "year") {
+        currentDate.setFullYear(currentDate.getFullYear() + 1);
+    } else {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+    }
+
+    renderCalendar(currentDate);
+});
+
+btnToday.addEventListener("click", () => {
+    currentDate = new Date();
+    renderCalendar(currentDate);
+});
+
+btnSearch.addEventListener("click", () => {
+    searchInput.value = "";
+    searchResults.innerHTML = '<p class="search-empty">Escribe para buscar eventos.</p>';
+    openModal(modalSearch);
+    searchInput.focus();
+});
+
+closeSearchModal.addEventListener("click", () => {
+    closeModal(modalSearch);
+});
+
+function buscarEventos(texto) {
+    const busqueda = normalizarTexto(texto);
+
+    if (!busqueda) {
+        searchResults.innerHTML = '<p class="search-empty">Escribe para buscar eventos.</p>';
+        return;
+    }
+
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+
+    const resultados = eventos.filter((evento) => {
+
+        let fechaEvento;
+
+        // INCIDENCIAS
+        if (evento.tipo === "incidencia") {
+
+            // Si está resuelta no aparece
+            if (evento.estado === "resuelta") return false;
+
+            // Usa fecha fin o fecha inicio
+            fechaEvento = new Date(evento.fechaFin || evento.fechaInicio);
+
+        } else {
+
+            // Tareas completadas no aparecen
+            if (evento.tipo === "tarea" && evento.estado === "completada") {
+                return false;
+            }
+
+            fechaEvento = new Date(evento.fecha);
+        }
+
+        // Ocultar eventos pasados
+        if (fechaEvento < hoy) {
+            return false;
+        }
+
+        const titulo = normalizarTexto(evento.titulo || "");
+        const tipo = normalizarTexto(typeNames[evento.tipo] || "");
+        const personas = normalizarTexto((evento.personas || []).join(" "));
+
+        return titulo.includes(busqueda) ||
+            tipo.includes(busqueda) ||
+            personas.includes(busqueda);
+    });
+
+    searchResults.innerHTML = "";
+
+    if (resultados.length === 0) {
+        searchResults.innerHTML = '<p class="search-empty">No se encontraron eventos.</p>';
+        return;
+    }
+
+    resultados.forEach((evento) => {
+        const card = document.createElement("div");
+        card.className = "search-result-card";
+
+        const fecha =
+            evento.tipo === "incidencia"
+                ? formatRangeText(evento.fechaInicio, evento.fechaFin)
+                : formatDateText(evento.fecha);
+
+        card.innerHTML = `
+            <div class="search-result-title">${evento.titulo}</div>
+            <div class="search-result-meta">
+                ${typeNames[evento.tipo]} · ${fecha}
+            </div>
+        `;
+
+        card.addEventListener("click", () => {
+            closeModal(modalSearch);
+
+            selectedEvent = evento;
+            showEventDetails(evento);
+
+            const fechaPrincipal = getEventMainDate(evento);
+
+            if (fechaPrincipal) {
+                const [anio, mes, dia] = fechaPrincipal.split("-").map(Number);
+                currentDate = new Date(anio, mes - 1, dia);
+                renderCalendar(currentDate);
+            }
+        });
+
+        searchResults.appendChild(card);
+    });
+}
+
+searchInput.addEventListener("input", () => {
+    buscarEventos(searchInput.value);
+});
+
+
+
+calendarViewSelect.addEventListener("change", () => {
+    currentView = calendarViewSelect.value;
     renderCalendar(currentDate);
 });
 
 document.getElementById("btn-add").addEventListener("click", () => {
     setMinDates();
-    updateFormByType();
-    openModal(modalAdd);
-});
 
-document.getElementById("btn-details").addEventListener("click", () => {
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-
-    const eventosMes = eventos.filter((evento) => {
-        if (evento.tipo === "incidencia") {
-            return incidenciaVisibleEnMes(evento, year, month);
-        }
-
-        const [anio, mes] = evento.fecha.split("-").map(Number);
-        return anio === year && (mes - 1) === month;
-    });
-
-    if (eventosMes.length > 0) {
-        selectedEvent = eventosMes[0];
-        showEventDetails(eventosMes[0]);
+    // Si ya había algo escrito, lo mantiene tal cual
+    if (!eventTitleInput.value.trim()) {
+        updateFormByType();
     }
+
+    openModal(modalAdd);
 });
 
 function normalizarTexto(texto) {
@@ -777,6 +1138,7 @@ function existeTareaMismoDia(titulo, fecha) {
 
     return eventos.some((evento) =>
         evento.tipo === "tarea" &&
+        evento.estado !== "completada" &&
         evento.fecha === fecha &&
         normalizarTexto(evento.titulo) === tituloNormalizado
     );
@@ -945,7 +1307,7 @@ document.getElementById("close-details-modal").addEventListener("click", () => {
 
 window.addEventListener("click", (e) => {
     if (e.target === modalAdd) {
-        clearWarning();
+        // Solo se cierra, pero NO limpia ni cambia el formulario, para evitar perder datos si se cierra por error
         closeModal(modalAdd);
     }
 
@@ -955,6 +1317,18 @@ window.addEventListener("click", (e) => {
 
     if (e.target === modalDay) {
         closeModal(modalDay);
+    }
+
+    if (e.target === modalSearch) {
+        closeModal(modalSearch);
+    }
+
+    if (e.target === modalDeleteRepeat) {
+        closeModal(modalDeleteRepeat);
+    }
+
+    if (e.target === modalDeleteConfirm) {
+        closeModal(modalDeleteConfirm);
     }
 });
 
@@ -972,6 +1346,46 @@ completeTaskBtn.addEventListener("click", async () => {
         : "completada";
 
     await actualizarEstadoEvento(selectedEvent.id_evento, nuevoEstado);
+});
+
+deleteEventBtn.addEventListener("click", () => {
+    if (!selectedEvent) return;
+
+    if (selectedEvent.tipo === "tarea") {
+        openModal(modalDeleteRepeat);
+    } else {
+        deleteConfirmText.textContent =
+            `¿Seguro que quieres eliminar este ${typeNames[selectedEvent.tipo].toLowerCase()}?`;
+
+        openModal(modalDeleteConfirm);
+    }
+});
+
+confirmDeleteEventBtn.addEventListener("click", () => {
+    if (!selectedEvent) return;
+    eliminarEvento(selectedEvent.id_evento);
+});
+
+closeDeleteConfirmBtn.addEventListener("click", () => {
+    closeModal(modalDeleteConfirm);
+});
+
+cancelDeleteConfirmBtn.addEventListener("click", () => {
+    closeModal(modalDeleteConfirm);
+});
+
+deleteOnlyOneBtn.addEventListener("click", () => {
+    if (!selectedEvent) return;
+    eliminarEvento(selectedEvent.id_evento);
+});
+
+deleteFutureTasksBtn.addEventListener("click", () => {
+    if (!selectedEvent) return;
+    eliminarTareasFuturas(selectedEvent);
+});
+
+closeDeleteRepeatBtn.addEventListener("click", () => {
+    closeModal(modalDeleteRepeat);
 });
 
 const closeDayModalBtn = document.getElementById("close-day-modal");

@@ -28,6 +28,14 @@ try {
             actualizarEstadoEvento($conn, $input);
             break;
 
+        case 'eliminar':
+            eliminarEvento($conn, $input);
+            break;
+
+        case 'eliminar_futuras':
+            eliminarTareasFuturas($conn, $input);
+            break;
+
         default:
             echo json_encode([
                 'success' => false,
@@ -254,5 +262,86 @@ function actualizarEstadoEvento($conn, $data)
     echo json_encode([
         'success' => true,
         'message' => 'Estado actualizado'
+    ]);
+}
+
+function eliminarEvento($conn, $data)
+{
+    $id_evento = isset($data['id_evento']) ? (int)$data['id_evento'] : 0;
+
+    if ($id_evento <= 0) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Falta el id del evento.'
+        ]);
+        return;
+    }
+
+    $stmtPersonas = $conn->prepare("DELETE FROM calendario_evento_personas WHERE id_evento = ?");
+    $stmtPersonas->bind_param("i", $id_evento);
+    $stmtPersonas->execute();
+    $stmtPersonas->close();
+
+    $stmt = $conn->prepare("DELETE FROM calendario_eventos WHERE id_evento = ?");
+    $stmt->bind_param("i", $id_evento);
+    $stmt->execute();
+    $stmt->close();
+
+    echo json_encode([
+        'success' => true,
+        'message' => 'Evento eliminado correctamente.'
+    ]);
+}
+
+function eliminarTareasFuturas($conn, $data)
+{
+    $titulo = trim($data['titulo'] ?? '');
+    $tipo = trim($data['tipo'] ?? '');
+    $fecha = $data['fecha'] ?? null;
+
+    if ($titulo === '' || $tipo !== 'tarea' || !$fecha) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Faltan datos para eliminar tareas futuras.'
+        ]);
+        return;
+    }
+
+    $stmtIds = $conn->prepare("
+        SELECT id_evento 
+        FROM calendario_eventos
+        WHERE tipo = 'tarea'
+        AND titulo = ?
+        AND fecha >= ?
+        AND estado != 'completada'
+    ");
+
+    $stmtIds->bind_param("ss", $titulo, $fecha);
+    $stmtIds->execute();
+
+    $resultado = $stmtIds->get_result();
+    $ids = [];
+
+    while ($fila = $resultado->fetch_assoc()) {
+        $ids[] = (int)$fila['id_evento'];
+    }
+
+    $stmtIds->close();
+
+    foreach ($ids as $id_evento) {
+        $stmtPersonas = $conn->prepare("DELETE FROM calendario_evento_personas WHERE id_evento = ?");
+        $stmtPersonas->bind_param("i", $id_evento);
+        $stmtPersonas->execute();
+        $stmtPersonas->close();
+
+        $stmtEvento = $conn->prepare("DELETE FROM calendario_eventos WHERE id_evento = ?");
+        $stmtEvento->bind_param("i", $id_evento);
+        $stmtEvento->execute();
+        $stmtEvento->close();
+    }
+
+    echo json_encode([
+        'success' => true,
+        'message' => 'Tareas futuras eliminadas correctamente.'
     ]);
 }

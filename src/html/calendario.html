@@ -78,27 +78,37 @@
         <main class="calendar-page">
 
             <!-- HEADER -->
-            <header class="calendar-header">
+            <div class="calendar-header">
                 <div>
-                    <h1>Calendario</h1>
-                    <p class="calendar-subtitle">Piso Calle Mayor, 12 · 3 compañeros</p>
+                    <h1 id="page-title">Mayo de 2026</h1>
+                    <p>Piso Calle Mayor, 12 · 3 compañeros</p>
                 </div>
 
                 <div class="calendar-actions">
-                    <button id="btn-prev">◀</button>
-                    <button id="btn-details">Ver primer evento</button>
-                    <button id="btn-add" class="btn-primary">+ Nuevo evento</button>
-                    <button id="btn-next">▶</button>
-                </div>
-            </header>
+                    <button id="btn-prev" class="icon-btn" type="button">◀</button>
 
+                    <select id="calendar-view" class="view-select">
+                        <option value="month">Mes</option>
+                        <option value="week">Semana</option>
+                        <option value="year">Año</option>
+                    </select>
+
+                    <button id="btn-search" class="icon-btn" type="button">
+                        <img src="../css/icons/search.svg" class="icon">
+                    </button>
+
+                    <button id="btn-add" class="icon-btn add-icon" type="button">+</button>
+
+                    <button id="btn-next" class="icon-btn" type="button">▶</button>
+                </div>
+            </div>
             <!-- CONTENIDO -->
             <section class="calendar-layout">
 
                 <!-- CALENDARIO -->
                 <div class="calendar-main">
                     <div class="calendar-month-bar">
-                        <h2 id="month-title">Abril de 2026</h2>
+                        <h2 id="month-title">Mayo de 2026</h2>
                     </div>
 
                     <div class="legend">
@@ -196,14 +206,24 @@
                     </div>
 
                     <div id="repeat-fields" class="conditional-fields hidden">
-                        <div class="repeat-box">
+                        <div class="repeat-toggle">
+                            <div>
+                                <strong>Repetir tarea</strong>
+                                <span>Configura si quieres que esta tarea se repita</span>
+                            </div>
 
-                            <label class="repeat-main">
+                            <label class="switch">
                                 <input type="checkbox" id="task-repeat">
-                                Repetir tarea
+                                <span class="slider"></span>
                             </label>
+                        </div>
+                    </div>
 
-                            <div id="repeat-options" class="repeat-options hidden">
+                    <div id="repeat-step" class="conditional-fields hidden">
+                        <div class="repeat-box">
+                            <h3>Repetición de la tarea</h3>
+
+                            <div id="repeat-options" class="repeat-options">
 
                                 <div class="repeat-select-row">
                                     <label for="repeat-type">Se repite</label>
@@ -234,7 +254,7 @@
                                     <div id="custom-week-days" class="custom-week-days hidden">
                                         <span class="repeat-options-title">Repetir el</span>
 
-                                        <div class="repeat-days-grid">
+                                        <div class="repeat-days-grid compact">
                                             <label><input type="checkbox" name="repeat-days" value="1"> Lunes</label>
                                             <label><input type="checkbox" name="repeat-days" value="2"> Martes</label>
                                             <label><input type="checkbox" name="repeat-days" value="3">
@@ -262,7 +282,6 @@
                                     <label for="repeat-end-date">Fecha de finalización</label>
                                     <input type="date" id="repeat-end-date">
                                 </div>
-
                             </div>
                         </div>
                     </div>
@@ -339,7 +358,9 @@
 
                     <div class="modal-buttons">
                         <button type="button" id="cancel-add" class="btn-secondary">Cancelar</button>
-                        <button type="submit" class="btn-primary">Guardar</button>
+                        <button type="button" id="back-repeat" class="btn-secondary hidden">Atrás</button>
+                        <button type="button" id="next-repeat" class="btn-primary hidden">Siguiente</button>
+                        <button type="submit" id="save-event" class="btn-primary">Guardar</button>
                     </div>
                 </form>
             </div>
@@ -390,9 +411,15 @@
                 </div>
 
                 <div class="modal-buttons details-actions">
-                    <button id="resolve-incidencia-btn" type="button" class="btn-danger hidden">Marcar como
-                        resuelta</button>
-                    <button id="complete-task-btn" type="button" class="btn-success hidden">Completada</button>
+                    <button id="delete-event-btn" type="button" class="btn-delete">Eliminar</button>
+
+                    <button id="resolve-incidencia-btn" type="button" class="btn-danger hidden">
+                        Marcar como resuelta
+                    </button>
+
+                    <button id="complete-task-btn" type="button" class="btn-success hidden">
+                        Completada
+                    </button>
                 </div>
             </div>
         </div>
@@ -409,9 +436,76 @@
             </div>
         </div>
 
+        <button id="btn-today" class="btn-today">Hoy</button>
+
+        <div id="modal-search" class="modal hidden">
+            <div class="modal-content search-modal">
+                <div class="search-header">
+                    <h2>Buscar evento</h2>
+                    <button id="close-search-modal" class="search-close" type="button">×</button>
+                </div>
+
+                <div class="search-box">
+                    <img src="../css/icons/search.svg" class="search-icon">
+                    <input type="text" id="search-input" placeholder="Buscar por título, tipo o persona...">
+                </div>
+
+                <div id="search-results" class="search-results">
+                    <p class="search-empty">Escribe para buscar eventos.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="modal-delete-repeat" class="modal hidden">
+            <div class="modal-content delete-modal">
+                <div class="modal-header">
+                    <h3>Eliminar tarea repetitiva</h3>
+                    <button id="close-delete-repeat" class="modal-close">&times;</button>
+                </div>
+
+                <p>
+                    ¿Seguro que quieres eliminar esta tarea? Es una tarea frecuente.
+                </p>
+
+                <div class="modal-buttons">
+                    <button id="delete-only-one" type="button" class="btn-secondary">
+                        Eliminar solo esta tarea
+                    </button>
+
+                    <button id="delete-future-tasks" type="button" class="btn-delete">
+                        Eliminar todas las tareas futuras
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="modal-delete-confirm" class="modal hidden">
+            <div class="modal-content delete-modal">
+                <div class="modal-header">
+                    <h3 id="delete-confirm-title">Eliminar evento</h3>
+                    <button id="close-delete-confirm" class="modal-close">&times;</button>
+                </div>
+
+                <p id="delete-confirm-text">
+                    ¿Seguro que quieres eliminar este evento?
+                </p>
+
+                <div class="modal-buttons">
+                    <button id="cancel-delete-confirm" type="button" class="btn-secondary">
+                        Cancelar
+                    </button>
+
+                    <button id="confirm-delete-event" type="button" class="btn-delete">
+                        Eliminar
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <script src="../js/dark-mode.js"></script>
         <script src="../js/calendario.js"></script>
         <script src="../js/cerrarSesion.js"></script>
+
     </div>
 </body>
 
