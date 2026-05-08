@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", cargarIncidencias);
 
 async function cargarIncidencias() {
     try {
-        const response = await fetch("../php/incidenciasAdmin.php?id_piso=1");
+        const response = await fetch("../php/incidenciasAdmin.php?accion=listar&id_piso=1");
         const data = await response.json();
 
         if (data.success) {
@@ -28,8 +28,8 @@ async function cargarIncidencias() {
 
 function pintarContadores() {
     countAbiertas.textContent = incidencias.filter(i => i.estado === "abierta").length;
-    countEnCurso.textContent = incidencias.filter(i => i.estado === "en_proceso").length;
-    countResueltas.textContent = incidencias.filter(i => i.estado === "resueltas").length;
+    countEnCurso.textContent = incidencias.filter(i => i.estado === "en_curso").length;
+    countResueltas.textContent = incidencias.filter(i => i.estado === "resuelta").length;
 }
 
 function pintarIncidencias() {
@@ -78,10 +78,22 @@ function pintarIncidencias() {
                 </span>
 
                 <select onchange="cambiarEstado(${incidencia.id_incidencia}, this.value)">
-                    <option value="abiertas" ${incidencia.estado === "abiertas" ? "selected" : ""}>Abiertas</option>
-                    <option value="en_proceso" ${incidencia.estado === "en_proceso" ? "selected" : ""}>En proceso</option>
-                    <option value="resueltas" ${incidencia.estado === "resueltas" ? "selected" : ""}>Resueltas</option>
+                    <option value="abierta" ${incidencia.estado === "abierta" ? "selected" : ""}>Abierta</option>
+                    <option value="en_curso" ${incidencia.estado === "en_curso" ? "selected" : ""}>En curso</option>
+                    <option value="resuelta" ${incidencia.estado === "resuelta" ? "selected" : ""}>Resuelta</option>
                 </select>
+
+                <button onclick="abrirChat(${incidencia.id_incidencia})">
+                    Ver mensajes
+                </button>
+
+                <button onclick="responderIncidencia(${incidencia.id_incidencia})">
+                    Responder
+                </button>
+
+                <button onclick="resolverIncidencia(${incidencia.id_incidencia})">
+                    Marcar resuelta
+                </button>
             </div>
         `;
 
@@ -114,6 +126,96 @@ async function cambiarEstado(idIncidencia, nuevoEstado) {
     }
 }
 
+async function responderIncidencia(idIncidencia) {
+    const mensaje = prompt("Escribe la respuesta para el usuario:");
+
+    if (!mensaje || mensaje.trim() === "") {
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("accion", "responder");
+    formData.append("id_incidencia", idIncidencia);
+    formData.append("id_usuario", 1);
+    formData.append("mensaje", mensaje);
+
+    try {
+        const response = await fetch("../php/incidenciasAdmin.php", {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            alert("Respuesta enviada correctamente");
+            cargarIncidencias();
+        } else {
+            alert(data.error || "No se pudo enviar la respuesta");
+        }
+
+    } catch (error) {
+        console.error("Error al responder incidencia:", error);
+    }
+}
+
+async function resolverIncidencia(idIncidencia) {
+    const confirmar = confirm("¿Seguro que quieres marcar esta incidencia como resuelta?");
+
+    if (!confirmar) {
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("accion", "resolver");
+    formData.append("id_incidencia", idIncidencia);
+
+    try {
+        const response = await fetch("../php/incidenciasAdmin.php", {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            alert("Incidencia marcada como resuelta");
+            cargarIncidencias();
+        } else {
+            alert(data.error || "No se pudo resolver la incidencia");
+        }
+
+    } catch (error) {
+        console.error("Error al resolver incidencia:", error);
+    }
+}
+
+async function abrirChat(idIncidencia) {
+    try {
+        const response = await fetch(`../php/incidenciasAdmin.php?accion=mensajes&id_incidencia=${idIncidencia}`);
+        const data = await response.json();
+
+        if (data.success) {
+            let texto = "Mensajes de la incidencia:\n\n";
+
+            if (data.mensajes.length === 0) {
+                texto += "Todavía no hay mensajes.";
+            } else {
+                data.mensajes.forEach(m => {
+                    texto += `${m.nombre}: ${m.mensaje}\n`;
+                });
+            }
+
+            alert(texto);
+        } else {
+            alert(data.error || "No se pudieron cargar los mensajes");
+        }
+
+    } catch (error) {
+        console.error("Error al cargar mensajes:", error);
+    }
+}
+
 filterButtons.forEach(button => {
     button.addEventListener("click", () => {
         filterButtons.forEach(btn => btn.classList.remove("active"));
@@ -135,9 +237,9 @@ function obtenerIcono(tipo) {
 }
 
 function formatearEstado(estado) {
-    if (estado === "abiertas") return "Abiertas";
-    if (estado === "en_proceso") return "En proceso";
-    if (estado === "resueltas") return "Resueltas";
+    if (estado === "abierta") return "Abierta";
+    if (estado === "en_curso") return "En curso";
+    if (estado === "resuelta") return "Resuelta";
     return estado;
 }
 

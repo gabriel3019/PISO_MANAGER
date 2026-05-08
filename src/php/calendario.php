@@ -72,6 +72,7 @@ function obtenerEventos($conn)
         LEFT JOIN calendario_evento_personas ep ON e.id_evento = ep.id_evento
         LEFT JOIN usuarios u ON ep.id_usuario = u.id_usuario
         WHERE e.id_piso = ?
+        AND NOT (e.tipo = 'incidencia' AND e.estado = 'finalizada')
         ORDER BY COALESCE(e.fecha_inicio, e.fecha), e.hora, e.id_evento
     ";
 

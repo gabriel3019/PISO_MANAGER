@@ -149,6 +149,27 @@ CREATE TABLE IF NOT EXISTS mensajes_incidencia (
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS incidencia_mensajes (
+    id_mensaje INT AUTO_INCREMENT PRIMARY KEY,
+    id_incidencia INT NOT NULL,
+    id_usuario INT NOT NULL,
+    mensaje TEXT NOT NULL,
+    fecha_envio DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_incidencia) REFERENCES incidencias(id_incidencia),
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
+);
+
+CREATE TABLE IF NOT EXISTS notificaciones (
+    id_notificacion INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    id_incidencia INT NULL,
+    mensaje VARCHAR(255) NOT NULL,
+    leida TINYINT(1) DEFAULT 0,
+    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario),
+    FOREIGN KEY (id_incidencia) REFERENCES incidencias(id_incidencia)
+);
+
 /* ===== CALENDARIO ===== */
 CREATE TABLE IF NOT EXISTS calendario_eventos (
     id_evento INT AUTO_INCREMENT PRIMARY KEY,
