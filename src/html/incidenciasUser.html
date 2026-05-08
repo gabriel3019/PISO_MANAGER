@@ -38,7 +38,6 @@
         <li>
           <a href="tareasUser.html" class="sidebar-link">
             <img src="../css/icons/square-check-big.svg" class="icon"> Tareas
-            <span class="badge" id="badge-tareas">5</span>
           </a>
         </li>
         <li>
@@ -89,7 +88,7 @@
 
     <section class="stats-grid">
       <div class="stat-card">
-        <div class="stat-card__icon stat-card__icon--red">🔴</div>
+        <div class="stat-card__icon stat-card__icon--blue">🔵</div>
         <div>
           <div class="stat-card__value" id="stat-abiertas">0</div>
           <div class="stat-card__label">Abiertas</div>
@@ -136,6 +135,68 @@
       </ul>
     </article>
 
+    <!-- ══════════════ MODAL DETALLE (NUEVO) ══════════════ -->
+    <div class="modal-overlay modal--hidden" id="modal-detalle-incidencia" role="dialog" aria-modal="true"
+      aria-labelledby="modal-detalle-title">
+      <div class="modal modal--detalle">
+        <div class="modal__header">
+          <div class="modal__header-left">
+            <span class="modal__icon" id="detalle-icono" aria-hidden="true">📋</span>
+            <h2 class="modal__title" id="modal-detalle-title">Detalle de Incidencia</h2>
+          </div>
+          <button class="modal__close" aria-label="Cerrar" data-modal-close="modal-detalle-incidencia">✕</button>
+        </div>
+        <hr class="modal__divider" />
+        <div class="modal__body modal__body--detalle">
+
+          <!-- Imagen si existe -->
+          <div id="detalle-imagen-wrap" class="detalle__imagen-wrap" style="display:none;">
+            <img id="detalle-imagen" src="" alt="Imagen incidencia" class="detalle__imagen" />
+          </div>
+
+          <!-- Estado + urgencia -->
+          <div class="detalle__badges">
+            <span class="status-badge" id="detalle-estado-badge"></span>
+            <span class="priority-dot" id="detalle-prioridad-dot"></span>
+          </div>
+
+          <!-- Campos -->
+          <div class="detalle__grid">
+            <div class="detalle__campo">
+              <span class="detalle__label">TIPO</span>
+              <span class="detalle__valor" id="detalle-tipo"></span>
+            </div>
+            <div class="detalle__campo">
+              <span class="detalle__label">FECHA</span>
+              <span class="detalle__valor" id="detalle-fecha"></span>
+            </div>
+          </div>
+
+          <div class="detalle__campo detalle__campo--full">
+            <span class="detalle__label">TÍTULO</span>
+            <span class="detalle__valor detalle__valor--titulo" id="detalle-titulo"></span>
+          </div>
+
+          <div class="detalle__campo detalle__campo--full">
+            <span class="detalle__label">DESCRIPCIÓN</span>
+            <p class="detalle__valor detalle__valor--desc" id="detalle-desc"></p>
+          </div>
+
+          <div class="detalle__campo detalle__campo--full">
+            <span class="detalle__label">NOTIFICAR ADMINISTRADOR</span>
+            <span class="detalle__valor" id="detalle-notificar"></span>
+          </div>
+
+        </div>
+        <hr class="modal__divider" />
+        <div class="modal__footer">
+          <button type="button" class="modal__btn modal__btn--cancel"
+            data-modal-close="modal-detalle-incidencia">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ MODAL NUEVA INCIDENCIA ══════════════ -->
     <div class="modal-overlay modal--hidden" id="modal-nueva-incidencia" role="dialog" aria-modal="true"
       aria-labelledby="modal-nueva-title">
       <div class="modal">
@@ -156,6 +217,7 @@
                 <option value="fontaneria">Fontanería</option>
                 <option value="electricidad">Electricidad</option>
                 <option value="climatizacion">Climatización</option>
+                <option value="carpinteria">Carpintería</option>
                 <option value="otros">Otros</option>
               </select>
             </div>
@@ -177,13 +239,19 @@
               <button type="button" class="modal__urgencia-btn" data-urgencia="bajo">
                 <span class="modal__urgencia-dot modal__urgencia-dot--low"></span>Bajo
               </button>
-              <button type="button" class="modal__urgencia-btn" data-urgencia="medio">
-                <span class="modal__urgencia-dot modal__urgencia-dot--medium"></span>Medio
-              </button>
+              <!-- "Medio" eliminado -->
               <button type="button" class="modal__urgencia-btn" data-urgencia="alto">
                 <span class="modal__urgencia-dot modal__urgencia-dot--high"></span>Alto
               </button>
             </div>
+          </div>
+          <!-- CHECKBOX NOTIFICAR ADMIN -->
+          <div class="modal__field">
+            <label class="modal__checkbox-label">
+              <input type="checkbox" id="nueva-notificar-admin" name="notificar_admin" class="modal__checkbox" />
+              <span>Notificar al administrador</span>
+            </label>
+            <p class="modal__checkbox-hint">El administrador podrá ver esta incidencia marcada en su panel.</p>
           </div>
           <div class="modal__field">
             <label class="modal__label">IMAGEN <span class="modal__optional">(opcional)</span></label>
@@ -203,6 +271,7 @@
       </div>
     </div>
 
+    <!-- ══════════════ MODAL EDITAR INCIDENCIA ══════════════ -->
     <div class="modal-overlay modal--hidden" id="modal-editar-incidencia" role="dialog" aria-modal="true"
       aria-labelledby="modal-editar-title">
       <div class="modal">
@@ -222,6 +291,7 @@
                 <option value="fontaneria">Fontanería</option>
                 <option value="electricidad">Electricidad</option>
                 <option value="climatizacion">Climatización</option>
+                <option value="carpinteria">Carpintería</option>
                 <option value="otros">Otros</option>
               </select>
             </div>
@@ -241,13 +311,19 @@
               <button type="button" class="modal__urgencia-btn" data-urgencia="bajo">
                 <span class="modal__urgencia-dot modal__urgencia-dot--low"></span>Bajo
               </button>
-              <button type="button" class="modal__urgencia-btn" data-urgencia="medio">
-                <span class="modal__urgencia-dot modal__urgencia-dot--medium"></span>Medio
-              </button>
+              <!-- CAMBIO: "Medio" eliminado -->
               <button type="button" class="modal__urgencia-btn" data-urgencia="alto">
                 <span class="modal__urgencia-dot modal__urgencia-dot--high"></span>Alto
               </button>
             </div>
+          </div>
+          <!-- CHECKBOX NOTIFICAR ADMIN -->
+          <div class="modal__field">
+            <label class="modal__checkbox-label">
+              <input type="checkbox" id="editar-notificar-admin" name="notificar_admin" class="modal__checkbox" />
+              <span>Notificar al administrador</span>
+            </label>
+            <p class="modal__checkbox-hint">El administrador podrá ver esta incidencia marcada en su panel.</p>
           </div>
           <div class="modal__field">
             <label class="modal__label">IMAGEN <span class="modal__optional">(opcional)</span></label>
@@ -266,6 +342,7 @@
       </div>
     </div>
 
+    <!-- ══════════════ MODAL ELIMINAR ══════════════ -->
     <div class="modal-overlay modal--hidden" id="modal-eliminar-incidencia" role="dialog" aria-modal="true"
       aria-labelledby="modal-eliminar-title">
       <div class="modal modal--sm">
