@@ -1,288 +1,200 @@
-// ================= ESTADO =================
-let modoDivision = "igual";
-let gastos = JSON.parse(localStorage.getItem("gastos")) || [];
-let pagos = JSON.parse(localStorage.getItem("pagos")) || [];
+const API_GASTOS = "../php/gastosComunes.php";
+const API_USUARIOS = "../php/usuariosPiso.php";
+const API_BALANCE = "../php/homeUser.php";
+const API_PAGOS = "../php/pagos.php";
 
-let gastoEditando = null;
+/* ================= ESTADO ================= */
+let gastos = [];
+let usuarios = [];
 let gastoAEliminar = null;
 
-const personasLista = ["Tú", "Laura", "Pablo", "Marta"];
+/* ================= DOM ================= */
+let modal, deleteModal, pagoModal;
+let tituloInput, importeInput, selectPagador;
+let lista, divisionContainer, usuariosCheckbox;
 
-// ================= MODALES =================
-const modal = document.getElementById("gastoModal");
-const deleteModal = document.getElementById("deleteModal");
+/* ================= INIT ================= */
+document.addEventListener("DOMContentLoaded", () => {
 
-// 🔥 NUEVO (DETALLE)
-const detalleModal = document.getElementById("detalleModal");
-const detalleContenido = document.getElementById("detalleContenido");
-const closeDetalle = document.getElementById("closeDetalle");
+  initDOM();
 
-const btnAbrir = document.querySelector(".add-btn");
-const btnCerrar = document.getElementById("closeGastoModal");
-const btnCancelar = document.getElementById("cancelGasto");
+  cargarUsuario();
+  cargarUsuarios();
+  cargarGastos();
+  cargarBalance();
+  cargarResumen(); 
 
-const confirmDelete = document.getElementById("confirmDelete");
-const cancelDelete = document.getElementById("cancelDelete");
-
-// ================= INPUTS =================
-const tituloInput = document.getElementById("gastoTitulo");
-const importeInput = document.getElementById("gastoImporte");
-const pagadorInput = document.getElementById("gastoPagador");
-const personasInput = document.getElementById("gastoPersonas");
-
-const btnGuardar = document.getElementById("guardarGasto");
-const lista = document.getElementById("gastosContainer");
-const resumen = document.getElementById("resumenDeudas");
-
-// ================= ERRORES =================
-const errorTitulo = document.getElementById("errorTitulo");
-const errorImporte = document.getElementById("errorImporte");
-
-// ================= DIVISION =================
-const divisionContainer = document.getElementById("divisionContainer");
-
-// ================= ABRIR / CERRAR =================
-btnAbrir.onclick = () => {
-  modal.classList.remove("hidden");
-  renderDivision();
-};
-
-btnCerrar.onclick = cerrarModal;
-btnCancelar.onclick = cerrarModal;
-
-function cerrarModal() {
-  modal.classList.add("hidden");
-  limpiarFormulario();
-}
-
-// cerrar detalle
-closeDetalle.onclick = () => {
-  detalleModal.classList.add("hidden");
-};
-
-// ================= BOTONES =================
-document.getElementById("btnIgual").onclick = () => {
-  modoDivision = "igual";
-  renderDivision();
-};
-
-document.getElementById("btnManual").onclick = () => {
-  modoDivision = "manual";
-  renderDivision();
-};
-
-// ================= DIVISION =================
-function renderDivision() {
-  divisionContainer.innerHTML = "";
-
-  const importe = parseFloat(importeInput.value) || 0;
-  const personas = parseInt(personasInput.value) || 1;
-
-  if (modoDivision === "igual") {
-    const porPersona = (importe / personas || 0).toFixed(2);
-
-    divisionContainer.innerHTML = `
-      <p>${personas} personas · ${porPersona}€ por persona</p>
-    `;
-  } else {
-    for (let i = 0; i < personas; i++) {
-      divisionContainer.innerHTML += `
-        <div style="display:flex; justify-content:space-between; margin-top:6px;">
-          <span>${personasLista[i]}</span>
-          <input type="number" class="input-manual" placeholder="0.00">
-        </div>
-      `;
-    }
-  }
-}
-
-importeInput.addEventListener("input", renderDivision);
-personasInput.addEventListener("change", renderDivision);
-
-// ================= VALIDACIÓN =================
-function limpiarErrores() {
-  errorTitulo.textContent = "";
-  errorImporte.textContent = "";
-  tituloInput.classList.remove("input-error");
-  importeInput.classList.remove("input-error");
-}
-
-tituloInput.addEventListener("input", limpiarErrores);
-importeInput.addEventListener("input", limpiarErrores);
-
-// ================= GUARDAR =================
-btnGuardar.onclick = () => {
-
-  limpiarErrores();
-
-  const titulo = tituloInput.value.trim();
-  const importe = parseFloat(importeInput.value);
-  const pagador = pagadorInput.value;
-  const personas = parseInt(personasInput.value) || 1;
-
-  let valido = true;
-
-  if (!titulo) {
-    errorTitulo.textContent = "Introduce un título";
-    tituloInput.classList.add("input-error");
-    valido = false;
-  }
-
-  if (!importe || importe <= 0) {
-    errorImporte.textContent = "Importe inválido";
-    importeInput.classList.add("input-error");
-    valido = false;
-  }
-
-  if (!valido) return;
-
-  let division = [];
-
-  if (modoDivision === "igual") {
-    const porPersona = importe / personas;
-
-    for (let i = 0; i < personas; i++) {
-      division.push({
-        nombre: personasLista[i],
-        paga: porPersona
-      });
-    }
-  } else {
-    const inputs = document.querySelectorAll(".input-manual");
-    let suma = 0;
-
-    inputs.forEach((input, i) => {
-      const valor = parseFloat(input.value) || 0;
-      suma += valor;
-
-      division.push({
-        nombre: personasLista[i],
-        paga: valor
-      });
-    });
-
-    if (suma.toFixed(2) != importe.toFixed(2)) {
-      errorImporte.textContent = "La suma no coincide";
-      return;
-    }
-  }
-
-  const gasto = {
-    id: Date.now(),
-    titulo,
-    importe,
-    pagador,
-    division
-  };
-
-  if (gastoEditando) {
-    gastos = gastos.filter(g => g.id !== gastoEditando.id);
-    gastoEditando = null;
-  }
-
-  gastos.push(gasto);
-  guardarLocalStorage();
-  renderTodo();
-  cerrarModal();
-};
-
-// ================= LOCAL STORAGE =================
-function guardarLocalStorage() {
-  localStorage.setItem("gastos", JSON.stringify(gastos));
-  localStorage.setItem("pagos", JSON.stringify(pagos));
-}
-
-// ================= BALANCE =================
-function calcularBalance() {
-  const balance = {};
-  personasLista.forEach(p => balance[p] = 0);
-
-  gastos.forEach(g => {
-    balance[g.pagador] += g.importe;
-
-    g.division.forEach(p => {
-      balance[p.nombre] -= p.paga;
-    });
-  });
-
-  pagos.forEach(p => {
-    balance[p.deudor] += p.cantidad;
-    balance[p.acreedor] -= p.cantidad;
-  });
-
-  return balance;
-}
-
-// ================= RENDER DEUDAS =================
-function renderDeudas() {
-  const balance = calcularBalance();
-  resumen.innerHTML = "";
-
-  const deudores = [];
-  const acreedores = [];
-
-  Object.keys(balance).forEach(p => {
-    if (balance[p] < 0) deudores.push({ persona: p, valor: Math.abs(balance[p]) });
-    if (balance[p] > 0) acreedores.push({ persona: p, valor: balance[p] });
-  });
-
-  deudores.forEach(d => {
-    const a = acreedores[0];
-    if (!a) return;
-
-    resumen.innerHTML += `
-      <div style="display:flex; gap:10px; align-items:center;">
-        <span style="color:red">${d.persona} → ${a.persona}: ${d.valor.toFixed(2)}€</span>
-        <button class="btn-pagar" data-deudor="${d.persona}" data-acreedor="${a.persona}" data-cantidad="${d.valor}">
-          Pagar
-        </button>
-      </div>
-    `;
-  });
-}
-
-// ================= PAGAR =================
-document.addEventListener("click", (e) => {
-  if (e.target.classList.contains("btn-pagar")) {
-
-    pagos.push({
-      deudor: e.target.dataset.deudor,
-      acreedor: e.target.dataset.acreedor,
-      cantidad: parseFloat(e.target.dataset.cantidad)
-    });
-
-    guardarLocalStorage();
-    renderTodo();
-  }
+  initEventos();
 });
 
-// ================= DETALLE =================
-function abrirDetalle(gasto) {
+/* ================= INIT DOM ================= */
+function initDOM() {
 
-  let html = `
-    <h3>${gasto.titulo}</h3>
-    <p>Total: ${gasto.importe.toFixed(2)}€</p>
-    <p>Pagado por: ${gasto.pagador}</p>
-    <hr>
-    <b>División:</b>
-  `;
+  modal = document.getElementById("gastoModal");
+  deleteModal = document.getElementById("deleteModal");
+  pagoModal = document.getElementById("pagoModal");
 
-  gasto.division.forEach(p => {
-    html += `
-      <div style="display:flex; justify-content:space-between; margin-top:6px;">
-        <span>${p.nombre}</span>
-        <span>${p.paga.toFixed(2)}€</span>
-      </div>
-    `;
-  });
+  tituloInput = document.getElementById("gastoTitulo");
+  importeInput = document.getElementById("gastoImporte");
+  selectPagador = document.getElementById("gastoPagador");
 
-  detalleContenido.innerHTML = html;
-  detalleModal.classList.remove("hidden");
+  lista = document.getElementById("gastosContainer");
+  divisionContainer = document.getElementById("divisionContainer");
+  usuariosCheckbox = document.getElementById("usuariosCheckbox");
 }
 
-// ================= LISTA =================
+/* ================= EVENTOS ================= */
+function initEventos() {
+
+  document.querySelector(".add-btn").onclick = abrirModal;
+  document.getElementById("closeGastoModal").onclick = cerrarModal;
+  document.getElementById("cancelGasto").onclick = cerrarModal;
+
+  document.getElementById("guardarGasto").onclick = guardarGasto;
+
+  document.getElementById("confirmDelete").onclick = eliminarGasto;
+  document.getElementById("cancelDelete").onclick = () => deleteModal.classList.add("hidden");
+
+  document.getElementById("btnIgual").onclick = dividirIgual;
+  document.getElementById("btnManual").onclick = dividirManual;
+
+  document.getElementById("btnPagar").onclick = abrirPago;
+  document.getElementById("closePagoModal").onclick = cerrarPago;
+  document.getElementById("cancelPago").onclick = cerrarPago;
+  document.getElementById("confirmPago").onclick = guardarPago;
+
+  selectPagador.addEventListener("change", actualizarCheckboxes);
+}
+
+/* ================= USUARIO ================= */
+function cargarUsuario() {
+  const usuario = JSON.parse(sessionStorage.getItem("usuario"));
+  document.getElementById("nombreUsuario").textContent = usuario?.nombre || "";
+}
+
+/* ================= BALANCE ================= */
+async function cargarBalance() {
+
+  const res = await fetch(API_BALANCE, {
+    method: "POST",
+    credentials: "same-origin"
+  });
+
+  const json = await res.json();
+  if (!json.success) return;
+
+  const b = json.data.balance;
+
+  document.getElementById("totalPiso").textContent = b.total.toFixed(2) + " €";
+  document.getElementById("pagado").textContent = b.pagado.toFixed(2) + " €";
+  document.getElementById("debido").textContent = b.debido.toFixed(2) + " €";
+
+  const balanceEl = document.getElementById("balance");
+
+  balanceEl.textContent =
+    (b.neto >= 0 ? "+" : "") + b.neto.toFixed(2) + " €";
+
+  balanceEl.className =
+    "amount " + (b.neto >= 0 ? "positive" : "negative");
+}
+
+/* ================= USUARIOS ================= */
+async function cargarUsuarios() {
+
+  const res = await fetch(API_USUARIOS, {
+    method: "POST",
+    credentials: "same-origin"
+  });
+
+  const data = await res.json();
+  if (!data.success) return;
+
+  usuarios = data.usuarios;
+
+  selectPagador.innerHTML = "";
+  const selectPago = document.getElementById("pagoReceptor");
+  selectPago.innerHTML = "";
+
+  usuarios.forEach(u => {
+
+    const option = document.createElement("option");
+    option.value = u.id_usuario;
+    option.textContent = u.nombre;
+    selectPagador.appendChild(option);
+
+    const opt = document.createElement("option");
+    opt.value = u.id_usuario;
+    opt.textContent = u.nombre;
+    selectPago.appendChild(opt);
+  });
+
+  renderCheckboxes();
+}
+
+/* ================= CHECKBOXES ================= */
+function renderCheckboxes() {
+
+  usuariosCheckbox.innerHTML = "";
+
+  usuarios.forEach(u => {
+
+    const div = document.createElement("div");
+
+    div.innerHTML = `
+      <label style="display:flex; gap:8px;">
+        <input type="checkbox" value="${u.id_usuario}" checked>
+        ${u.nombre}
+      </label>
+    `;
+
+    usuariosCheckbox.appendChild(div);
+  });
+}
+
+/* 🔥 EXCLUIR PAGADOR */
+function actualizarCheckboxes() {
+
+  const pagador = selectPagador.value;
+
+  usuariosCheckbox.querySelectorAll("input").forEach(cb => {
+
+    if (cb.value == pagador) {
+      cb.checked = false;
+      cb.disabled = true;
+    } else {
+      cb.disabled = false;
+    }
+
+  });
+}
+
+/* ================= GASTOS ================= */
+async function cargarGastos() {
+
+  const fd = new FormData();
+  fd.append("accion", "listar");
+
+  const res = await fetch(API_GASTOS, {
+    method: "POST",
+    body: fd,
+    credentials: "same-origin"
+  });
+
+  const data = await res.json();
+  if (!data.success) return;
+
+  gastos = data.gastos;
+  renderLista();
+}
+
 function renderLista() {
+
   lista.innerHTML = "";
+
+  if (!gastos.length) {
+    lista.innerHTML = "<p>No hay gastos aún</p>";
+    return;
+  }
 
   gastos.forEach(gasto => {
 
@@ -294,75 +206,211 @@ function renderLista() {
         <div class="icon-box">💸</div>
         <div>
           <div class="title">${gasto.titulo}</div>
-          <div class="meta">Pagado por ${gasto.pagador}</div>
+          <small>Pagado por ${gasto.pagador}</small>
         </div>
       </div>
 
       <div class="right">
-        <div class="amount">${gasto.importe.toFixed(2)} €</div>
-        <span class="edit-btn">✏️</span>
+        <div class="amount">${parseFloat(gasto.importe).toFixed(2)} €</div>
         <span class="delete-btn">🗑️</span>
       </div>
     `;
 
-    // 👉 CLICK DETALLE
-    div.onclick = () => abrirDetalle(gasto);
-
-    div.querySelector(".edit-btn").onclick = (e) => {
-      e.stopPropagation();
-      gastoEditando = gasto;
-
-      tituloInput.value = gasto.titulo;
-      importeInput.value = gasto.importe;
-      pagadorInput.value = gasto.pagador;
-      personasInput.value = gasto.division.length;
-
-      modal.classList.remove("hidden");
-    };
-
-    div.querySelector(".delete-btn").onclick = (e) => {
-      e.stopPropagation();
-      gastoAEliminar = gasto;
-      deleteModal.classList.remove("hidden");
-    };
+    div.querySelector(".delete-btn").onclick = () => abrirDelete(gasto);
 
     lista.appendChild(div);
   });
 }
 
-// ================= ELIMINAR =================
-cancelDelete.onclick = () => deleteModal.classList.add("hidden");
+/* ================= MODAL ================= */
+function abrirModal() {
+  limpiarFormulario();
+  renderCheckboxes();
+  actualizarCheckboxes();
+  modal.classList.remove("hidden");
+}
 
-confirmDelete.onclick = () => {
-  gastos = gastos.filter(g => g.id !== gastoAEliminar.id);
-  guardarLocalStorage();
-  deleteModal.classList.add("hidden");
-  renderTodo();
-};
+function cerrarModal() {
+  modal.classList.add("hidden");
+}
 
-// ================= LIMPIAR =================
 function limpiarFormulario() {
   tituloInput.value = "";
   importeInput.value = "";
-  personasInput.value = "3";
-  modoDivision = "igual";
   divisionContainer.innerHTML = "";
 }
 
-// ================= RENDER =================
-function renderTodo() {
-  renderLista();
-  renderDeudas();
+/* ================= DIVISION ================= */
+function getSeleccionados() {
+  return [...usuariosCheckbox.querySelectorAll("input:checked")];
 }
 
-// ================= INIT =================
-renderTodo();
+function dividirIgual() {
 
-// UX
-window.addEventListener("click", (e) => {
-  if (e.target === modal) cerrarModal();
-});
+  const total = parseFloat(importeInput.value);
+  const seleccionados = getSeleccionados();
 
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") cerrarModal();
-});
+  if (!total || seleccionados.length === 0) return;
+
+  const parte = (total / seleccionados.length).toFixed(2);
+
+  divisionContainer.innerHTML = "";
+
+  seleccionados.forEach(cb => {
+
+    const user = usuarios.find(u => u.id_usuario == cb.value);
+
+    divisionContainer.innerHTML += `
+      <div class="division-item">
+        <span>${user.nombre}</span>
+        <input type="number" value="${parte}" disabled>
+      </div>
+    `;
+  });
+}
+
+function dividirManual() {
+
+  const seleccionados = getSeleccionados();
+
+  divisionContainer.innerHTML = "";
+
+  seleccionados.forEach(cb => {
+
+    const user = usuarios.find(u => u.id_usuario == cb.value);
+
+    divisionContainer.innerHTML += `
+      <div class="division-item">
+        <span>${user.nombre}</span>
+        <input type="number" placeholder="0.00">
+      </div>
+    `;
+  });
+}
+
+/* ================= GUARDAR ================= */
+async function guardarGasto() {
+
+  const titulo = tituloInput.value.trim();
+  const importe = parseFloat(importeInput.value);
+  const pagador = selectPagador.value;
+
+  const participantes = getSeleccionados().map(cb => cb.value);
+
+  if (!titulo || isNaN(importe) || participantes.length === 0) return;
+
+  const fd = new FormData();
+  fd.append("accion", "crear");
+  fd.append("titulo", titulo);
+  fd.append("importe", importe);
+  fd.append("pagador", pagador);
+  fd.append("participantes", JSON.stringify(participantes));
+
+  await fetch(API_GASTOS, {
+    method: "POST",
+    body: fd,
+    credentials: "same-origin"
+  });
+
+  cerrarModal();
+  cargarGastos();
+  cargarBalance();
+  cargarResumen(); // 🔥
+}
+
+/* ================= ELIMINAR ================= */
+function abrirDelete(gasto) {
+  gastoAEliminar = gasto;
+  deleteModal.classList.remove("hidden");
+}
+
+async function eliminarGasto() {
+
+  const fd = new FormData();
+  fd.append("accion", "eliminar");
+  fd.append("id_gasto", gastoAEliminar.id_gasto);
+
+  await fetch(API_GASTOS, {
+    method: "POST",
+    body: fd,
+    credentials: "same-origin"
+  });
+
+  deleteModal.classList.add("hidden");
+
+  cargarGastos();
+  cargarBalance();
+  cargarResumen(); // 🔥
+}
+
+/* ================= PAGOS ================= */
+function abrirPago() {
+  pagoModal.classList.remove("hidden");
+}
+
+function cerrarPago() {
+  pagoModal.classList.add("hidden");
+}
+
+async function guardarPago() {
+
+  const receptor = document.getElementById("pagoReceptor").value;
+  const importe = document.getElementById("pagoImporte").value;
+
+  if (!importe) return;
+
+  const fd = new FormData();
+  fd.append("accion", "crear");
+  fd.append("receptor", receptor);
+  fd.append("importe", importe);
+
+  await fetch(API_PAGOS, {
+    method: "POST",
+    body: fd,
+    credentials: "same-origin"
+  });
+
+  cerrarPago();
+
+  cargarBalance();
+  cargarResumen(); // 🔥
+}
+
+/* ================= RESUMEN ================= */
+async function cargarResumen() {
+
+  const fd = new FormData();
+  fd.append("accion", "resumen");
+
+  const res = await fetch(API_GASTOS, {
+    method: "POST",
+    body: fd,
+    credentials: "same-origin"
+  });
+
+  const data = await res.json();
+  if (!data.success) return;
+
+  const contenedor = document.getElementById("resumenDeudas");
+  contenedor.innerHTML = "";
+
+  data.debes.forEach(d => {
+    contenedor.innerHTML += `
+      <div class="deuda">
+        Debes ${d.importe.toFixed(2)} € a ${d.nombre}
+      </div>
+    `;
+  });
+
+  data.recibes.forEach(r => {
+    contenedor.innerHTML += `
+      <div class="recibe">
+        ${r.nombre} te debe ${r.importe.toFixed(2)} €
+      </div>
+    `;
+  });
+
+  if (!data.debes.length && !data.recibes.length) {
+    contenedor.innerHTML = "<p>Todo está saldado ✅</p>";
+  }
+}

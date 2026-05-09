@@ -6,8 +6,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tareas</title>
 
+    <script>
+    if (localStorage.getItem("darkMode") === "true") {
+      document.documentElement.classList.add("dark");
+    }
+  </script>
+
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/tareasUser.css">
+  <link rel="stylesheet" href="../css/dark-mode.css">
 </head>
 
 <body>
@@ -17,35 +24,33 @@
     <!-- SIDEBAR -->
     <aside class="sidebar">
       <div>
-        <h3>Usuario 1</h3>
+        <h3 id="nombreUsuario"></h3>
         <span class="subtitle">Panel de inicio</span>
 
         <p class="section-title">PRINCIPAL</p>
         <ul>
           <li>
-            <a href="">
+            <a href="homeUser.html">
               <img src="../css/icons/house.svg" class="icon"> Inicio
             </a>
           </li>
 
-          <li class="active">
-            <a href="../html/gastosComunesUser.html" class="sidebar__link">
+          <li>
+            <a href="gastosComunesUser.html">
               <img src="../css/icons/euro.svg" class="icon">
               Gastos Comunes
-              <span class="badge">3</span>
             </a>
           </li>
 
           <li class="active">
-            <a href="../html/tareasUser.html">
-              <img src="../css/icons/layout-grid.svg" class="icon">
+            <a href="tareasUser.html">
+              <img src="../css/icons/square-check-big.svg" class="icon">
               Tareas
-              <span class="badge">5</span>
             </a>
           </li>
 
           <li>
-            <a href="../html/calendario.html">
+            <a href="calendario.html">
               <img src="../css/icons/calendar.svg" class="icon"> Calendario
             </a>
           </li>
@@ -54,22 +59,15 @@
         <p class="section-title">PISO</p>
         <ul>
           <li>
-            <a href="piso.html">
-              <img src="../css/icons/house.svg" class="icon"> Mi Piso
-            </a>
-          </li>
-
-          <li>
-            <a href="companeros.html">
+            <a href="companerosUser.html">
               <img src="../css/icons/users.svg" class="icon"> Compañeros
             </a>
           </li>
 
           <li>
-            <a href="../html/incidenciasUser.html">
+            <a href="incidenciasUser.html">
               <img src="../css/icons/circle-alert.svg" class="icon">
               Incidencias
-              <span class="badge gray">2</span>
             </a>
           </li>
         </ul>
@@ -90,23 +88,18 @@
     <!-- MAIN -->
     <main class="main">
 
+      <!-- TOPBAR LIMPIO -->
       <div class="topbar">
-        <div class="tabs">
-          <span class="active">Mis tareas <b>8</b></span>
-          <span>Del equipo <b>24</b></span>
-          <span>Completadas <b>41</b></span>
-        </div>
+        <h1>Tareas</h1>
 
         <div class="actions">
-          <button type="button" class="btn-light">Filtros</button>
-          <button type="button" class="btn-light">Agrupar</button>
-          <button type="button" class="btn-light">Vista</button>
-          <button type="button" class="btn-primary" id="openModal">+ Nueva tarea</button>
+          <button type="button" class="btn-primary" id="openModal">
+            + Nueva tarea
+          </button>
         </div>
       </div>
 
-      <h1>Tareas</h1>
-
+      <!-- FILTROS (los puedes dejar o quitar si quieres más simple aún) -->
       <div class="filters-bar">
         <div class="filters">
           <button type="button" class="active">Todas</button>
@@ -122,6 +115,7 @@
         </div>
       </div>
 
+      <!-- CONTENEDOR -->
       <div id="taskContainer"></div>
 
     </main>
@@ -163,9 +157,7 @@
         <div class="form-group">
           <label for="asignados">Asignar a*</label>
           <select id="asignados" multiple>
-            <option value="YO">Yo</option>
-            <option value="AL">AL</option>
-            <option value="ME">ME</option>
+            <!-- SE LLENA DESDE JS -->
           </select>
           <span id="errorAsignados" class="error-text"></span>
         </div>
@@ -216,8 +208,11 @@
     </div>
   </div>
 
-  <div id="toast" class="toast hidden">Tarea eliminada correctamente</div>
+  <!-- TOAST -->
+  <div id="toast" class="toast hidden"></div>
 
+  <!-- JS -->
+  <script src="../js/dark-mode.js"></script>
   <script src="../js/tareasUser.js"></script>
   <script src="../js/cerrarSesion.js"></script>
 

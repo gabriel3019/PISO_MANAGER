@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compañeros</title>
+
+  <!-- DARK MODE PRELOAD -->
+  <script>
+    if (localStorage.getItem("darkMode") === "true") {
+      document.documentElement.classList.add("dark");
+    }
+  </script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/tareasUser.css">
+  <link rel="stylesheet" href="../css/dark-mode.css">
+<link rel="stylesheet" href="../css/companeros.css">
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- SIDEBAR (IGUAL) -->
+  <aside class="sidebar">
+    <div>
+      <h3 id="nombreUsuario"></h3>
+      <span class="subtitle">Panel de inicio</span>
+
+      <p class="section-title">PRINCIPAL</p>
+      <ul>
+        <li>
+          <a href="homeUser.html">
+            <img src="../css/icons/house.svg" class="icon"> Inicio
+          </a>
+        </li>
+
+        <li>
+          <a href="gastosComunesUser.html">
+            <img src="../css/icons/euro.svg" class="icon"> Gastos
+          </a>
+        </li>
+
+        <li>
+          <a href="tareasUser.html">
+            <img src="../css/icons/layout-grid.svg" class="icon"> Tareas
+          </a>
+        </li>
+
+        <li>
+          <a href="calendario.html">
+            <img src="../css/icons/calendar.svg" class="icon"> Calendario
+          </a>
+        </li>
+      </ul>
+
+      <p class="section-title">PISO</p>
+      <ul>
+
+        <li class="active">
+          <a href="companerosUser.html">
+            <img src="../css/icons/users.svg" class="icon"> Compañeros
+          </a>
+        </li>
+
+        <li>
+          <a href="incidenciasUser.html">
+            <img src="../css/icons/circle-alert.svg" class="icon"> Incidencias
+          </a>
+        </li>
+      </ul>
+
+      <p class="section-title">CUENTA</p>
+      <ul>
+        <li>
+          <a href="ajustes.html">
+            <img src="../css/icons/settings.svg" class="icon"> Ajustes
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="logout" id="btn-cerrar-sesion">Cerrar sesión</div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="topbar">
+      <h1>Compañeros de piso</h1>
+    </div>
+
+    <!-- CONTENEDOR -->
+    <div id="companerosContainer"></div>
+
+  </main>
+
+</div>
+
+<!-- JS -->
+<script src="../js/dark-mode.js"></script>
+<script src="../js/companerosUser.js"></script>
+<script src="../js/cerrarSesion.js"></script>
+
+</body>
+</html>

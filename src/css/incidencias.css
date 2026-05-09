@@ -23,6 +23,7 @@ body {
   min-height: 100vh;
   overflow-y: auto;
 }
+
 /* ══════════════════════════════════════════════════════════════
    SIDEBAR
    ══════════════════════════════════════════════════════════════ */
@@ -86,12 +87,10 @@ body {
   background: var(--bg-tag);
 }
 
-/* Estado activo gestionado por JS — se aplica al <li> */
 .sidebar li.active {
   background: #e0e7ff;
 }
 
-/* El enlace y el texto dentro del li activo */
 .sidebar li.active .sidebar-link {
   color: var(--accent-blue);
   font-weight: 600;
@@ -154,73 +153,6 @@ body {
   color: var(--text-secondary);
 }
 
-.page-header__actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-/* ─ Botón modo claro ─ */
-.btn-mode {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 14px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: var(--bg-card);
-  font-family: var(--font-main);
-  font-size: .82rem;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: border-color .15s, box-shadow .15s;
-}
-.btn-mode:hover { border-color: #b0bec5; box-shadow: 0 0 0 3px rgba(0,0,0,.04); }
-
-/* ─ Notificación & Avatar ─ */
-.header-icon {
-  position: relative;
-  width: 36px; height: 36px;
-  border-radius: 50%;
-  border: 1px solid var(--border);
-  background: var(--bg-card);
-  display: grid; place-items: center;
-  cursor: pointer;
-  color: var(--text-secondary);
-  font-size: .9rem;
-  transition: background .15s;
-}
-.header-icon:hover { background: var(--bg-tag); }
-
-.badge {
-  position: absolute;
-  top: -3px; right: -3px;
-  width: 16px; height: 16px;
-  border-radius: 50%;
-  background: var(--prio-high);
-  color: #fff;
-  font-size: .6rem;
-  font-weight: 600;
-  display: grid; place-items: center;
-  border: 2px solid var(--bg-page);
-}
-
-.username {
-  font-size: .82rem;
-  color: var(--text-secondary);
-}
-
-.avatar {
-  width: 36px; height: 36px;
-  border-radius: 50%;
-  background: var(--accent-blue);
-  color: #fff;
-  display: grid; place-items: center;
-  font-size: .8rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
 /* ── Estadísticas ── */
 .stats-grid {
   display: grid;
@@ -249,10 +181,15 @@ body {
   font-size: 1.2rem;
   flex-shrink: 0;
 }
-.stat-card__icon--red    { background: #fff1f2; }
+
+/* CAMBIO: rojo → azul para "Abiertas" */
+.stat-card__icon--blue   { background: #dbeafe; }
 .stat-card__icon--orange { background: #fff7ed; }
 .stat-card__icon--green  { background: #f0fdf4; }
 .stat-card__icon--slate  { background: #f1f5f9; }
+
+/* Mantenemos --red por si se usa en otro lado */
+.stat-card__icon--red    { background: #fff1f2; }
 
 .stat-card__value {
   font-size: 1.9rem;
@@ -291,7 +228,6 @@ body {
   color: var(--text-primary);
 }
 
-/* ─ Botón nueva incidencia ─ */
 .btn-new {
   display: flex;
   align-items: center;
@@ -311,7 +247,6 @@ body {
 .btn-new:hover  { background: var(--accent-blue-h); }
 .btn-new:active { transform: scale(.97); }
 
-/* ─ Menú de sección ─ */
 .section__menu-btn {
   background: none;
   border: none;
@@ -340,7 +275,6 @@ body {
 .incident-item:last-child { border-bottom: none; }
 .incident-item:hover { background: var(--bg-tag); }
 
-/* ─ Ícono de incidencia ─ */
 .incident-icon {
   width: 40px; height: 40px;
   border-radius: var(--radius-md);
@@ -351,7 +285,6 @@ body {
   flex-shrink: 0;
 }
 
-/* ─ Cuerpo texto ─ */
 .incident-body__title {
   font-size: .88rem;
   font-weight: 600;
@@ -374,7 +307,6 @@ body {
   color: var(--text-muted);
 }
 
-/* ─ Estado y prioridad ─ */
 .incident-status {
   display: flex;
   flex-direction: column;
@@ -391,7 +323,8 @@ body {
   font-size: .73rem;
   font-weight: 600;
 }
-.status-badge--open     { background: var(--status-open-bg);     color: var(--status-open-text); }
+
+.status-badge--open     { background: #dbeafe; color: #1d4ed8; }
 .status-badge--progress { background: var(--status-progress-bg); color: var(--status-progress-text); }
 .status-badge--done     { background: var(--status-done-bg);     color: var(--status-done-text); }
 
@@ -412,7 +345,6 @@ body {
 .priority-dot--medium::before { background: var(--prio-medium); }
 .priority-dot--low::before    { background: var(--prio-low); }
 
-/* ── Botones de acción (editar / eliminar) ── */
 .incident-actions {
   display: flex;
   align-items: center;
@@ -436,7 +368,6 @@ body {
 .incident-actions__btn--edit:hover   { background: #eff6ff; }
 .incident-actions__btn--delete:hover { background: #fff1f2; }
 
-/* ── Añadir nueva incidencia (dashed) ── */
 .incident-add {
   display: flex;
   flex-direction: column;
@@ -459,7 +390,7 @@ body {
 
 
 /* ══════════════════════════════════════════════════════════════
-   MODALES
+   MODALES — Base
    ══════════════════════════════════════════════════════════════ */
 
 .modal-overlay {
@@ -477,22 +408,106 @@ body {
   display: none;
 }
 
+/* CAMBIO: sin scroll en el modal. El contenido se adapta al viewport */
 .modal {
   background: #ffffff;
   border-radius: 16px;
   width: 100%;
   max-width: 500px;
   max-height: 90vh;
-  overflow-y: auto;
+  overflow: hidden;           /* sin scroll en el propio modal */
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
+}
+
+/* Solo el body hace scroll si el contenido es largo */
+.modal__body {
+  padding: 4px 24px 8px;
+  flex: 1;
+  overflow-y: auto;           /* scroll solo en el cuerpo si hace falta */
 }
 
 .modal--sm {
   max-width: 420px;
 }
 
+/* ── Modal detalle ── */
+.modal--detalle {
+  max-width: 520px;
+}
+
+.modal__body--detalle {
+  padding: 20px 24px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Imagen del detalle */
+.detalle__imagen-wrap {
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  max-height: 200px;
+}
+.detalle__imagen {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Badges estado + prioridad */
+.detalle__badges {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Grid de campos */
+.detalle__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.detalle__campo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detalle__campo--full {
+  grid-column: 1 / -1;
+}
+
+.detalle__label {
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.detalle__valor {
+  font-size: .88rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.detalle__valor--titulo {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.detalle__valor--desc {
+  font-size: .85rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  font-weight: 400;
+}
+
+/* ── Cabecera modal ── */
 .modal__header {
   display: flex;
   align-items: center;
@@ -539,11 +554,6 @@ body {
   border-top: 1px solid var(--border);
   margin: 0;
   flex-shrink: 0;
-}
-
-.modal__body {
-  padding: 4px 24px 8px;
-  flex: 1;
 }
 
 .modal__body--center {
@@ -689,6 +699,33 @@ body {
 .modal__urgencia-dot--medium { background: var(--prio-medium); }
 .modal__urgencia-dot--high   { background: var(--prio-high); }
 
+/* ── Checkbox notificar admin ── */
+.modal__checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: .88rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.modal__checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent-blue);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.modal__checkbox-hint {
+  margin-top: 5px;
+  font-size: .75rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* ── Dropzone ── */
 .modal__dropzone {
   display: flex;
   flex-direction: column;
@@ -722,6 +759,7 @@ body {
   color: var(--text-muted);
 }
 
+/* ── Footer modal ── */
 .modal__footer {
   display: flex;
   justify-content: flex-end;
@@ -770,7 +808,46 @@ body {
   text-align: center;
 }
 
-/* ── Responsive básico ── */
+/* ══════════════════════════════════════════════════════════════
+   DARK MODE
+   ══════════════════════════════════════════════════════════════ */
+
+body.dark .card {
+  background: #020617;
+  border-color: #1e293b;
+}
+
+body.dark .form-group input {
+  background: #020617;
+  color: #e5e7eb;
+  border-color: #1e293b;
+}
+
+body.dark label {
+  color: #cbd5f5;
+}
+
+body.dark .avatar button {
+  background: #1e293b;
+  color: #e5e7eb;
+}
+
+body.dark .slider {
+  background: #374151;
+}
+
+body.dark input:checked + .slider {
+  background: #2563eb;
+}
+
+body,
+.card,
+input,
+.slider {
+  transition: all 0.3s ease;
+}
+
+/* ── Responsive ── */
 @media (max-width: 860px) {
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .sidebar { width: 200px; }
@@ -782,4 +859,5 @@ body {
   .section { margin-left: 16px; margin-right: 16px; }
   .modal__footer { flex-direction: column-reverse; }
   .modal__btn { width: 100%; text-align: center; }
+  .detalle__grid { grid-template-columns: 1fr; }
 }

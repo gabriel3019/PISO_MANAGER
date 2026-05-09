@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ajustes</title>
+
+    <script>
+    if (localStorage.getItem("darkMode") === "true") {
+      document.documentElement.classList.add("dark");
+    }
+  </script>
+
+  <!-- FUENTE -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- CSS GENERAL -->
+  <link rel="stylesheet" href="../css/tareasUser.css">
+
+  <link rel="stylesheet" href="../css/dark-mode.css">
+
+  <!-- CSS AJUSTES -->
+  <link rel="stylesheet" href="../css/ajustes.css">
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar">
+    <div>
+      <h3 id="nombreUsuario"></h3>
+      <span class="subtitle">Panel de inicio</span>
+
+      <p class="section-title">PRINCIPAL</p>
+      <ul>
+        <li>
+          <a href="homeUser.html">
+            <img src="../css/icons/house.svg" class="icon"> Inicio
+          </a>
+        </li>
+
+        <li>
+          <a href="gastosComunesUser.html">
+            <img src="../css/icons/euro.svg" class="icon">
+            Gastos Comunes
+          </a>
+        </li>
+
+        <li>
+          <a href="tareasUser.html">
+            <img src="../css/icons/layout-grid.svg" class="icon">
+            Tareas
+          </a>
+        </li>
+
+        <li>
+          <a href="calendario.html">
+            <img src="../css/icons/calendar.svg" class="icon"> Calendario
+          </a>
+        </li>
+      </ul>
+
+      <p class="section-title">PISO</p>
+      <ul>
+
+        <li>
+          <a href="companerosUser.html">
+            <img src="../css/icons/users.svg" class="icon"> Compañeros
+          </a>
+        </li>
+
+        <li>
+          <a href="incidenciasUser.html">
+            <img src="../css/icons/circle-alert.svg" class="icon">
+            Incidencias
+          </a>
+        </li>
+      </ul>
+
+      <p class="section-title">CUENTA</p>
+      <ul>
+        <li class="active">
+          <a href="ajustes.html">
+            <img src="../css/icons/settings.svg" class="icon"> Ajustes
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="logout" id="btn-cerrar-sesion">Cerrar sesión</div>
+  </aside>
+
+  <!-- ================= MAIN ================= -->
+  <main class="main">
+
+    <div class="settings">
+
+      <h1>Ajustes</h1>
+
+      <!-- ================= PERFIL ================= -->
+      <div class="card">
+
+        <h3>Perfil</h3>
+
+        <div class="profile">
+
+          <!-- FOTO -->
+          <div class="avatar">
+            <img id="fotoPerfil" src="../img/default-avatar.png">
+            <input type="file" id="inputFoto" hidden>
+            <button id="cambiarFoto" class="btn-light">
+              Cambiar foto
+            </button>
+          </div>
+
+          <!-- FORM -->
+          <div class="form">
+
+            <div class="row">
+              <div class="form-group">
+                <label>Nombre</label>
+                <input id="nombre" type="text">
+              </div>
+
+              <div class="form-group">
+                <label>Apellidos</label>
+                <input id="apellidos" type="text">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Email</label>
+              <input id="email" type="email">
+            </div>
+
+            <div class="row">
+              <div class="form-group">
+                <label>Teléfono</label>
+                <input id="telefono" type="text">
+              </div>
+
+              <div class="form-group">
+                <label>Dirección</label>
+                <input id="direccion" type="text">
+              </div>
+            </div>
+
+            <button class="btn-primary" id="guardarPerfil">
+              Guardar cambios
+            </button>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= PREFERENCIAS ================= -->
+      <div class="card">
+
+        <h3>Preferencias</h3>
+
+        <div class="setting-item">
+          <span>Modo oscuro</span>
+
+          <label class="switch">
+            <input type="checkbox" id="modoOscuro">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+</div>
+
+<!-- ================= JS ================= -->
+ <script src="../js/dark-mode.js"></script>
+<script src="../js/ajustes.js"></script>
+<script src="../js/cerrarSesion.js"></script>
+
+</body>
+</html>

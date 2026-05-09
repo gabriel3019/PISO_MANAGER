@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Admin</title>
+    <link rel="stylesheet" href="../css/homeAdmin.css">
+</head>
+
+<body>
+    <aside class="sidebar-admin">
+        <div class="admin-info">
+            <div class="avatar">AD</div>
+            <div>
+                <h3 id="nombreAdmin"></h3>
+                <p>ADMINISTRADOR</p>
+            </div>
+        </div>
+
+        <nav>
+            <a class="active" href="../html/homeAdmin.html"><img src="../css/icons/settings.svg" class="icon">
+                <strong>Home</strong></a>
+            <a href="../html/incidenciasAdmin.html"><img src="../css/icons/circle-alert.svg"
+                    class="icon"><strong>Incidencias</strong></a>
+        </nav>
+
+        <button class="logout" id="btn-cerrar-sesion">Cerrar sesión</button>
+    </aside>
+
+    <main class="admin-main">
+        <header>
+            <h1>Ajustes del Piso</h1>
+            <p>Configuración exclusiva del administrador</p>
+        </header>
+
+        <section class="card">
+            <h2>Información del piso</h2>
+
+            <label>Dirección</label>
+            <input id="calle" type="text">
+
+            <div class="row">
+                <div>
+                    <label>Ciudad</label>
+                    <input id="ciudad" type="text">
+                </div>
+                <div>
+                    <label>Código postal</label>
+                    <input id="codigo_postal" type="text">
+                </div>
+            </div>
+        </section>
+
+        <section class="card reglas-card">
+            <h2>Reglas y configuración</h2>
+
+            <div class="setting-row">
+                <div>
+                    <p>Notificaciones automáticas</p>
+                    <span>Incidencias</span>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="notificaciones" checked>
+                    <span></span>
+                </label>
+            </div>
+        </section>
+
+        <section class="card danger">
+            <h2>Zona de peligro</h2>
+            <button>Eliminar piso</button>
+            <button>Descargarse contrato</button>
+        </section>
+
+        <button class="save-btn">Guardar cambios</button>
+    </main>
+
+    <script src="../js/homeAdmin.js"></script>
+</body>
+
+</html>

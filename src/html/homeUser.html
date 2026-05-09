@@ -1,0 +1,164 @@
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Inicio</title>
+
+
+  <script>
+    if (localStorage.getItem("darkMode") === "true") {
+      document.documentElement.classList.add("dark");
+    }
+  </script>
+
+  <!-- FUENTE -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="../css/homeUser.css">
+  <link rel="stylesheet" href="../css/dark-mode.css">
+</head>
+
+<body>
+
+  <div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div>
+        <h3 id="nombreUsuario"></h3>
+        <span class="subtitle">Panel de inicio</span>
+
+        <p class="section-title">PRINCIPAL</p>
+        <ul>
+          <li class="active">
+            <a href="homeUser.html"><img src="../css/icons/house.svg" class="icon"> Inicio</a>
+          </li>
+          <li>
+            <a href="gastosComunesUser.html"><img src="../css/icons/euro.svg" class="icon"> Gastos Comunes</a>
+          </li>
+          <li>
+            <a href="tareasUser.html"><img src="../css/icons/square-check-big.svg" class="icon"> Tareas</a>
+          </li>
+          <li>
+            <a href="calendario.html"><img src="../css/icons/calendar.svg" class="icon"> Calendario</a>
+          </li>
+        </ul>
+
+        <p class="section-title">PISO</p>
+        <ul>
+          <li>
+            <a href="companerosUser.html"><img src="../css/icons/users.svg" class="icon"> Compañeros</a>
+          </li>
+          <li>
+            <a href="incidenciasUser.html"><img src="../css/icons/circle-alert.svg" class="icon"> Incidencias</a>
+          </li>
+        </ul>
+
+        <p class="section-title">CUENTA</p>
+        <ul>
+          <li>
+            <a href="ajustes.html"><img src="../css/icons/settings.svg" class="icon"> Ajustes</a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="logout" id="btn-cerrar-sesion">Cerrar sesión</div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+      <div class="topbar">
+        <div>
+          <h1>Panel de Inicio</h1>
+          <span class="subtitle">Piso Calle Mayor · 3 compañeros</span>
+        </div>
+      </div>
+
+      <div class="dashboard">
+
+        <!-- BALANCE -->
+        <div class="card balance">
+          <h3>Tu Balance</h3>
+          <div class="amount positive" id="balance">0€</div>
+
+          <div class="details">
+            <p>Total gastos del piso <span id="totalPiso">0€</span></p>
+            <p>Tu parte pagada <span id="pagado">0€</span></p>
+            <p>Tu parte debida <span id="debido">0€</span></p>
+          </div>
+
+          <a href="gastosComunesUser.html" class="btn-primary">
+            Ver gastos
+          </a>
+        </div>
+
+        <!-- TAREAS -->
+        <div class="card">
+          <h3>Tareas de hoy</h3>
+
+          <ul class="tasks" id="listaTareas">
+            <!-- JS -->
+          </ul>
+
+          <!-- PROGRESO -->
+          <div class="progress">
+            <div class="progress-bar" id="barraProgreso"></div>
+          </div>
+
+          <!-- CONTADOR -->
+          <div class="tareas-footer">
+            <span id="contadorTareas"></span>
+          </div>
+        </div>
+
+        <!-- GASTOS -->
+        <div class="card full">
+          <h3>Gastos recientes</h3>
+          <div id="gastosPreview"></div>
+        </div>
+
+        <!-- REPARTO -->
+        <div class="card">
+          <h3>Reparto</h3>
+
+          <div class="reparto" id="repartoPreview">
+            <!-- JS -->
+          </div>
+        </div>
+
+        <!-- AVISOS -->
+        <div class="card">
+          <h3>Avisos del piso</h3>
+
+          <div id="avisosPreview">
+            <!-- JS -->
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+
+  <div id="modalConfirm" class="modal hidden">
+    <div class="modal-content">
+      <p id="modalText">¿Marcar tarea como completada?</p>
+
+      <div class="modal-actions">
+        <button id="cancelarBtn" class="btn-secondary">Cancelar</button>
+        <button id="confirmarBtn" class="btn-primary">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS -->
+  <script src="../js/dark-mode.js"></script>
+  <script src="../js/homeUser.js"></script>
+  <script src="../js/cerrarSesion.js"></script>
+
+</body>
+
+</html>

@@ -1,4 +1,8 @@
-// ================= MODALES =================
+const API_URL = "../php/tareas.php";
+
+/* ================= DOM ================= */
+const nombreUsuario = document.getElementById("nombreUsuario");
+
 const modal = document.getElementById("taskModal");
 const deleteModal = document.getElementById("deleteModal");
 
@@ -9,17 +13,51 @@ const cancelBtn = document.getElementById("cancelModal");
 const cancelDelete = document.getElementById("cancelDelete");
 const confirmDelete = document.getElementById("confirmDelete");
 
-// abrir modal crear
+const selectAsignados = document.getElementById("asignados");
+
+/* ================= ESTADO ================= */
+let tareas = [];
+let deleteId = null;
+let tareaEditando = null;
+
+/* ================= INIT ================= */
+document.addEventListener("DOMContentLoaded", () => {
+  cargarUsuario();
+  cargarUsuarios();
+  cargarTareas();
+  activarPrioridad(); // 🔥 IMPORTANTE
+});
+
+/* ================= USUARIO ================= */
+function cargarUsuario() {
+  const usuario = JSON.parse(sessionStorage.getItem("usuario"));
+  if (usuario && nombreUsuario) {
+    nombreUsuario.textContent = usuario.nombre;
+  }
+}
+
+/* ================= PRIORIDAD ================= */
+function activarPrioridad() {
+  document.querySelectorAll(".prio").forEach(btn => {
+    btn.addEventListener("click", () => {
+
+      document.querySelectorAll(".prio")
+        .forEach(b => b.classList.remove("active"));
+
+      btn.classList.add("active");
+    });
+  });
+}
+
+/* ================= MODAL ================= */
 openBtn.addEventListener("click", () => {
   modal.classList.remove("hidden");
 });
 
-// cerrar modal
 [closeBtn, cancelBtn].forEach(btn => {
   btn.addEventListener("click", cerrarModal);
 });
 
-// cerrar fuera
 window.addEventListener("click", (e) => {
   if (e.target === modal) cerrarModal();
   if (e.target === deleteModal) cerrarDeleteModal();
@@ -32,11 +70,10 @@ function cerrarModal() {
 
 function cerrarDeleteModal() {
   deleteModal.classList.add("hidden");
-  deleteIndex = null;
+  deleteId = null;
 }
 
-
-// ================= TOAST =================
+/* ================= TOAST ================= */
 function mostrarToast(mensaje) {
   const toast = document.getElementById("toast");
 
@@ -51,25 +88,100 @@ function mostrarToast(mensaje) {
   }, 2000);
 }
 
+/* ================= API ================= */
 
-// ================= PRIORIDAD =================
-let prioridadSeleccionada = "baja";
-
-document.querySelectorAll(".prio").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".prio").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    prioridadSeleccionada = btn.dataset.value;
+async function cargarTareas() {
+  const res = await fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "listar" })
   });
-});
 
+  const json = await res.json();
 
-// ================= DATOS =================
-let tareas = JSON.parse(localStorage.getItem("tareas")) || [];
-let deleteIndex = null;
+  if (json.success) {
+    tareas = json.tareas;
+    renderTareas();
+  }
+}
 
+async function crearTarea(data) {
+  await fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "crear",
+      ...data
+    })
+  });
+}
 
-// ================= RENDER =================
+async function editarTarea(id, data) {
+  await fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "editar",
+      id_tarea: id,
+      ...data
+    })
+  });
+}
+
+async function actualizarTarea(id, estado) {
+  await fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "toggle",
+      id_tarea: id,
+      estado
+    })
+  });
+}
+
+async function eliminarTarea(id) {
+  await fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "eliminar",
+      id_tarea: id
+    })
+  });
+}
+
+/* ================= USUARIOS ================= */
+async function cargarUsuarios() {
+  const res = await fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "usuarios" })
+  });
+
+  const json = await res.json();
+
+  if (!json.success) return;
+
+  selectAsignados.innerHTML = "";
+
+  const usuarioSesion = JSON.parse(sessionStorage.getItem("usuario"));
+
+  json.usuarios.forEach(u => {
+    const option = document.createElement("option");
+
+    option.value = u.id_usuario;
+
+    option.textContent =
+      usuarioSesion && usuarioSesion.id == u.id_usuario
+        ? "Tú"
+        : u.nombre;
+
+    selectAsignados.appendChild(option);
+  });
+}
+
+/* ================= RENDER ================= */
 function renderTareas() {
   const container = document.getElementById("taskContainer");
 
@@ -88,43 +200,37 @@ function renderTareas() {
   const pendientesDiv = document.getElementById("pendientes");
   const completadasDiv = document.getElementById("completadas");
 
-  tareas.forEach((t, index) => {
+  tareas.forEach(t => {
 
-    const prioridadClass =
-      t.prioridad === "alta" ? "red" :
-      t.prioridad === "media" ? "yellow" : "blue";
+    const completada = t.estado === "completada";
 
     const html = `
-      <div class="task ${t.completada ? "completed" : ""}">
+      <div class="task ${completada ? "completed" : ""}">
 
         <div class="left">
-          <input type="checkbox" data-index="${index}" ${t.completada ? "checked" : ""}>
+          <input type="checkbox" data-id="${t.id_tarea}" ${completada ? "checked" : ""}>
 
           <div>
             <p>${t.titulo}</p>
 
             <div class="meta">
-              <span class="tag ${prioridadClass}">
-                ${t.prioridad}
-              </span>
+              <span class="tag ${t.prioridad}">${t.prioridad}</span>
               <span class="date">${t.fecha || ""}</span>
             </div>
           </div>
         </div>
 
         <div class="right">
-          <div class="avatars">
-            ${t.asignados.map(a => `<span>${a}</span>`).join("")}
-          </div>
+          <span>${t.nombre}</span>
 
-          <button class="edit-btn" data-index="${index}">✏️</button>
-          <button class="delete-btn" data-index="${index}">🗑️</button>
+          <button class="edit-btn" data-id="${t.id_tarea}">✏️</button>
+          <button class="delete-btn" data-id="${t.id_tarea}">🗑️</button>
         </div>
 
       </div>
     `;
 
-    if (t.completada) {
+    if (completada) {
       completadasDiv.innerHTML += html;
     } else {
       pendientesDiv.innerHTML += html;
@@ -132,47 +238,48 @@ function renderTareas() {
   });
 
   activarChecks();
-  activarEditar();
   activarEliminar();
+  activarEditar();
 }
 
-
-// ================= CHECKBOX =================
+/* ================= CHECK ================= */
 function activarChecks() {
   document.querySelectorAll("input[type='checkbox']").forEach(check => {
-    check.addEventListener("change", (e) => {
-      const index = e.target.dataset.index;
-      tareas[index].completada = e.target.checked;
+    check.addEventListener("change", async (e) => {
 
-      guardar();
-      renderTareas();
+      const id = e.target.dataset.id;
+      const estado = e.target.checked ? "completada" : "pendiente";
+
+      await actualizarTarea(id, estado);
+      cargarTareas();
     });
   });
 }
 
-
-// ================= EDITAR =================
+/* ================= EDITAR ================= */
 function activarEditar() {
   document.querySelectorAll(".edit-btn").forEach(btn => {
     btn.addEventListener("click", () => {
 
-      const index = btn.dataset.index;
-      const tarea = tareas[index];
+      const id = btn.dataset.id;
+      const tarea = tareas.find(t => t.id_tarea == id);
+
+      if (!tarea) return;
+
+      tareaEditando = tarea;
 
       document.getElementById("titulo").value = tarea.titulo;
-      document.getElementById("descripcion").value = tarea.descripcion;
-      document.getElementById("fecha").value = tarea.fecha;
+      document.getElementById("descripcion").value = tarea.descripcion || "";
+      document.getElementById("fecha").value = tarea.fecha || "";
+      document.getElementById("frecuencia").value = tarea.frecuencia || "puntual";
 
-      const select = document.getElementById("asignados");
-      [...select.options].forEach(option => {
-        option.selected = tarea.asignados.includes(option.value);
-      });
+      selectAsignados.value = tarea.id_usuario;
 
-      prioridadSeleccionada = tarea.prioridad;
+      // prioridad
       document.querySelectorAll(".prio").forEach(b => b.classList.remove("active"));
-      document.querySelector(`.prio.${tarea.prioridad}`).classList.add("active");
+      const btnPrio = document.querySelector(`.prio[data-value="${tarea.prioridad}"]`);
+      if (btnPrio) btnPrio.classList.add("active");
 
-      document.getElementById("editIndex").value = index;
       document.querySelector(".modal-header h2").textContent = "Editar tarea";
 
       modal.classList.remove("hidden");
@@ -180,12 +287,11 @@ function activarEditar() {
   });
 }
 
-
-// ================= ELIMINAR =================
+/* ================= ELIMINAR ================= */
 function activarEliminar() {
   document.querySelectorAll(".delete-btn").forEach(btn => {
     btn.addEventListener("click", () => {
-      deleteIndex = btn.dataset.index;
+      deleteId = btn.dataset.id;
       deleteModal.classList.remove("hidden");
     });
   });
@@ -193,121 +299,66 @@ function activarEliminar() {
 
 cancelDelete.addEventListener("click", cerrarDeleteModal);
 
-confirmDelete.addEventListener("click", () => {
+confirmDelete.addEventListener("click", async () => {
 
-  if (deleteIndex !== null) {
-    tareas.splice(deleteIndex, 1);
-    guardar();
-    mostrarToast("Tarea eliminada correctamente ✅");
+  if (deleteId) {
+    await eliminarTarea(deleteId);
+    mostrarToast("Tarea eliminada ✅");
   }
 
   cerrarDeleteModal();
-  renderTareas();
+  cargarTareas();
 });
 
-
-// ================= VALIDACIÓN =================
-function validarFormulario() {
-  const tituloInput = document.getElementById("titulo");
-  const fechaInput = document.getElementById("fecha");
-  const asignadosSelect = document.getElementById("asignados");
-
-  const titulo = tituloInput.value.trim();
-  const fecha = fechaInput.value;
-  const asignados = [...asignadosSelect.selectedOptions].map(o => o.value);
-
-  let valido = true;
-
-  limpiarErrores();
-
-  if (!titulo) {
-    setError("errorTitulo", tituloInput, "El título es obligatorio");
-    valido = false;
-  }
-
-  if (!fecha) {
-    setError("errorFecha", fechaInput, "Selecciona una fecha");
-    valido = false;
-  }
-
-  if (asignados.length === 0) {
-    setError("errorAsignados", asignadosSelect, "Selecciona al menos una persona");
-    valido = false;
-  }
-
-  return valido;
-}
-
-function setError(id, input, mensaje) {
-  document.getElementById(id).textContent = mensaje;
-  input.classList.add("input-error");
-}
-
-function limpiarErrores() {
-  document.querySelectorAll(".error-text").forEach(e => e.textContent = "");
-  document.querySelectorAll(".input-error").forEach(e => e.classList.remove("input-error"));
-}
-
-
-// ================= CREAR / EDITAR =================
-document.getElementById("crearTarea").addEventListener("click", () => {
-
-  if (!validarFormulario()) return;
+/* ================= CREAR / EDITAR ================= */
+document.getElementById("crearTarea").addEventListener("click", async () => {
 
   const titulo = document.getElementById("titulo").value.trim();
   const descripcion = document.getElementById("descripcion").value;
+  const prioridad = document.querySelector(".prio.active")?.dataset.value || "baja";
   const fecha = document.getElementById("fecha").value;
+  const frecuencia = document.getElementById("frecuencia").value;
+  const usuario = selectAsignados.value;
 
-  const asignados = [...document.getElementById("asignados").selectedOptions]
-    .map(o => o.value);
-
-  const editIndex = document.getElementById("editIndex").value;
+  if (!titulo) {
+    mostrarToast("El título es obligatorio");
+    return;
+  }
 
   const data = {
     titulo,
     descripcion,
-    prioridad: prioridadSeleccionada,
+    prioridad,
     fecha,
-    asignados
+    frecuencia,
+    id_usuario: usuario
   };
 
-  if (editIndex !== "") {
-    tareas[editIndex] = { ...tareas[editIndex], ...data };
+  if (tareaEditando) {
+    await editarTarea(tareaEditando.id_tarea, data);
     mostrarToast("Tarea actualizada ✏️");
   } else {
-    tareas.push({ ...data, completada: false });
-    mostrarToast("Tarea creada correctamente 🚀");
+    await crearTarea(data);
+    mostrarToast("Tarea creada 🚀");
   }
 
-  guardar();
-  renderTareas();
   cerrarModal();
+  cargarTareas();
 });
 
-
-// ================= HELPERS =================
-function guardar() {
-  localStorage.setItem("tareas", JSON.stringify(tareas));
-}
-
-
-// ================= LIMPIAR =================
+/* ================= LIMPIAR ================= */
 function limpiarFormulario() {
   document.getElementById("titulo").value = "";
   document.getElementById("descripcion").value = "";
   document.getElementById("fecha").value = "";
-  document.getElementById("editIndex").value = "";
+  document.getElementById("frecuencia").value = "puntual";
 
-  prioridadSeleccionada = "baja";
+  selectAsignados.selectedIndex = 0;
 
   document.querySelectorAll(".prio").forEach(b => b.classList.remove("active"));
-  document.querySelector(".prio.baja").classList.add("active");
+  document.querySelector(".prio.baja")?.classList.add("active");
 
-  limpiarErrores();
+  tareaEditando = null;
 
   document.querySelector(".modal-header h2").textContent = "Nueva tarea";
 }
-
-
-// ================= INIT =================
-renderTareas();
