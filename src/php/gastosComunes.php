@@ -1,138 +1,356 @@
 <?php
+
 session_start();
+
 require_once __DIR__ . "/BBDD/conecta.php";
 
 header("Content-Type: application/json");
 
-/* ================= SEGURIDAD ================= */
+/* ===================================================== */
+/* ================= SEGURIDAD ========================= */
+/* ===================================================== */
+
 if (!isset($_SESSION['id_usuario'])) {
-    echo json_encode(["success" => false, "message" => "No autorizado"]);
+
+    echo json_encode([
+        "success" => false,
+        "message" => "No autorizado"
+    ]);
+
     exit;
 }
 
 $id_usuario = $_SESSION['id_usuario'];
+
 $id_piso = $_SESSION['piso_id'] ?? null;
 
 if (!$id_piso) {
-    echo json_encode(["success" => false, "message" => "No hay piso activo"]);
+
+    echo json_encode([
+        "success" => false,
+        "message" => "No hay piso activo"
+    ]);
+
     exit;
 }
 
-/* ================= INPUT ================= */
+/* ===================================================== */
+/* ================= INPUT ============================= */
+/* ===================================================== */
+
 $accion = $_POST['accion'] ?? '';
+
 $id_gasto = $_POST['id_gasto'] ?? null;
+
 $titulo = trim($_POST['titulo'] ?? '');
+
 $importe = floatval($_POST['importe'] ?? 0);
+
 $pagador = $_POST['pagador'] ?? $id_usuario;
 
-$participantes = json_decode($_POST['participantes'] ?? '[]', true);
-$importesManual = json_decode($_POST['importes'] ?? '[]', true);
+$participantes = json_decode(
+    $_POST['participantes'] ?? '[]',
+    true
+);
+
+$importesManual = json_decode(
+    $_POST['importes'] ?? '[]',
+    true
+);
+
+/* ===================================================== */
+/* ================= TRY =============================== */
+/* ===================================================== */
 
 try {
 
     /* ===================================================== */
-    /* ================= CREAR GASTO ======================= */
+    /* ================= CREAR ============================== */
     /* ===================================================== */
+
     if ($accion === "crear") {
 
-        if (!$titulo || !$importe || empty($participantes)) {
-            echo json_encode(["success" => false, "message" => "Datos incompletos"]);
+        if (
+            !$titulo ||
+            !$importe ||
+            empty($participantes)
+        ) {
+
+            echo json_encode([
+                "success" => false,
+                "message" => "Datos incompletos"
+            ]);
+
             exit;
         }
 
-        /* INSERT GASTO */
-        $sql = "INSERT INTO gastos (id_piso, id_pagador, descripcion, monto_total)
-                VALUES (?, ?, ?, ?)";
+        /* ================= INSERT GASTO ================= */
+
+        $sql = "
+        INSERT INTO gastos
+        (
+            id_piso,
+            id_pagador,
+            descripcion,
+            monto_total
+        )
+        VALUES (?, ?, ?, ?)
+        ";
 
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("iisd", $id_piso, $pagador, $titulo, $importe);
+
+        $stmt->bind_param(
+            "iisd",
+            $id_piso,
+            $pagador,
+            $titulo,
+            $importe
+        );
+
         $stmt->execute();
 
         $id_gasto = $stmt->insert_id;
 
-        /* ===== DIVISIÓN ===== */
+        /* ===================================================== */
+        /* ================= DIVISION MANUAL =================== */
+        /* ===================================================== */
 
-        // 🔥 MANUAL
         if (!empty($importesManual)) {
 
             foreach ($importesManual as $uid => $parte) {
 
                 $parte = floatval($parte);
-                if ($parte <= 0) continue;
 
-                $pagado = ($uid == $pagador) ? 1 : 0;
+                if ($parte <= 0) {
+                    continue;
+                }
 
-                $sql = "INSERT INTO gastos_participantes 
-                        (id_gasto, id_usuario, importe, pagado)
-                        VALUES (?, ?, ?, ?)";
+                $pagado =
+                    ($uid == $pagador)
+                    ? 1
+                    : 0;
+
+                $sql = "
+                INSERT INTO gastos_participantes
+                (
+                    id_gasto,
+                    id_usuario,
+                    importe,
+                    pagado
+                )
+                VALUES (?, ?, ?, ?)
+                ";
 
                 $stmt = $conn->prepare($sql);
-                $stmt->bind_param("iidi", $id_gasto, $uid, $parte, $pagado);
+
+                $stmt->bind_param(
+                    "iidi",
+                    $id_gasto,
+                    $uid,
+                    $parte,
+                    $pagado
+                );
+
                 $stmt->execute();
             }
 
         } else {
 
-            // 🔥 IGUAL
-            $parte = $importe / count($participantes);
+            /* ===================================================== */
+            /* ================= DIVISION IGUAL ==================== */
+            /* ===================================================== */
+
+            $parte =
+                $importe / count($participantes);
 
             foreach ($participantes as $uid) {
 
-                $pagado = ($uid == $pagador) ? 1 : 0;
+                $pagado =
+                    ($uid == $pagador)
+                    ? 1
+                    : 0;
 
-                $sql = "INSERT INTO gastos_participantes 
-                        (id_gasto, id_usuario, importe, pagado)
-                        VALUES (?, ?, ?, ?)";
+                $sql = "
+                INSERT INTO gastos_participantes
+                (
+                    id_gasto,
+                    id_usuario,
+                    importe,
+                    pagado
+                )
+                VALUES (?, ?, ?, ?)
+                ";
 
                 $stmt = $conn->prepare($sql);
-                $stmt->bind_param("iidi", $id_gasto, $uid, $parte, $pagado);
+
+                $stmt->bind_param(
+                    "iidi",
+                    $id_gasto,
+                    $uid,
+                    $parte,
+                    $pagado
+                );
+
                 $stmt->execute();
             }
         }
 
-        echo json_encode(["success" => true]);
+        echo json_encode([
+            "success" => true
+        ]);
+
         exit;
     }
 
     /* ===================================================== */
-    /* ================= ELIMINAR =========================== */
+    /* ================= ELIMINAR ========================== */
     /* ===================================================== */
-    if ($accion === "eliminar" && $id_gasto) {
 
-        $sql = "DELETE FROM gastos WHERE id_gasto=? AND id_piso=?";
+    if (
+        $accion === "eliminar" &&
+        $id_gasto
+    ) {
+
+        /* ELIMINAR PARTICIPANTES */
+
+        $sql = "
+        DELETE FROM gastos_participantes
+        WHERE id_gasto = ?
+        ";
+
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ii", $id_gasto, $id_piso);
+
+        $stmt->bind_param(
+            "i",
+            $id_gasto
+        );
+
         $stmt->execute();
 
-        echo json_encode(["success" => true]);
+        /* ELIMINAR GASTO */
+
+        $sql = "
+        DELETE FROM gastos
+        WHERE id_gasto = ?
+        AND id_piso = ?
+        ";
+
+        $stmt = $conn->prepare($sql);
+
+        $stmt->bind_param(
+            "ii",
+            $id_gasto,
+            $id_piso
+        );
+
+        $stmt->execute();
+
+        echo json_encode([
+            "success" => true
+        ]);
+
         exit;
     }
 
     /* ===================================================== */
-    /* ================= LISTAR ============================= */
+    /* ================= LISTAR ============================ */
     /* ===================================================== */
+
     if ($accion === "listar") {
 
         $sql = "
-        SELECT 
+        SELECT
             g.id_gasto,
+            g.id_pagador,
             g.descripcion AS titulo,
             g.monto_total AS importe,
+            g.fecha,
             u.nombre AS pagador
         FROM gastos g
-        JOIN usuarios u ON g.id_pagador = u.id_usuario
+
+        JOIN usuarios u
+            ON g.id_pagador = u.id_usuario
+
         WHERE g.id_piso = ?
+
         ORDER BY g.id_gasto DESC
         ";
 
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $id_piso);
+
+        $stmt->bind_param(
+            "i",
+            $id_piso
+        );
+
         $stmt->execute();
 
         $res = $stmt->get_result();
+
         $gastos = [];
 
         while ($row = $res->fetch_assoc()) {
+
+            $id_gasto_actual =
+                $row['id_gasto'];
+
+            /* ================= PARTICIPANTES ================= */
+
+            $sqlParticipantes = "
+            SELECT
+                u.id_usuario,
+                u.nombre,
+                gp.importe,
+                gp.pagado
+            FROM gastos_participantes gp
+
+            JOIN usuarios u
+                ON gp.id_usuario = u.id_usuario
+
+            WHERE gp.id_gasto = ?
+            ";
+
+            $stmt2 =
+                $conn->prepare(
+                    $sqlParticipantes
+                );
+
+            $stmt2->bind_param(
+                "i",
+                $id_gasto_actual
+            );
+
+            $stmt2->execute();
+
+            $res2 =
+                $stmt2->get_result();
+
+            $participantesDetalle = [];
+
+            while (
+                $p = $res2->fetch_assoc()
+            ) {
+
+                $participantesDetalle[] = [
+
+                    "id_usuario" =>
+                        (int)$p['id_usuario'],
+
+                    "nombre" =>
+                        $p['nombre'],
+
+                    "importe" =>
+                        (float)$p['importe'],
+
+                    "pagado" =>
+                        (int)$p['pagado']
+
+                ];
+            }
+
+            $row['participantes'] =
+                $participantesDetalle;
+
             $gastos[] = $row;
         }
 
@@ -140,84 +358,155 @@ try {
             "success" => true,
             "gastos" => $gastos
         ]);
+
         exit;
     }
 
     /* ===================================================== */
-    /* ================= RESUMEN PRO ======================== */
+    /* ================= RESUMEN =========================== */
     /* ===================================================== */
+
     if ($accion === "resumen") {
 
         $debes = [];
+
         $recibes = [];
 
-        /* 🔴 LO QUE DEBES */
+        /* ===================================================== */
+        /* ================= LO QUE DEBES ====================== */
+        /* ===================================================== */
+
         $sql = "
-        SELECT 
+        SELECT
             u.nombre,
             SUM(gp.importe) as total
+
         FROM gastos_participantes gp
-        JOIN gastos g ON gp.id_gasto = g.id_gasto
-        JOIN usuarios u ON g.id_pagador = u.id_usuario
+
+        JOIN gastos g
+            ON gp.id_gasto = g.id_gasto
+
+        JOIN usuarios u
+            ON g.id_pagador = u.id_usuario
+
         WHERE gp.id_usuario = ?
+        AND gp.pagado = 0
         AND g.id_pagador != ?
         AND g.id_piso = ?
+
         GROUP BY g.id_pagador
         ";
 
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("iii", $id_usuario, $id_usuario, $id_piso);
+
+        $stmt->bind_param(
+            "iii",
+            $id_usuario,
+            $id_usuario,
+            $id_piso
+        );
+
         $stmt->execute();
+
         $res = $stmt->get_result();
 
-        while ($row = $res->fetch_assoc()) {
+        while (
+            $row = $res->fetch_assoc()
+        ) {
+
             $debes[] = [
-                "nombre" => $row['nombre'],
-                "importe" => (float)$row['total']
+
+                "nombre" =>
+                    $row['nombre'],
+
+                "importe" =>
+                    (float)$row['total']
+
             ];
         }
 
-        /* 🟢 LO QUE TE DEBEN */
+        /* ===================================================== */
+        /* ================= LO QUE TE DEBEN =================== */
+        /* ===================================================== */
+
         $sql = "
-        SELECT 
+        SELECT
             u.nombre,
             SUM(gp.importe) as total
+
         FROM gastos_participantes gp
-        JOIN gastos g ON gp.id_gasto = g.id_gasto
-        JOIN usuarios u ON gp.id_usuario = u.id_usuario
+
+        JOIN gastos g
+            ON gp.id_gasto = g.id_gasto
+
+        JOIN usuarios u
+            ON gp.id_usuario = u.id_usuario
+
         WHERE g.id_pagador = ?
+        AND gp.pagado = 0
         AND gp.id_usuario != ?
         AND g.id_piso = ?
+
         GROUP BY gp.id_usuario
         ";
 
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("iii", $id_usuario, $id_usuario, $id_piso);
+
+        $stmt->bind_param(
+            "iii",
+            $id_usuario,
+            $id_usuario,
+            $id_piso
+        );
+
         $stmt->execute();
+
         $res = $stmt->get_result();
 
-        while ($row = $res->fetch_assoc()) {
+        while (
+            $row = $res->fetch_assoc()
+        ) {
+
             $recibes[] = [
-                "nombre" => $row['nombre'],
-                "importe" => (float)$row['total']
+
+                "nombre" =>
+                    $row['nombre'],
+
+                "importe" =>
+                    (float)$row['total']
+
             ];
         }
 
         echo json_encode([
+
             "success" => true,
+
             "debes" => $debes,
+
             "recibes" => $recibes
+
         ]);
+
         exit;
     }
 
     /* ===================================================== */
-    echo json_encode(["success" => false, "message" => "Acción no válida"]);
+    /* ================= ERROR ============================= */
+    /* ===================================================== */
+
+    echo json_encode([
+        "success" => false,
+        "message" => "Acción no válida"
+    ]);
 
 } catch (Exception $e) {
 
     echo json_encode([
+
         "success" => false,
+
         "message" => $e->getMessage()
+
     ]);
 }
