@@ -248,11 +248,11 @@ if ($row['total'] == 0) {
 
     /* ===== INCIDENCIAS ===== */
     INSERT INTO incidencias (id_piso, id_usuario, tipo, titulo, descripcion, imagen, notificar_admin, urgencia, estado) VALUES
-    (1, 2, 'fontaneria',   'Fuga baño',         'Pierde agua por la junta del grifo', NULL, 0, 'alta',  'abierta'),
-    (1, 3, 'electricidad', 'Enchufe roto',       'El enchufe del salón no funciona', NULL, 0, 'baja', 'abierta'),
-    (1, 4, 'carpinteria',  'Puerta no cierra',   'La puerta de entrada no cierra bien, está rozando', NULL, 1, 'baja',  'en_curso'),
-    (2, 2, 'fontaneria',   'Gotera cocina',      'Hay una gotera en el techo de la cocina', NULL, 0, 'alta',  'abierta'),
-    (2, 3, 'electricidad', 'Luz escalera fundida', 'La bombilla de la escalera está fundida', NULL, 0, 'alta', 'resuelta');
+    (1, 2, 'fontaneria',   'Fuga baño',         'Pierde agua por la junta del grifo',            NULL, 0, 'alta',    'abierta'),
+    (1, 3, 'electricidad', 'Enchufe roto',       'El enchufe del salón no funciona',               NULL, 0, 'baja',    'abierta'),
+    (1, 4, 'carpinteria',  'Puerta no cierra',   'La puerta de entrada no cierra bien, está rozando', NULL, 1, 'baja',    'en_curso'),
+    (2, 2, 'fontaneria',   'Gotera cocina',      'Hay una gotera en el techo de la cocina',        NULL, 0, 'alta',    'abierta'),
+    (2, 3, 'electricidad', 'Luz escalera fundida', 'La bombilla de la escalera está fundida',       NULL, 0, 'alta',    'resuelta');
 
     /* ===== MENSAJES ===== */
     INSERT INTO mensajes_incidencia (id_incidencia,id_usuario,mensaje) VALUES

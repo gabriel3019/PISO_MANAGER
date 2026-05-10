@@ -182,13 +182,10 @@ body {
   flex-shrink: 0;
 }
 
-/* CAMBIO: rojo → azul para "Abiertas" */
 .stat-card__icon--blue   { background: #dbeafe; }
 .stat-card__icon--orange { background: #fff7ed; }
 .stat-card__icon--green  { background: #f0fdf4; }
 .stat-card__icon--slate  { background: #f1f5f9; }
-
-/* Mantenemos --red por si se usa en otro lado */
 .stat-card__icon--red    { background: #fff1f2; }
 
 .stat-card__value {
@@ -345,28 +342,40 @@ body {
 .priority-dot--medium::before { background: var(--prio-medium); }
 .priority-dot--low::before    { background: var(--prio-low); }
 
+/* ══════════════════════════════════════════════════════════════
+   BOTONES EDITAR / ELIMINAR — siempre visibles, resalte en hover
+   ══════════════════════════════════════════════════════════════ */
+
 .incident-actions {
   display: flex;
   align-items: center;
   gap: 4px;
-  opacity: 0;
-  transition: opacity .15s;
+  /* CAMBIO: siempre visibles, sin ocultarse */
+  opacity: 1;
 }
-.incident-item:hover .incident-actions { opacity: 1; }
 
 .incident-actions__btn {
   display: grid;
   place-items: center;
   width: 32px; height: 32px;
-  border: none;
+  border: 1px solid transparent;
   border-radius: var(--radius-sm);
   background: transparent;
   cursor: pointer;
   font-size: .95rem;
-  transition: background .15s;
+  transition: background .15s, border-color .15s, transform .1s;
 }
-.incident-actions__btn--edit:hover   { background: #eff6ff; }
-.incident-actions__btn--delete:hover { background: #fff1f2; }
+.incident-actions__btn:active { transform: scale(.93); }
+
+/* CAMBIO: hover con color de fondo y borde llamativo */
+.incident-actions__btn--edit:hover {
+  background: #dbeafe;
+  border-color: #93c5fd;
+}
+.incident-actions__btn--delete:hover {
+  background: #fee2e2;
+  border-color: #fca5a5;
+}
 
 .incident-add {
   display: flex;
@@ -408,24 +417,22 @@ body {
   display: none;
 }
 
-/* CAMBIO: sin scroll en el modal. El contenido se adapta al viewport */
 .modal {
   background: #ffffff;
   border-radius: 16px;
   width: 100%;
   max-width: 500px;
   max-height: 90vh;
-  overflow: hidden;           /* sin scroll en el propio modal */
+  overflow: hidden;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
 }
 
-/* Solo el body hace scroll si el contenido es largo */
 .modal__body {
   padding: 4px 24px 8px;
   flex: 1;
-  overflow-y: auto;           /* scroll solo en el cuerpo si hace falta */
+  overflow-y: auto;
 }
 
 .modal--sm {
@@ -775,7 +782,7 @@ body {
   font-size: .85rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background .15s, transform .1s;
+  transition: background .15s, transform .1s, opacity .15s, box-shadow .15s;
 }
 .modal__btn:active { transform: scale(.97); }
 
@@ -786,19 +793,38 @@ body {
 }
 .modal__btn--cancel:hover { background: var(--bg-tag); }
 
+/* CAMBIO: --primary ahora es azul sólido, bien visible */
 .modal__btn--primary {
   border: none;
-  background: #a5b4fc;
+  background: #2563eb;
   color: #fff;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
 }
-.modal__btn--primary:hover { background: #818cf8; }
+.modal__btn--primary:hover {
+  background: #1d4ed8;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.45);
+}
 
+/* CAMBIO: estado deshabilitado claramente diferenciado */
+.modal__btn--primary:disabled {
+  background: #93c5fd;
+  color: #fff;
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+/* CAMBIO: --danger ahora es rojo sólido, bien visible */
 .modal__btn--danger {
   border: none;
-  background: #fca5a5;
+  background: #dc2626;
   color: #fff;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.35);
 }
-.modal__btn--danger:hover { background: #f87171; }
+.modal__btn--danger:hover {
+  background: #b91c1c;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.45);
+}
 
 .modal__confirm-text {
   font-size: .8rem;
