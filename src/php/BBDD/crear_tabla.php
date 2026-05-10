@@ -129,6 +129,8 @@ CREATE TABLE IF NOT EXISTS incidencias (
     tipo VARCHAR(50),
     titulo VARCHAR(100),
     descripcion TEXT,
+    imagen VARCHAR(255) DEFAULT NULL,
+    notificar_admin BOOLEAN DEFAULT FALSE,
     urgencia ENUM('baja','media','alta') DEFAULT 'media',
     estado ENUM('abierta','en_curso','resuelta') DEFAULT 'abierta',
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -145,6 +147,27 @@ CREATE TABLE IF NOT EXISTS mensajes_incidencia (
     leido BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (id_incidencia) REFERENCES incidencias(id_incidencia) ON DELETE CASCADE,
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS incidencia_mensajes (
+    id_mensaje INT AUTO_INCREMENT PRIMARY KEY,
+    id_incidencia INT NOT NULL,
+    id_usuario INT NOT NULL,
+    mensaje TEXT NOT NULL,
+    fecha_envio DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_incidencia) REFERENCES incidencias(id_incidencia),
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
+);
+
+CREATE TABLE IF NOT EXISTS notificaciones (
+    id_notificacion INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    id_incidencia INT NULL,
+    mensaje VARCHAR(255) NOT NULL,
+    leida TINYINT(1) DEFAULT 0,
+    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario),
+    FOREIGN KEY (id_incidencia) REFERENCES incidencias(id_incidencia)
 );
 
 /* ===== CALENDARIO ===== */
@@ -194,8 +217,9 @@ if ($row['total'] == 0) {
     ('Gabriel','Gimenes','gabriel@mail.com','$passUser','600000004','Calle Mayor 12 - Habitación 3');
 
     /* ===== PISO ===== */
-    INSERT INTO pisos (nombre_casero, calle, ciudad, codigo_postal)
-    VALUES ('Juan Gonzalez', 'Calle Mayor 12', 'Madrid', '28001');
+    INSERT INTO pisos (nombre_casero, calle, ciudad, codigo_postal) VALUES
+    ('Juan Gonzalez', 'Calle Mayor 12', 'Madrid', '28001'),
+    ('Maria Lopez',   'Calle Mayor 14', 'Madrid', '28001');
 
     INSERT INTO usuarios_pisos VALUES
     (1,1,'admin'),(2,1,'miembro'),(3,1,'miembro'),(4,1,'miembro');
@@ -223,10 +247,12 @@ if ($row['total'] == 0) {
     (NULL,1,'Reunión','Viernes a las 20:00');
 
     /* ===== INCIDENCIAS ===== */
-    INSERT INTO incidencias (id_piso,id_usuario,tipo,titulo,descripcion,urgencia)
-    VALUES
-    (1,2,'fontaneria','Fuga baño','Pierde agua','alta'),
-    (1,3,'electricidad','Enchufe roto','No funciona','media');
+    INSERT INTO incidencias (id_piso, id_usuario, tipo, titulo, descripcion, imagen, notificar_admin, urgencia, estado) VALUES
+    (1, 2, 'fontaneria',   'Fuga baño',         'Pierde agua por la junta del grifo', NULL, 0, 'alta',  'abierta'),
+    (1, 3, 'electricidad', 'Enchufe roto',       'El enchufe del salón no funciona', NULL, 0, 'baja', 'abierta'),
+    (1, 4, 'carpinteria',  'Puerta no cierra',   'La puerta de entrada no cierra bien, está rozando', NULL, 1, 'baja',  'en_curso'),
+    (2, 2, 'fontaneria',   'Gotera cocina',      'Hay una gotera en el techo de la cocina', NULL, 0, 'alta',  'abierta'),
+    (2, 3, 'electricidad', 'Luz escalera fundida', 'La bombilla de la escalera está fundida', NULL, 0, 'alta', 'resuelta');
 
     /* ===== MENSAJES ===== */
     INSERT INTO mensajes_incidencia (id_incidencia,id_usuario,mensaje) VALUES
