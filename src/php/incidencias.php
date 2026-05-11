@@ -4,6 +4,12 @@ require_once("BBDD/conecta.php");
 
 $accion = $_REQUEST['accion'] ?? '';
 
+// Helper para normalizar urgencia (JS envía "bajo"/"alto", la BD usa "baja"/"alta")
+function normalizarUrgencia($raw) {
+    $map = ['bajo' => 'baja', 'alto' => 'alta', 'medio' => 'media'];
+    return isset($map[$raw]) ? $map[$raw] : 'baja';
+}
+
 switch ($accion) {
 
     case 'listar':
@@ -13,7 +19,18 @@ switch ($accion) {
             exit;
         }
 
-        $result = $conn->query("SELECT * FROM incidencias WHERE id_piso = $id_piso ORDER BY id_incidencia DESC");
+        // ✅ Se añade subquery para traer el último comentario de admin
+        $result = $conn->query("
+            SELECT i.*,
+                   (SELECT mensaje 
+                    FROM mensajes_incidencia 
+                    WHERE id_incidencia = i.id_incidencia 
+                    ORDER BY id_mensaje DESC 
+                    LIMIT 1) AS comentario_admin
+            FROM incidencias i
+            WHERE i.id_piso = $id_piso
+            ORDER BY i.id_incidencia DESC
+        ");
         $incidencias = [];
 
         while ($row = $result->fetch_assoc()) {
@@ -29,9 +46,20 @@ switch ($accion) {
         $tipo            = $_POST['tipo']            ?? '';
         $titulo          = $_POST['titulo']          ?? '';
         $descripcion     = $_POST['descripcion']     ?? '';
-        $urgencia        = $_POST['urgencia']        ?? 'bajo';
+        $urgencia_raw    = $_POST['urgencia']        ?? 'bajo';
+        $urgencia        = normalizarUrgencia($urgencia_raw);
         $notificar_admin = (int)($_POST['notificar_admin'] ?? 0);
         $estado          = 'abierta';
+
+        $fecha_inicio  = $_POST['fecha_inicio']  ?? null;
+        $fecha_fin     = !empty($_POST['fecha_fin']) ? $_POST['fecha_fin'] : null;
+
+        // Validación servidor: fecha_inicio es obligatorio y >= hoy
+        $hoy = date('Y-m-d');
+        if (!$fecha_inicio || $fecha_inicio < $hoy) {
+            echo json_encode(['success' => false, 'error' => 'La fecha de inicio es obligatoria y no puede ser anterior a hoy']);
+            exit;
+        }
 
         // Procesar imagen
         $imagen_path = null;
@@ -52,25 +80,32 @@ switch ($accion) {
 
         $stmt = $conn->prepare(
             "INSERT INTO incidencias
-             (id_piso, id_usuario, tipo, titulo, descripcion, urgencia, estado, imagen, notificar_admin)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+             (id_piso, id_usuario, tipo, titulo, descripcion, urgencia, estado, imagen, notificar_admin, fecha_inicio, fecha_fin)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
-        
-        // 9 parámetros: iissssssi
-        $stmt->bind_param("iissssssi",
-            $id_piso, 
-            $id_usuario, 
-            $tipo, 
-            $titulo,
-            $descripcion, 
-            $urgencia, 
-            $estado, 
-            $imagen_path, 
-            $notificar_admin
+        $stmt->bind_param("iissssssiss",
+            $id_piso, $id_usuario, $tipo, $titulo, $descripcion, 
+            $urgencia, $estado, $imagen_path, $notificar_admin, 
+            $fecha_inicio, $fecha_fin
         );
 
         if ($stmt->execute()) {
-            echo json_encode(['success' => true, 'id' => $stmt->insert_id]);
+            $id_incidencia = $stmt->insert_id;
+
+            // ✅ Si hay comentario de admin, guardarlo en mensajes_incidencia
+            if (!empty($_POST['comentario_admin']) && !empty($_POST['id_usuario_comentario'])) {
+                $comentario = trim($_POST['comentario_admin']);
+                $id_usuario_comentario = (int)$_POST['id_usuario_comentario'];
+                
+                $stmt_msg = $conn->prepare(
+                    "INSERT INTO mensajes_incidencia (id_incidencia, id_usuario, mensaje) VALUES (?, ?, ?)"
+                );
+                $stmt_msg->bind_param("iis", $id_incidencia, $id_usuario_comentario, $comentario);
+                $stmt_msg->execute();
+                $stmt_msg->close();
+            }
+
+            echo json_encode(['success' => true, 'id' => $id_incidencia]);
         } else {
             echo json_encode(['success' => false, 'error' => $conn->error]);
         }
@@ -82,8 +117,20 @@ switch ($accion) {
         $titulo          = $_POST['titulo']         ?? '';
         $descripcion     = $_POST['descripcion']    ?? '';
         $tipo            = $_POST['tipo']           ?? '';
-        $urgencia        = $_POST['urgencia']       ?? 'bajo';
+        $urgencia_raw    = $_POST['urgencia']       ?? 'bajo';
+        $urgencia        = normalizarUrgencia($urgencia_raw);
         $notificar_admin = (int)($_POST['notificar_admin'] ?? 0);
+
+        $fecha_inicio  = $_POST['fecha_inicio'] ?? null;
+        $fecha_fin     = !empty($_POST['fecha_fin']) ? $_POST['fecha_fin'] : null;
+        
+        if ($fecha_inicio) {
+            $hoy = date('Y-m-d');
+            if ($fecha_inicio < $hoy) {
+                echo json_encode(['success' => false, 'error' => 'La fecha de inicio no puede ser anterior a hoy']);
+                exit;
+            }
+        }
 
         // Procesar imagen si se sube una nueva
         $imagen_path = null;
@@ -105,26 +152,38 @@ switch ($accion) {
         if ($imagen_path) {
             $stmt = $conn->prepare(
                 "UPDATE incidencias
-                 SET titulo=?, descripcion=?, tipo=?, urgencia=?, notificar_admin=?, imagen=?
+                 SET titulo=?, descripcion=?, tipo=?, urgencia=?, notificar_admin=?, fecha_inicio=?, fecha_fin=?, imagen=?
                  WHERE id_incidencia=?"
             );
-            // 7 parámetros: ssssisi
-            $stmt->bind_param("ssssisi", 
-                $titulo, $descripcion, $tipo, $urgencia, $notificar_admin, $imagen_path, $id
+            $stmt->bind_param("ssssisssi", 
+                $titulo, $descripcion, $tipo, $urgencia, $notificar_admin, 
+                $fecha_inicio, $fecha_fin, $imagen_path, $id
             );
         } else {
             $stmt = $conn->prepare(
                 "UPDATE incidencias
-                 SET titulo=?, descripcion=?, tipo=?, urgencia=?, notificar_admin=?
+                 SET titulo=?, descripcion=?, tipo=?, urgencia=?, notificar_admin=?, fecha_inicio=?, fecha_fin=?
                  WHERE id_incidencia=?"
             );
-            // 6 parámetros: ssssii
-            $stmt->bind_param("ssssii", 
-                $titulo, $descripcion, $tipo, $urgencia, $notificar_admin, $id
+            $stmt->bind_param("ssssissi", 
+                $titulo, $descripcion, $tipo, $urgencia, $notificar_admin, 
+                $fecha_inicio, $fecha_fin, $id
             );
         }
 
         if ($stmt->execute()) {
+            // ✅ Si hay comentario de admin, guardarlo en mensajes_incidencia
+            if (!empty($_POST['comentario_admin']) && !empty($_POST['id_usuario_comentario'])) {
+                $comentario = trim($_POST['comentario_admin']);
+                $id_usuario_comentario = (int)$_POST['id_usuario_comentario'];
+                
+                $stmt_msg = $conn->prepare(
+                    "INSERT INTO mensajes_incidencia (id_incidencia, id_usuario, mensaje) VALUES (?, ?, ?)"
+                );
+                $stmt_msg->bind_param("iis", $id, $id_usuario_comentario, $comentario);
+                $stmt_msg->execute();
+                $stmt_msg->close();
+            }
             echo json_encode(['success' => true]);
         } else {
             echo json_encode(['success' => false, 'error' => $conn->error]);

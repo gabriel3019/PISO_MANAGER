@@ -6,11 +6,12 @@ function cargarUsuario() {
     if (usuario && nombreUsuario) {
         nombreUsuario.textContent = usuario.nombre;
     }
+    return usuario;
 }
 
 async function initIncidencias() {
 
-    cargarUsuario();
+    const usuario = cargarUsuario();
 
     // ─── Sidebar: marcar enlace activo ───────────────────────────────
     const paginaActual = window.location.pathname.split("/").pop();
@@ -33,7 +34,6 @@ async function initIncidencias() {
         const modal = document.getElementById(id);
         if (!modal) return;
         modal.classList.add("modal--hidden");
-        // Solo restaurar scroll si no hay otro modal abierto
         const hayModalAbierto = [...document.querySelectorAll(".modal-overlay")]
             .some(m => !m.classList.contains("modal--hidden"));
         if (!hayModalAbierto) document.body.style.overflow = "";
@@ -48,6 +48,68 @@ async function initIncidencias() {
     document.querySelectorAll("[data-modal-close]").forEach((btn) => {
         btn.addEventListener("click", () => cerrarModal(btn.dataset.modalClose));
     });
+
+    // ─── MOSTRAR COMENTARIO SI SE MARCA "NOTIFICAR ADMIN" ────────────
+    function initToggleComentario() {
+        ['nueva', 'editar'].forEach(prefix => {
+            const checkbox = document.getElementById(`${prefix}-notificar-admin`);
+            const wrap = document.getElementById(`${prefix}-comentario-admin-wrap`);
+            if (checkbox && wrap) {
+                checkbox.addEventListener('change', () => {
+                    wrap.style.display = checkbox.checked ? 'block' : 'none';
+                });
+                // Estado inicial al abrir el modal
+                wrap.style.display = checkbox.checked ? 'block' : 'none';
+            }
+        });
+    }
+
+    // ─── CONFIGURAR FECHA MÍNIMA (hoy) para fecha_inicio ─────────────
+    function setMinDateToday(inputId) {
+        const input = document.getElementById(inputId);
+        if (!input) return;
+        const hoy = new Date().toISOString().split('T')[0];
+        input.min = hoy;
+    }
+
+    // ─── VALIDACIÓN EN TIEMPO REAL de fecha_inicio ───────────────────
+    function setupFechaInicioValidation(inputId, errorId) {
+        const input = document.getElementById(inputId);
+        const error = document.getElementById(errorId);
+        if (!input) return;
+
+        input.addEventListener('change', function() {
+            const hoy = new Date().toISOString().split('T')[0];
+            if (this.value && this.value < hoy) {
+                if (error) {
+                    error.style.display = 'block';
+                    this.setCustomValidity('Fecha inválida');
+                    this.reportValidity();
+                }
+            } else {
+                if (error) {
+                    error.style.display = 'none';
+                    this.setCustomValidity('');
+                }
+            }
+        });
+
+        input.addEventListener('blur', function() {
+            const hoy = new Date().toISOString().split('T')[0];
+            if (this.value && this.value < hoy) {
+                if (error) error.style.display = 'block';
+            }
+        });
+    }
+
+    // Inicializar validaciones y fechas mínimas
+    setMinDateToday('nueva-fecha-inicio');
+    setMinDateToday('editar-fecha-inicio');
+    setupFechaInicioValidation('nueva-fecha-inicio', 'nueva-fecha-inicio-error');
+    setupFechaInicioValidation('editar-fecha-inicio', 'editar-fecha-inicio-error');
+
+    // Inicializar toggle de comentario
+    initToggleComentario();
 
     // ─── Urgencia buttons (selección) ────────────────────────────────
     document.querySelectorAll(".modal__urgencia-row").forEach(row => {
@@ -91,19 +153,16 @@ async function initIncidencias() {
         try {
             const resp = await fetch(`../php/incidencias.php?accion=listar&id_piso=1`);
             const data = await resp.json();
-
             const incidencias = Array.isArray(data) ? data : [];
 
             const listaActivas   = document.getElementById("lista-activas");
             const listaResueltas = document.getElementById("lista-resueltas");
-
             listaActivas.innerHTML   = "";
             listaResueltas.innerHTML = "";
 
             let contadores = { abierta: 0, en_curso: 0, resuelta: 0 };
 
             incidencias.forEach(inc => {
-
                 if (contadores.hasOwnProperty(inc.estado)) {
                     contadores[inc.estado]++;
                 }
@@ -132,6 +191,7 @@ async function initIncidencias() {
                     ? `<span style="font-size:.7rem;background:#dbeafe;color:#1d4ed8;padding:2px 7px;border-radius:999px;font-weight:600;margin-left:6px;">Admin</span>`
                     : '';
 
+                // ✅ data-comentario añadido aquí
                 const html = `
                     <li class="incident-item"
                         data-id="${inc.id}"
@@ -142,7 +202,10 @@ async function initIncidencias() {
                         data-estado="${inc.estado}"
                         data-fecha="${inc.fecha_creacion || ''}"
                         data-imagen="${inc.imagen || ''}"
-                        data-notificar="${inc.notificar_admin || 0}">
+                        data-notificar="${inc.notificar_admin || 0}"
+                        data-fecha-inicio="${inc.fecha_inicio || ''}"
+                        data-fecha-fin="${inc.fecha_fin || ''}"
+                        data-comentario="${(inc.comentario_admin || '').replace(/"/g,'&quot;')}">
 
                         ${iconoHTML}
 
@@ -192,12 +255,9 @@ async function initIncidencias() {
     cargarIncidencias();
 
     // ─── MODAL DETALLE ──────────────────────────────────────────────
-    // Se abre al clicar en el item (pero NO en los botones de editar/eliminar)
     document.addEventListener("click", (e) => {
         const item = e.target.closest(".incident-item");
         if (!item) return;
-
-        // Si el clic es en el botón editar o eliminar, no abrir detalle
         if (e.target.closest(".btn-abrir-editar") || e.target.closest(".btn-abrir-eliminar")) return;
 
         const icono = {
@@ -208,10 +268,8 @@ async function initIncidencias() {
             otros:        "📋"
         }[item.dataset.tipo] || "📋";
 
-        // Icono título modal
         document.getElementById("detalle-icono").textContent = icono;
 
-        // Estado badge
         const estadoClase =
             item.dataset.estado === 'abierta'  ? 'open' :
             item.dataset.estado === 'en_curso' ? 'progress' : 'done';
@@ -219,7 +277,6 @@ async function initIncidencias() {
         estadoBadge.className = `status-badge status-badge--${estadoClase}`;
         estadoBadge.textContent = item.dataset.estado;
 
-        // Prioridad dot
         const prioClase =
             item.dataset.urgencia === 'alta'  ? 'high' :
             item.dataset.urgencia === 'media' ? 'medium' : 'low';
@@ -227,17 +284,29 @@ async function initIncidencias() {
         prioDot.className = `priority-dot priority-dot--${prioClase}`;
         prioDot.textContent = item.dataset.urgencia;
 
-        // Campos texto
         document.getElementById("detalle-tipo").textContent  = item.dataset.tipo;
         document.getElementById("detalle-fecha").textContent = item.dataset.fecha || "—";
         document.getElementById("detalle-titulo").textContent = item.dataset.titulo;
         document.getElementById("detalle-desc").textContent  = item.dataset.desc;
-
-        // Notificar admin
         document.getElementById("detalle-notificar").textContent =
             item.dataset.notificar === "1" ? "✅ Sí, notificado al administrador" : "No";
 
-        // Imagen
+        // ✅ Mostrar u ocultar el comentario según si existe
+        const comentarioWrap = document.getElementById("detalle-comentario-wrap");
+        const comentarioEl   = document.getElementById("detalle-comentario");
+        if (item.dataset.comentario) {
+            comentarioEl.textContent = item.dataset.comentario;
+            comentarioWrap.style.display = "block";
+        } else {
+            comentarioEl.textContent = "";
+            comentarioWrap.style.display = "none";
+        }
+
+        const fechaInicio = item.dataset.fechaInicio ? new Date(item.dataset.fechaInicio).toLocaleDateString('es-ES') : '—';
+        const fechaFin = item.dataset.fechaFin ? new Date(item.dataset.fechaFin).toLocaleDateString('es-ES') : 'Pendiente';
+        document.getElementById("detalle-fecha-inicio").textContent = fechaInicio;
+        document.getElementById("detalle-fecha-fin").textContent = fechaFin;
+
         const imagenWrap = document.getElementById("detalle-imagen-wrap");
         const imagenEl   = document.getElementById("detalle-imagen");
         if (item.dataset.imagen) {
@@ -254,6 +323,8 @@ async function initIncidencias() {
     document.querySelectorAll(".btn-abrir-nueva").forEach(btn => {
         btn.addEventListener("click", () => {
             limpiarFormulario("modal-nueva-incidencia");
+            initToggleComentario();
+            setMinDateToday('nueva-fecha-inicio');
             abrirModal("modal-nueva-incidencia");
         });
     });
@@ -273,15 +344,29 @@ async function initIncidencias() {
             document.getElementById("editar-desc").value   = item.dataset.desc;
             document.getElementById("editar-tipo").value   = item.dataset.tipo;
 
-            // Urgencia activa
+            if (item.dataset.fechaInicio) {
+                document.getElementById("editar-fecha-inicio").value = item.dataset.fechaInicio;
+            }
+            if (item.dataset.fechaFin) {
+                document.getElementById("editar-fecha-fin").value = item.dataset.fechaFin;
+            }
+
             const urgencia = item.dataset.urgencia;
             modal.querySelectorAll(".modal__urgencia-btn").forEach(b => {
                 b.classList.toggle("modal__urgencia-btn--active", b.dataset.urgencia === urgencia);
             });
 
-            // Checkbox notificar
             document.getElementById("editar-notificar-admin").checked =
                 item.dataset.notificar === "1";
+
+            // ✅ Precargar el comentario existente en el textarea de editar
+            const comentarioEditarEl = document.getElementById("editar-comentario-admin");
+            if (comentarioEditarEl) {
+                comentarioEditarEl.value = item.dataset.comentario || "";
+            }
+
+            initToggleComentario();
+            setupFechaInicioValidation('editar-fecha-inicio', 'editar-fecha-inicio-error');
 
             abrirModal("modal-editar-incidencia");
         }
@@ -299,25 +384,43 @@ async function initIncidencias() {
         const titulo      = document.getElementById("nueva-titulo").value.trim();
         const descripcion = document.getElementById("nueva-desc").value.trim();
         const tipo        = document.getElementById("nueva-tipo").value;
+        const fechaInicio = document.getElementById("nueva-fecha-inicio").value;
+        const fechaFin    = document.getElementById("nueva-fecha-fin").value || null;
         const urgenciaBtn = document.querySelector(
             "#modal-nueva-incidencia .modal__urgencia-btn--active"
         );
         const notificar   = document.getElementById("nueva-notificar-admin").checked ? 1 : 0;
 
-        if (!titulo || !descripcion || !tipo) {
+        if (!titulo || !descripcion || !tipo || !fechaInicio) {
             alert("Rellena todos los campos obligatorios.");
+            return;
+        }
+
+        const hoy = new Date().toISOString().split('T')[0];
+        if (fechaInicio < hoy) {
+            document.getElementById("nueva-fecha-inicio-error").style.display = 'block';
             return;
         }
 
         const formData = new FormData();
         formData.append("accion",          "crear");
         formData.append("id_piso",         1);
-        formData.append("id_usuario",      1);
+        formData.append("id_usuario",      usuario?.id_usuario || 1);
         formData.append("titulo",          titulo);
         formData.append("descripcion",     descripcion);
         formData.append("tipo",            tipo);
+        formData.append("fecha_inicio",    fechaInicio);
+        formData.append("fecha_fin",       fechaFin);
         formData.append("urgencia",        urgenciaBtn ? urgenciaBtn.dataset.urgencia : "bajo");
         formData.append("notificar_admin", notificar);
+
+        if (notificar) {
+            const comentario = document.getElementById("nueva-comentario-admin")?.value.trim();
+            if (comentario) {
+                formData.append("comentario_admin", comentario);
+                formData.append("id_usuario_comentario", usuario?.id_usuario || 1);
+            }
+        }
 
         const imagenFile = document.getElementById("nueva-imagen").files[0];
         if (imagenFile) formData.append("imagen", imagenFile);
@@ -341,11 +444,19 @@ async function initIncidencias() {
         const titulo      = document.getElementById("editar-titulo").value.trim();
         const descripcion = document.getElementById("editar-desc").value.trim();
         const tipo        = document.getElementById("editar-tipo").value;
+        const fechaInicio = document.getElementById("editar-fecha-inicio").value;
+        const fechaFin    = document.getElementById("editar-fecha-fin").value || null;
         const urgenciaBtn = modal.querySelector(".modal__urgencia-btn--active");
         const notificar   = document.getElementById("editar-notificar-admin").checked ? 1 : 0;
 
-        if (!titulo || !descripcion) {
-            alert("Rellena título y descripción.");
+        if (!titulo || !descripcion || !fechaInicio) {
+            alert("Rellena título, descripción y fecha de inicio.");
+            return;
+        }
+
+        const hoy = new Date().toISOString().split('T')[0];
+        if (fechaInicio < hoy) {
+            document.getElementById("editar-fecha-inicio-error").style.display = 'block';
             return;
         }
 
@@ -355,8 +466,18 @@ async function initIncidencias() {
         formData.append("titulo",          titulo);
         formData.append("descripcion",     descripcion);
         formData.append("tipo",            tipo);
+        formData.append("fecha_inicio",    fechaInicio);
+        formData.append("fecha_fin",       fechaFin);
         formData.append("urgencia",        urgenciaBtn ? urgenciaBtn.dataset.urgencia : "bajo");
         formData.append("notificar_admin", notificar);
+
+        if (notificar) {
+            const comentario = document.getElementById("editar-comentario-admin")?.value.trim();
+            if (comentario) {
+                formData.append("comentario_admin", comentario);
+                formData.append("id_usuario_comentario", usuario?.id_usuario || 1);
+            }
+        }
 
         const imagenFile = document.getElementById("editar-imagen").files[0];
         if (imagenFile) formData.append("imagen", imagenFile);
@@ -374,9 +495,7 @@ async function initIncidencias() {
 
     // ─── ELIMINAR ───────────────────────────────────────────────────
     document.getElementById("btn-confirmar-eliminar")?.addEventListener("click", async () => {
-
         const id = document.getElementById("modal-eliminar-incidencia").dataset.incidenciaId;
-
         const formData = new FormData();
         formData.append("accion", "eliminar");
         formData.append("id",     id);
@@ -396,11 +515,18 @@ async function initIncidencias() {
     function limpiarFormulario(modalId) {
         const modal = document.getElementById(modalId);
         if (!modal) return;
-        modal.querySelectorAll("input, textarea, select").forEach(el => el.value = "");
+        modal.querySelectorAll("input, textarea, select").forEach(el => {
+            if (el.type !== 'date' || !el.hasAttribute('required')) {
+                el.value = "";
+            }
+        });
         modal.querySelectorAll(".modal__urgencia-btn--active")
              .forEach(b => b.classList.remove("modal__urgencia-btn--active"));
         modal.querySelectorAll("input[type=checkbox]")
              .forEach(cb => cb.checked = false);
+        modal.querySelectorAll(".modal__hint").forEach(hint => {
+            if (hint.id?.includes('error')) hint.style.display = 'none';
+        });
     }
 }
 
