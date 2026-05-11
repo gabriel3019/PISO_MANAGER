@@ -693,9 +693,9 @@ body {
 .modal__urgencia-btn:hover { background: var(--bg-tag); }
 
 .modal__urgencia-btn--active                         { background: var(--bg-tag); }
-.modal__urgencia-btn--active[data-urgencia="bajo"]   { border-color: var(--prio-low); }
-.modal__urgencia-btn--active[data-urgencia="medio"]  { border-color: var(--prio-medium); }
-.modal__urgencia-btn--active[data-urgencia="alto"]   { border-color: var(--prio-high); }
+.modal__urgencia-btn--active[data-urgencia="baja"]   { border-color: var(--prio-low);    background: #f0fdf4; color: #15803d; }
+.modal__urgencia-btn--active[data-urgencia="media"]  { border-color: var(--prio-medium); background: #fffbeb; color: #b45309; }
+.modal__urgencia-btn--active[data-urgencia="alta"]   { border-color: var(--prio-high);   background: #fef2f2; color: #dc2626; }
 
 .modal__urgencia-dot {
   width: 8px; height: 8px;
