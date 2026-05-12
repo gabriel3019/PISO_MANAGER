@@ -77,10 +77,9 @@ nav {
 nav a {
     height: 52px;
     display: grid;
-    grid-template-columns: 32px 1fr auto;
+    grid-template-columns: 32px 1fr auto auto;
     align-items: center;
     gap: 12px;
-
     padding: 0 14px;
     border-radius: 2px;
     font-size: 14px;
@@ -274,4 +273,204 @@ select {
     text-align: center;
     color: #777;
     padding: 30px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   🔔 MODAL NOTIFICACIONES ADMIN
+   ═══════════════════════════════════════════════════════ */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.modal-overlay.modal--hidden {
+    display: none;
+}
+
+.modal--notificaciones {
+    background: #fff;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 480px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+}
+
+.modal__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+}
+
+.modal__header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.modal__icon--notify {
+    background: #dc2626;
+    color: #fff;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.modal__title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.modal__close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #666;
+}
+
+.modal__divider {
+    border: none;
+    border-top: 1px solid #e5e7eb;
+    margin: 0;
+}
+
+.modal__body {
+    padding: 16px 20px;
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+.modal__footer {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    padding: 14px 20px;
+}
+
+.notify-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.notify-item {
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    border-bottom: 1px solid #f1f1f1;
+    cursor: pointer;
+    transition: background 0.2s;
+    align-items: flex-start;
+}
+
+.notify-item:hover {
+    background: #f9fafb;
+}
+
+.notify-item:last-child {
+    border-bottom: none;
+}
+
+.notify-item__icon {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: #fee2e2;
+    color: #dc2626;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+}
+
+.notify-item__body {
+    flex: 1;
+    min-width: 0;
+}
+
+.notify-item__title {
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 4px 0;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.notify-item__meta {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin: 0;
+}
+
+.notify-item__urgencia {
+    flex-shrink: 0;
+    font-size: 0.7rem;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-weight: 700;
+    white-space: nowrap;
+    text-transform: uppercase;
+}
+
+.notify-item__urgencia--alta {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.notify-item__urgencia--baja {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+.notify-empty {
+    padding: 24px 16px;
+    text-align: center;
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.modal__btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+}
+
+.modal__btn--primary {
+    background: #dc2626;
+    color: #fff;
+}
+
+.modal__btn--primary:hover {
+    background: #b91c1c;
+}
+
+.modal__btn--cancel {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.modal__btn--cancel:hover {
+    background: #e5e7eb;
 }
