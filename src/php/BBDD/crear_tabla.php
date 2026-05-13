@@ -131,10 +131,13 @@ CREATE TABLE IF NOT EXISTS incidencias (
     descripcion TEXT,
     imagen VARCHAR(255) DEFAULT NULL,
     notificar_admin BOOLEAN DEFAULT FALSE,
+    leido_admin BOOLEAN DEFAULT FALSE,
     urgencia ENUM('baja','media','alta') DEFAULT 'media',
     estado ENUM('abierta','en_curso','resuelta') DEFAULT 'abierta',
     fecha DATE NULL,
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fecha_inicio DATE NOT NULL,
+    fecha_fin DATE NULL,
     FOREIGN KEY (id_piso) REFERENCES pisos(id_piso) ON DELETE CASCADE,
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
 );
@@ -255,6 +258,7 @@ if ($row['total'] == 0) {
 (2, 2, 'fontaneria',   'Gotera cocina', 'Hay una gotera en el techo de la cocina', NULL, 0, 'alta', 'abierta', '2026-05-08'),
 (2, 3, 'electricidad', 'Luz escalera fundida', 'La bombilla de la escalera está fundida', NULL, 0, 'alta', 'resuelta', '2026-05-08');
 
+    
     /* ===== MENSAJES ===== */
     INSERT INTO mensajes_incidencia (id_incidencia,id_usuario,mensaje) VALUES
     (1,2,'Hay una fuga'),

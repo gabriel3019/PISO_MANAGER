@@ -135,7 +135,7 @@
       </ul>
     </article>
 
-    <!-- ══════════════ MODAL DETALLE (NUEVO) ══════════════ -->
+    <!-- ══════════════ MODAL DETALLE ══════════════ -->
     <div class="modal-overlay modal--hidden" id="modal-detalle-incidencia" role="dialog" aria-modal="true"
       aria-labelledby="modal-detalle-title">
       <div class="modal modal--detalle">
@@ -149,18 +149,15 @@
         <hr class="modal__divider" />
         <div class="modal__body modal__body--detalle">
 
-          <!-- Imagen si existe -->
           <div id="detalle-imagen-wrap" class="detalle__imagen-wrap" style="display:none;">
             <img id="detalle-imagen" src="" alt="Imagen incidencia" class="detalle__imagen" />
           </div>
 
-          <!-- Estado + urgencia -->
           <div class="detalle__badges">
             <span class="status-badge" id="detalle-estado-badge"></span>
             <span class="priority-dot" id="detalle-prioridad-dot"></span>
           </div>
 
-          <!-- Campos -->
           <div class="detalle__grid">
             <div class="detalle__campo">
               <span class="detalle__label">TIPO</span>
@@ -185,6 +182,24 @@
           <div class="detalle__campo detalle__campo--full">
             <span class="detalle__label">NOTIFICAR ADMINISTRADOR</span>
             <span class="detalle__valor" id="detalle-notificar"></span>
+          </div>
+
+          <!-- ✅ NUEVO: Comentario al administrador (solo visible si existe) -->
+          <div class="detalle__campo detalle__campo--full" id="detalle-comentario-wrap" style="display:none;">
+            <span class="detalle__label">COMENTARIO AL ADMINISTRADOR</span>
+            <p class="detalle__valor detalle__valor--desc" id="detalle-comentario"></p>
+          </div>
+
+          <!-- Fechas de incidencia -->
+          <div class="detalle__grid">
+            <div class="detalle__campo">
+              <span class="detalle__label">FECHA INICIO</span>
+              <span class="detalle__valor" id="detalle-fecha-inicio"></span>
+            </div>
+            <div class="detalle__campo">
+              <span class="detalle__label">FECHA FIN</span>
+              <span class="detalle__valor" id="detalle-fecha-fin"></span>
+            </div>
           </div>
 
         </div>
@@ -236,16 +251,33 @@
           <div class="modal__field">
             <label class="modal__label">NIVEL DE URGENCIA<span class="modal__required">*</span></label>
             <div class="modal__urgencia-row" role="group" aria-label="Nivel de urgencia">
-              <button type="button" class="modal__urgencia-btn" data-urgencia="bajo">
+              <button type="button" class="modal__urgencia-btn" data-urgencia="baja">
                 <span class="modal__urgencia-dot modal__urgencia-dot--low"></span>Bajo
               </button>
-              <!-- "Medio" eliminado -->
-              <button type="button" class="modal__urgencia-btn" data-urgencia="alto">
+
+              <button type="button" class="modal__urgencia-btn" data-urgencia="alta">
                 <span class="modal__urgencia-dot modal__urgencia-dot--high"></span>Alto
               </button>
             </div>
           </div>
-          <!-- CHECKBOX NOTIFICAR ADMIN -->
+
+          <div class="modal__field">
+            <label class="modal__label" for="nueva-fecha-inicio">FECHA DE INICIO<span class="modal__required">*</span></label>
+            <input class="modal__input" id="nueva-fecha-inicio" name="fecha_inicio" type="date" required />
+            <span class="modal__hint" id="nueva-fecha-inicio-error" style="color:#dc2626;font-size:.8rem;display:none;">La fecha no puede ser anterior a hoy</span>
+          </div>
+
+          <div class="modal__field">
+            <label class="modal__label" for="nueva-fecha-fin">FECHA DE FIN <span class="modal__optional">(opcional)</span></label>
+            <input class="modal__input" id="nueva-fecha-fin" name="fecha_fin" type="date" />
+            <span class="modal__hint">(Déjalo vacío si no sabes cuándo terminará)</span>
+          </div>
+
+          <div class="modal__field admin-only" id="nueva-comentario-admin-wrap" style="display:none;">
+            <label class="modal__label" for="nueva-comentario-admin">COMENTARIO PARA EL ADMINISTRADOR</label>
+            <textarea class="modal__textarea" id="nueva-comentario-admin" name="comentario_admin" placeholder="Añade una nota interna para el administrador..."></textarea>
+          </div>
+
           <div class="modal__field">
             <label class="modal__checkbox-label">
               <input type="checkbox" id="nueva-notificar-admin" name="notificar_admin" class="modal__checkbox" />
@@ -296,6 +328,19 @@
               </select>
             </div>
           </div>
+
+          <!-- ── ESTADO (añadido) ── -->
+          <div class="modal__field">
+            <label class="modal__label" for="editar-estado">ESTADO</label>
+            <div class="modal__select-wrapper">
+              <select class="modal__select" id="editar-estado" name="estado">
+                <option value="abierta">Abierta</option>
+                <option value="en_curso">En curso</option>
+                <option value="resuelta">Resuelta</option>
+              </select>
+            </div>
+          </div>
+
           <div class="modal__field">
             <label class="modal__label" for="editar-titulo">TÍTULO</label>
             <input class="modal__input" id="editar-titulo" name="titulo" type="text" maxlength="100" />
@@ -308,16 +353,32 @@
           <div class="modal__field">
             <label class="modal__label">NIVEL DE URGENCIA</label>
             <div class="modal__urgencia-row" role="group" aria-label="Nivel de urgencia">
-              <button type="button" class="modal__urgencia-btn" data-urgencia="bajo">
+              <!-- ✅ CORREGIDO: data-urgencia="baja/alta" en lugar de "bajo/alto" -->
+              <button type="button" class="modal__urgencia-btn" data-urgencia="baja">
                 <span class="modal__urgencia-dot modal__urgencia-dot--low"></span>Bajo
               </button>
-              <!-- CAMBIO: "Medio" eliminado -->
-              <button type="button" class="modal__urgencia-btn" data-urgencia="alto">
+              <button type="button" class="modal__urgencia-btn" data-urgencia="alta">
                 <span class="modal__urgencia-dot modal__urgencia-dot--high"></span>Alto
               </button>
             </div>
           </div>
-          <!-- CHECKBOX NOTIFICAR ADMIN -->
+
+          <div class="modal__field">
+            <label class="modal__label" for="editar-fecha-inicio">FECHA DE INICIO<span class="modal__required">*</span></label>
+            <input class="modal__input" id="editar-fecha-inicio" name="fecha_inicio" type="date" required />
+            <span class="modal__hint" id="editar-fecha-inicio-error" style="color:#dc2626;font-size:.8rem;display:none;">La fecha no puede ser anterior a hoy</span>
+          </div>
+
+          <div class="modal__field">
+            <label class="modal__label" for="editar-fecha-fin">FECHA DE FIN <span class="modal__optional">(opcional)</span></label>
+            <input class="modal__input" id="editar-fecha-fin" name="fecha_fin" type="date" />
+            <span class="modal__hint">Déjalo vacío si no sabes cuándo terminará</span>
+          </div>
+
+          <div class="modal__field admin-only" id="editar-comentario-admin-wrap" style="display:none;">
+            <label class="modal__label" for="editar-comentario-admin">COMENTARIO PARA EL ADMINISTRADOR</label>
+            <textarea class="modal__textarea" id="editar-comentario-admin" name="comentario_admin" placeholder="Añade una nota interna para el administrador..."></textarea>
+          </div>
           <div class="modal__field">
             <label class="modal__checkbox-label">
               <input type="checkbox" id="editar-notificar-admin" name="notificar_admin" class="modal__checkbox" />

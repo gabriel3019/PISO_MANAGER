@@ -9,7 +9,10 @@ const countResueltas = document.getElementById("count-resueltas");
 let incidencias = [];
 let filtroActual = "todas";
 
-document.addEventListener("DOMContentLoaded", cargarIncidencias);
+document.addEventListener("DOMContentLoaded", () => {
+    cargarIncidencias();
+    cargarNotificaciones();
+});
 
 async function cargarIncidencias() {
     try {
