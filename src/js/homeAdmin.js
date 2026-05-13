@@ -1,5 +1,8 @@
 let nombrePisoActual = "este piso";
 
+let pisos = [];
+let pisoSeleccionado = null;
+
 /* ================= INIT ================= */
 document.addEventListener("DOMContentLoaded", () => {
   inicializar();
@@ -45,17 +48,42 @@ async function cargarDatos() {
     }
 
     /* ===== PISO ===== */
-    if (data.piso) {
-      nombrePisoActual = data.piso.calle || "este piso";
+    if (data.pisos) {
+      pisos = data.pisos;
 
-      document.getElementById("calle").value = data.piso.calle || "";
-      document.getElementById("ciudad").value = data.piso.ciudad || "";
-      document.getElementById("codigo_postal").value = data.piso.codigo_postal || "";
+      const selector = document.getElementById("selectorPiso");
+      selector.innerHTML = "";
+
+      pisos.forEach(piso => {
+        const option = document.createElement("option");
+        option.value = piso.id_piso;
+        option.textContent = `${piso.calle} - ${piso.nombre_casero}`;
+        selector.appendChild(option);
+      });
+
+      pisoSeleccionado = pisos[0];
+      pintarPiso(pisoSeleccionado);
+
+      selector.addEventListener("change", () => {
+        pisoSeleccionado = pisos.find(p => p.id_piso == selector.value);
+        pintarPiso(pisoSeleccionado);
+      });
     }
 
   } catch (err) {
     console.error("Error cargando datos:", err);
   }
+}
+
+function pintarPiso(piso) {
+  if (!piso) return;
+
+  nombrePisoActual = piso.calle || "este piso";
+
+  document.getElementById("nombre_casero").value = piso.nombre_casero || "";
+  document.getElementById("calle").value = piso.calle || "";
+  document.getElementById("ciudad").value = piso.ciudad || "";
+  document.getElementById("codigo_postal").value = piso.codigo_postal || "";
 }
 
 

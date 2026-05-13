@@ -37,7 +37,9 @@ function pintarIncidencias() {
 
     const filtradas = incidencias.filter(incidencia => {
         const coincideFiltro =
-            filtroActual === "todas" || incidencia.estado === filtroActual;
+            filtroActual === "todas"
+                ? incidencia.estado !== "resuelta"
+                : incidencia.estado === filtroActual;
 
         const coincideBusqueda =
             incidencia.titulo.toLowerCase().includes(textoBusqueda) ||
@@ -83,20 +85,8 @@ function pintarIncidencias() {
                     <option value="resuelta" ${incidencia.estado === "resuelta" ? "selected" : ""}>Resuelta</option>
                 </select>
 
-                <button onclick="abrirDetalleAdmin(${incidencia.id_incidencia})">
-                    Ver detalle
-                </button>
-
-                <button onclick="abrirChat(${incidencia.id_incidencia})">
-                    Ver mensajes
-                </button>
-
-                <button onclick="responderIncidencia(${incidencia.id_incidencia})">
-                    Responder
-                </button>
-
-                <button onclick="resolverIncidencia(${incidencia.id_incidencia})">
-                    Marcar resuelta
+                <button class="btn-primary" onclick="abrirDetalleIncidencia(${incidencia.id_incidencia})">
+                    Abrir incidencia
                 </button>
             </div>
         `;
@@ -128,89 +118,6 @@ async function cambiarEstado(idIncidencia, nuevoEstado) {
     } catch (error) {
         console.error("Error al cambiar estado:", error);
     }
-}
-
-async function responderIncidencia(idIncidencia) {
-    const mensaje = prompt("Escribe la respuesta para el usuario:");
-
-    if (!mensaje || mensaje.trim() === "") {
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append("accion", "responder");
-    formData.append("id_incidencia", idIncidencia);
-    formData.append("id_usuario", 1);
-    formData.append("mensaje", mensaje);
-
-    try {
-        const response = await fetch("../php/incidenciasAdmin.php", {
-            method: "POST",
-            body: formData
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            alert("Respuesta enviada correctamente");
-            cargarIncidencias();
-        } else {
-            alert(data.error || "No se pudo enviar la respuesta");
-        }
-
-    } catch (error) {
-        console.error("Error al responder incidencia:", error);
-    }
-}
-
-async function resolverIncidencia(idIncidencia) {
-    const confirmar = confirm("¿Seguro que quieres marcar esta incidencia como resuelta?");
-
-    if (!confirmar) {
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append("accion", "resolver");
-    formData.append("id_incidencia", idIncidencia);
-
-    try {
-        const response = await fetch("../php/incidenciasAdmin.php", {
-            method: "POST",
-            body: formData
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            alert("Incidencia marcada como resuelta");
-            cargarIncidencias();
-        } else {
-            alert(data.error || "No se pudo resolver la incidencia");
-        }
-
-    } catch (error) {
-        console.error("Error al resolver incidencia:", error);
-    }
-}
-
-let incidenciaSeleccionada = null;
-
-async function abrirDetalleAdmin(idIncidencia) {
-    incidenciaSeleccionada = idIncidencia;
-
-    const incidencia = incidencias.find(i => i.id_incidencia == idIncidencia);
-
-    document.getElementById("detalleTitulo").textContent = incidencia.titulo;
-    document.getElementById("detalleDescripcion").textContent = incidencia.descripcion;
-    document.getElementById("detalleUsuario").textContent = incidencia.usuario;
-    document.getElementById("detalleEstado").textContent = incidencia.estado;
-
-    document.getElementById("modalDetalleIncidencia").classList.remove("hidden");
-
-    await marcarEnCurso(idIncidencia);
-    await cargarMensajes(idIncidencia);
-    await cargarIncidencias();
 }
 
 async function marcarEnCurso(idIncidencia) {
@@ -247,70 +154,9 @@ async function cargarMensajes(idIncidencia) {
     }
 }
 
-document.getElementById("btnEnviarRespuesta").addEventListener("click", async () => {
-    const mensaje = document.getElementById("mensajeAdmin").value.trim();
-
-    if (!mensaje) return;
-
-    const formData = new FormData();
-    formData.append("accion", "responder");
-    formData.append("id_incidencia", incidenciaSeleccionada);
-    formData.append("id_usuario", 1);
-    formData.append("mensaje", mensaje);
-
-    await fetch("../php/incidenciasAdmin.php", {
-        method: "POST",
-        body: formData
-    });
-
-    document.getElementById("mensajeAdmin").value = "";
-    await cargarMensajes(incidenciaSeleccionada);
-    await cargarIncidencias();
-});
-
-document.getElementById("btnMarcarResuelta").addEventListener("click", async () => {
-    const formData = new FormData();
-    formData.append("accion", "resolver");
-    formData.append("id_incidencia", incidenciaSeleccionada);
-
-    await fetch("../php/incidenciasAdmin.php", {
-        method: "POST",
-        body: formData
-    });
-
-    document.getElementById("modalDetalleIncidencia").classList.add("hidden");
-    await cargarIncidencias();
-});
-
 document.getElementById("cerrarModalDetalle").addEventListener("click", () => {
     document.getElementById("modalDetalleIncidencia").classList.add("hidden");
 });
-
-async function abrirChat(idIncidencia) {
-    try {
-        const response = await fetch(`../php/incidenciasAdmin.php?accion=mensajes&id_incidencia=${idIncidencia}`);
-        const data = await response.json();
-
-        if (data.success) {
-            let texto = "Mensajes de la incidencia:\n\n";
-
-            if (data.mensajes.length === 0) {
-                texto += "Todavía no hay mensajes.";
-            } else {
-                data.mensajes.forEach(m => {
-                    texto += `${m.nombre}: ${m.mensaje}\n`;
-                });
-            }
-
-            alert(texto);
-        } else {
-            alert(data.error || "No se pudieron cargar los mensajes");
-        }
-
-    } catch (error) {
-        console.error("Error al cargar mensajes:", error);
-    }
-}
 
 filterButtons.forEach(button => {
     button.addEventListener("click", () => {
@@ -343,3 +189,166 @@ function formatearFecha(fecha) {
     const date = new Date(fecha);
     return date.toLocaleDateString("es-ES");
 }
+
+async function abrirDetalleIncidencia(idIncidencia) {
+
+    const incidencia = incidencias.find(
+        i => i.id_incidencia == idIncidencia
+    );
+
+    if (!incidencia) return;
+
+    /* ===== ABRIR MODAL ===== */
+    document
+        .getElementById("modalDetalleIncidencia")
+        .classList.remove("hidden");
+
+    /* ===== RELLENAR INFO ===== */
+    document.getElementById("detalleTitulo").textContent =
+        incidencia.titulo;
+
+    document.getElementById("detalleDescripcion").textContent =
+        incidencia.descripcion;
+
+    document.getElementById("detalleUsuario").textContent =
+        incidencia.usuario;
+
+    document.getElementById("detalleEstado").textContent =
+        formatearEstado(incidencia.estado);
+
+    /* ===== CARGAR MENSAJES ===== */
+    try {
+
+        const response = await fetch(
+            `../php/incidenciasAdmin.php?accion=mensajes&id_incidencia=${idIncidencia}`
+        );
+
+        const data = await response.json();
+
+        const lista = document.getElementById("listaMensajes");
+
+        lista.innerHTML = "";
+
+        if (data.success && data.mensajes.length > 0) {
+
+            data.mensajes.forEach(msg => {
+
+                lista.innerHTML += `
+                    <div class="mensaje">
+                        <strong>${msg.nombre}</strong>
+                        <p>${msg.mensaje}</p>
+                    </div>
+                `;
+            });
+
+        } else {
+
+            lista.innerHTML = `
+                <p class="sin-mensajes">
+                    Todavía no hay mensajes
+                </p>
+            `;
+        }
+
+    } catch (error) {
+        console.error(error);
+    }
+
+    /* ===== GUARDAR ID ACTUAL ===== */
+    document
+        .getElementById("btnEnviarRespuesta")
+        .dataset.id = idIncidencia;
+
+    document
+        .getElementById("btnMarcarResuelta")
+        .dataset.id = idIncidencia;
+}
+
+document
+    .getElementById("cerrarModalDetalle")
+    ?.addEventListener("click", () => {
+
+        document
+            .getElementById("modalDetalleIncidencia")
+            .classList.add("hidden");
+    });
+
+document.getElementById("btnMarcarResuelta")?.addEventListener("click", async () => {
+    const idIncidencia = document.getElementById("btnMarcarResuelta").dataset.id;
+
+    console.log("ID incidencia para resolver:", idIncidencia);
+
+    if (!idIncidencia) {
+        alert("No se ha encontrado la incidencia");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("accion", "resolver");
+    formData.append("id_incidencia", idIncidencia);
+
+    try {
+        const response = await fetch("../php/incidenciasAdmin.php", {
+            method: "POST",
+            body: formData
+        });
+
+        const texto = await response.text();
+        console.log("Respuesta resolver:", texto);
+
+        const data = JSON.parse(texto);
+
+        if (data.success) {
+            document.getElementById("modalDetalleIncidencia").classList.add("hidden");
+            await cargarIncidencias();
+        } else {
+            alert(data.error || "No se pudo marcar como resuelta");
+        }
+
+    } catch (error) {
+        console.error("Error al resolver incidencia:", error);
+    }
+});
+
+document.getElementById("btnEnviarRespuesta")?.addEventListener("click", async () => {
+    const idIncidencia = document.getElementById("btnEnviarRespuesta").dataset.id;
+    const mensaje = document.getElementById("mensajeAdmin").value.trim();
+
+    if (!idIncidencia) {
+        alert("No se ha encontrado la incidencia");
+        return;
+    }
+
+    if (!mensaje) {
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("accion", "responder");
+    formData.append("id_incidencia", idIncidencia);
+    formData.append("id_usuario", 1);
+    formData.append("mensaje", mensaje);
+
+    try {
+        const response = await fetch("../php/incidenciasAdmin.php", {
+            method: "POST",
+            body: formData
+        });
+
+        const texto = await response.text();
+        console.log("Respuesta responder:", texto);
+
+        const data = JSON.parse(texto);
+
+        if (data.success) {
+            document.getElementById("mensajeAdmin").value = "";
+            await cargarMensajes(idIncidencia);
+            await cargarIncidencias();
+        } else {
+            alert(data.error || "No se pudo enviar la respuesta");
+        }
+
+    } catch (error) {
+        console.error("Error al responder:", error);
+    }
+});

@@ -78,22 +78,47 @@
     </div>
 
     <div id="modalDetalleIncidencia" class="modal hidden">
-        <div class="modal-content">
-            <button id="cerrarModalDetalle" class="modal-close">&times;</button>
+
+        <div class="modal-content incidencia-modal">
+
+            <button id="cerrarModalDetalle" class="modal-close">
+                &times;
+            </button>
 
             <h2 id="detalleTitulo"></h2>
-            <p id="detalleDescripcion"></p>
-            <p><strong>Usuario:</strong> <span id="detalleUsuario"></span></p>
-            <p><strong>Estado:</strong> <span id="detalleEstado"></span></p>
 
-            <h3>Mensajes</h3>
-            <div id="listaMensajes"></div>
+            <p id="detalleDescripcion" class="detalle-desc"></p>
 
-            <textarea id="mensajeAdmin" placeholder="Escribe una respuesta..."></textarea>
+            <div class="detalle-info">
+                <p>
+                    <strong>Usuario:</strong>
+                    <span id="detalleUsuario"></span>
+                </p>
 
-            <button id="btnEnviarRespuesta">Enviar respuesta</button>
-            <button id="btnMarcarResuelta">Marcar como resuelta</button>
+                <p>
+                    <strong>Estado:</strong>
+                    <span id="detalleEstado"></span>
+                </p>
+            </div>
+
+            <h3 class="chat-title">Conversación</h3>
+
+            <div id="listaMensajes" class="chat-box"></div>
+
+            <textarea id="mensajeAdmin" class="chat-textarea" placeholder="Escribe una respuesta..."></textarea>
+
+            <div class="modal-actions">
+                <button id="btnEnviarRespuesta" class="btn-primary">
+                    Enviar respuesta
+                </button>
+
+                <button id="btnMarcarResuelta" class="btn-danger">
+                    Marcar como resuelta
+                </button>
+            </div>
+
         </div>
+
     </div>
 
     <script src="../js/incidenciasAdmin.js"></script>

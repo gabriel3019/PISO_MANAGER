@@ -39,6 +39,12 @@
         <section class="card">
             <h2>Información del piso</h2>
 
+            <label>Seleccionar piso</label>
+            <select id="selectorPiso"></select>">
+
+            <label>Nombre del casero</label>
+            <input id="nombre_casero" type="text">
+
             <label>Dirección</label>
             <input id="calle" type="text">
 
@@ -78,83 +84,51 @@
         <section id="sinPiso" class="hidden empty-flat">
             <h2>No tienes ningún piso creado</h2>
             <p>Añade un piso para empezar a gestionar compañeros, tareas e incidencias.</p>
-            <button id="btnAbrirCrearPiso">Añadir piso</button>
+            <button type="button" id="btnAbrirCrearPiso">Añadir piso</button>
         </section>
 
         <button class="save-btn">Guardar cambios</button>
     </main>
 
     <div id="modalEliminarPiso" class="modal hidden">
-        <div class="modal-content">
+        <div class="modal-content delete-modal">
             <h3 id="textoEliminarPiso">
-                ¿Seguro que quieres eliminar el piso? </h3>
+                ¿Seguro que quieres eliminar el piso?
+            </h3>
 
             <div class="modal-actions">
-                <button id="cancelarEliminarPiso" class="btn-secondary"> Cancelar </button>
-                <button id="confirmarEliminarPiso" class="btn-danger"> Eliminar </button>
+                <button type="button" id="cancelarEliminarPiso" class="btn-secondary">Cancelar</button>
+                <button type="button" id="confirmarEliminarPiso" class="btn-danger">Eliminar</button>
             </div>
         </div>
+    </div>
 
-        <div id="sinPiso" class="hidden">
+    <div id="modalCrearPiso" class="modal hidden">
+        <div class="modal-content create-modal">
+            <h2>Crear piso</h2>
 
-            <h2>No tienes ningún piso creado</h2>
+            <div class="form-grid">
+                <label for="nuevoNombreCasero">Nombre del casero</label>
+                <input type="text" id="nuevoNombreCasero" placeholder="Nombre del casero">
 
-            <p>
-                Crea un piso para empezar a gestionar compañeros,
-                incidencias y gastos.
-            </p>
+                <label for="nuevaCalle">Calle</label>
+                <input type="text" id="nuevaCalle" placeholder="Calle">
 
-            <button id="btnAbrirCrearPiso">
-                Añadir piso
-            </button>
+                <label for="nuevaCiudad">Ciudad</label>
+                <input type="text" id="nuevaCiudad" placeholder="Ciudad">
 
-            <button type="button" id="guardarNuevoPiso">
-                Crear piso
-            </button>
-
-            <button type="button" id="cancelarCrearPiso">
-                Cancelar
-            </button>
-
-        </div>
-
-        <div id="modalCrearPiso" class="modal-overlay hidden">
-
-            <div class="modal-content create-modal">
-
-                <h2>Crear piso</h2>
-
-                <div class="form-grid">
-
-                    <label>NOMBRE DEL CASERO</label>
-                    <input type="text" id="nombre_casero" placeholder="Nombre del casero">
-
-                    <label>CALLE</label>
-                    <input type="text" id="calle" placeholder="Calle">
-
-                    <label>CIUDAD</label>
-                    <input type="text" id="ciudad" placeholder="Ciudad">
-
-                    <label>CÓDIGO POSTAL</label>
-                    <input type="text" id="codigo_postal" placeholder="Código postal">
-
-                </div>
-
-                <div class="modal-actions">
-                    <button id="cancelarCrearPiso" class="btn-secondary">
-                        Cancelar
-                    </button>
-
-                    <button id="guardarNuevoPiso" class="btn-primary">
-                        Crear piso
-                    </button>
-                </div>
-
+                <label for="nuevoCodigoPostal">Código postal</label>
+                <input type="text" id="nuevoCodigoPostal" placeholder="Código postal">
             </div>
 
+            <div class="modal-actions">
+                <button type="button" id="cancelarCrearPiso" class="btn-secondary">Cancelar</button>
+                <button type="button" id="guardarNuevoPiso" class="btn-primary">Crear piso</button>
+            </div>
         </div>
+    </div>
 
-        <script src="../js/homeAdmin.js"></script>
+    <script src="../js/homeAdmin.js"></script>
 </body>
 
 </html>

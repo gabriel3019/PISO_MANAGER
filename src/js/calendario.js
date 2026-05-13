@@ -18,11 +18,8 @@ const addEventForm = document.getElementById("add-event-form");
 const eventTitleInput = document.getElementById("event-title");
 const eventTypeInput = document.getElementById("event-type");
 const eventDateInput = document.getElementById("event-date");
-const eventStartDateInput = document.getElementById("event-start-date");
-const eventEndDateInput = document.getElementById("event-end-date");
 const eventTimeInput = document.getElementById("event-time");
 
-const incidenciaFields = document.getElementById("incidencia-fields");
 const generalFields = document.getElementById("general-fields");
 const peopleFields = document.getElementById("people-fields");
 const timeFields = document.getElementById("time-fields");
@@ -773,15 +770,10 @@ function showEventDetails(evento) {
 function updateFormByType() {
     const tipo = eventTypeInput.value;
 
-    incidenciaFields.classList.add("hidden");
     generalFields.classList.add("hidden");
     peopleFields.classList.add("hidden");
     timeFields.classList.add("hidden");
     repeatFields.classList.add("hidden");
-
-    if (tipo === "incidencia") {
-        incidenciaFields.classList.remove("hidden");
-    }
 
     if (tipo === "tarea") {
         generalFields.classList.remove("hidden");
@@ -970,12 +962,7 @@ function setMinDates() {
     const todayString = `${yyyy}-${mm}-${dd}`;
 
     eventDateInput.min = todayString;
-    eventStartDateInput.min = todayString;
-    eventEndDateInput.min = todayString;
 }
-eventStartDateInput.addEventListener("change", () => {
-    eventEndDateInput.min = eventStartDateInput.value;
-});
 
 eventTypeInput.addEventListener("change", updateFormByType);
 
@@ -1161,42 +1148,6 @@ addEventForm.addEventListener("submit", async (e) => {
 
     if (!titulo || !tipo) {
         return;
-    }
-
-    if (tipo === "incidencia") {
-        const fechaInicio = eventStartDateInput.value;
-        const fechaFin = eventEndDateInput.value;
-
-        if (!fechaInicio) {
-            eventWarning.textContent = "Selecciona la fecha de inicio de la incidencia.";
-            eventWarning.classList.add("show");
-            return;
-        }
-
-        if (fechaFin && fechaFin < fechaInicio) {
-            eventWarning.textContent = "La fecha de fin no puede ser anterior a la de inicio.";
-            eventWarning.classList.add("show");
-            return;
-        }
-
-        const nuevoEvento = {
-            titulo,
-            tipo,
-            fecha: fechaInicio,
-            fechaInicio: fechaInicio,
-            fechaFin: fechaFin || null,
-            estado: "abierta",
-            urgencia: "media",
-            descripcion: titulo,
-            personas: []
-        };
-
-        console.log("EVENTO QUE ENVÍO:", nuevoEvento);
-
-        await guardarEventoEnBD(nuevoEvento);
-
-        const [anio, mes] = fechaInicio.split("-").map(Number);
-        currentDate = new Date(anio, mes - 1, 1);
     }
 
     if (tipo === "tarea") {
