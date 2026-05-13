@@ -254,11 +254,11 @@ nav a span {
     transition: 0.2s;
 }
 
-.switch input:checked + span {
+.switch input:checked+span {
     background: #3f7f5f;
 }
 
-.switch input:checked + span::before {
+.switch input:checked+span::before {
     transform: translateX(16px);
 }
 
@@ -292,6 +292,169 @@ nav a span {
     font-weight: 700;
     cursor: pointer;
 }
+
+.hidden {
+    display: none !important;
+}
+
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.modal-content {
+    width: 430px;
+    background: white;
+    border-radius: 18px;
+    padding: 28px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, .18);
+}
+
+.modal-content h3 {
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.modal-content p {
+    color: #555;
+    margin-bottom: 18px;
+}
+
+.modal-content input {
+    width: 100%;
+    padding: 13px;
+    margin-bottom: 12px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.empty-flat {
+    max-width: 680px;
+    margin: 80px auto 0;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 22px;
+    padding: 55px 45px;
+    text-align: center;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.06);
+}
+
+
+/* ================= MODAL ELIMINAR ================= */
+
+.delete-modal {
+    width: 430px;
+    text-align: center;
+    padding: 34px;
+}
+
+.delete-modal h3 {
+    font-size: 24px;
+    line-height: 1.35;
+    color: #1f2937;
+    margin-bottom: 28px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.delete-modal h3 span {
+    color: #dc2626;
+    font-weight: 800;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+}
+
+/* CANCELAR */
+.btn-secondary {
+    border: 1px solid #d1d5db;
+    background: white;
+    color: #374151;
+
+    padding: 12px 18px;
+    border-radius: 12px;
+
+    cursor: pointer;
+    font-weight: 600;
+
+    transition: 0.2s;
+}
+
+.btn-secondary:hover {
+    background: #f3f4f6;
+}
+
+/* ELIMINAR */
+.btn-danger {
+    border: none;
+    background: #ef4444;
+    color: white;
+
+    padding: 12px 20px;
+    border-radius: 12px;
+
+    cursor: pointer;
+    font-weight: 700;
+
+    transition: 0.2s;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+}
+
+/* ===== PANTALLA SIN PISO ===== */
+
+.empty-flat h2 {
+    font-size: 28px;
+    margin-bottom: 10px;
+    color: #111827;
+}
+
+.empty-flat p {
+    color: #6b7280;
+    font-size: 15px;
+    margin-bottom: 26px;
+}
+
+.empty-flat button {
+    border: none;
+    background: #111827;
+    color: white;
+    padding: 13px 22px;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.empty-flat button:hover {
+    background: #000;
+    transform: translateY(-1px);
+}
+
+/* ===== BOTÓN GUARDAR CAMBIOS ===== */
+.save-btn {
+    display: block;
+    margin: 40px 0 0 auto;
+    padding: 15px 28px;
+    border-radius: 14px;
+}
+
 
 /* RESPONSIVE */
 @media (max-width: 768px) {

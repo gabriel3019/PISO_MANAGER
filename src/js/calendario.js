@@ -333,14 +333,14 @@ function incidenciaVisibleEnMes(incidencia, year, month) {
 
     const { firstDay, lastDay } = getMonthRange(year, month);
 
-    const fechaFin = incidencia.fechaFin || lastDay;
+    const fechaInicio = incidencia.fechaInicio || incidencia.fecha;
+    const fechaFin = incidencia.fechaFin || fechaInicio;
 
-    return incidencia.fechaInicio <= lastDay && fechaFin >= firstDay;
+    return fechaInicio <= lastDay && fechaFin >= firstDay;
 }
 
 function getEventMainDate(evento) {
-    if (evento.tipo === "incidencia") return evento.fechaInicio;
-    return evento.fecha;
+    return evento.fechaInicio || evento.fecha;
 }
 
 function getVisibleEventsForDate(fullDate) {
@@ -349,8 +349,11 @@ function getVisibleEventsForDate(fullDate) {
 
         if (evento.tipo === "incidencia") {
             if (evento.estado === "resuelta") return false;
-            const fechaFin = evento.fechaFin || fullDate;
-            return fullDate >= evento.fechaInicio && fullDate <= fechaFin;
+
+            const fechaInicio = evento.fechaInicio || evento.fecha;
+            const fechaFin = evento.fechaFin || fechaInicio;
+
+            return fullDate >= fechaInicio && fullDate <= fechaFin;
         }
 
         return evento.fecha === fullDate;
@@ -604,12 +607,12 @@ function renderUpcomingEvents() {
         .sort((a, b) => {
             const fechaA =
                 a.tipo === "incidencia"
-                    ? a.fechaInicio
+                    ? (a.fechaInicio || a.fecha)
                     : `${a.fecha}T${a.hora || "00:00"}`;
 
             const fechaB =
                 b.tipo === "incidencia"
-                    ? b.fechaInicio
+                    ? (b.fechaInicio || b.fecha)
                     : `${b.fecha}T${b.hora || "00:00"}`;
 
             return fechaA.localeCompare(fechaB);
@@ -620,9 +623,11 @@ function renderUpcomingEvents() {
 
             let meta = "";
             if (evento.tipo === "incidencia") {
+                const fechaInicio = evento.fechaInicio || evento.fecha;
+
                 const textoFecha = evento.fechaFin
-                    ? formatRangeText(evento.fechaInicio, evento.fechaFin)
-                    : `${formatDateText(evento.fechaInicio)} - sin fecha de fin`;
+                    ? formatRangeText(fechaInicio, evento.fechaFin)
+                    : formatDateText(fechaInicio);
 
                 meta = `${typeNames[evento.tipo]} · ${textoFecha}`;
             } else if (evento.tipo === "tarea") {
@@ -701,9 +706,11 @@ function showEventDetails(evento) {
 
     if (evento.tipo === "incidencia") {
         detailDayLabel.textContent = "Fecha / rango";
+        const fechaInicio = evento.fechaInicio || evento.fecha;
+
         detailDay.textContent = evento.fechaFin
-            ? formatRangeText(evento.fechaInicio, evento.fechaFin)
-            : `${formatDateText(evento.fechaInicio)} - sin fecha de fin`;
+            ? formatRangeText(fechaInicio, evento.fechaFin)
+            : formatDateText(fechaInicio);
         detailTimeBox.classList.add("hidden");
         detailPerson.textContent = "No aplica";
         detailStatus.textContent = evento.estado === "resuelta" ? "Resuelta" : "Activa";
@@ -1175,11 +1182,16 @@ addEventForm.addEventListener("submit", async (e) => {
         const nuevoEvento = {
             titulo,
             tipo,
-            fechaInicio,
+            fecha: fechaInicio,
+            fechaInicio: fechaInicio,
             fechaFin: fechaFin || null,
-            estado: "activa",
+            estado: "abierta",
+            urgencia: "media",
+            descripcion: titulo,
             personas: []
         };
+
+        console.log("EVENTO QUE ENVÍO:", nuevoEvento);
 
         await guardarEventoEnBD(nuevoEvento);
 

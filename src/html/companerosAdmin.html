@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compañeros</title>
+
+    <!-- DARK MODE PRELOAD -->
+    <script>
+        if (localStorage.getItem("darkMode") === "true") {
+            document.documentElement.classList.add("dark");
+        }
+    </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/tareasUser.css">
+    <link rel="stylesheet" href="../css/dark-mode.css">
+    <link rel="stylesheet" href="../css/companerosAdmin.css">
+</head>
+
+<body>
+
+    <div class="app">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar-admin">
+            <div class="admin-info">
+                <div class="avatar">AD</div>
+                <div>
+                    <h3>Admin Piso</h3>
+                    <p>ADMINISTRADOR</p>
+                </div>
+            </div>
+
+            <nav>
+                <a href="../html/homeAdmin.html"><img src="../css/icons/settings.svg" class="icon">
+                    <strong>Home</strong></a>
+                <a href="../html/incidenciasAdmin.html"><img src="../css/icons/circle-alert.svg"
+                        class="icon"><strong>Incidencias</strong></a>
+                <a class="active" href="../html/companerosAdmin.html"><img src="../css/icons/users.svg"
+                        class="icon"><strong>Compañeros</strong></a>
+            </nav>
+
+            <button class="logout">Cerrar sesión</button>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="main">
+
+            <div class="topbar">
+                <h1>Compañeros de piso</h1>
+            </div>
+
+            <!-- CONTENEDOR -->
+            <div id="companerosContainer"></div>
+
+        </main>
+
+    </div>
+
+    <!-- JS -->
+    <script src="../js/dark-mode.js"></script>
+    <script src="../js/companerosUser.js"></script>
+    <script src="../js/cerrarSesion.js"></script>
+
+</body>
+
+</html>

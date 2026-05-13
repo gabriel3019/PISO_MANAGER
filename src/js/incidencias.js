@@ -54,7 +54,7 @@ async function initIncidencias() {
         row.querySelectorAll(".modal__urgencia-btn").forEach(btn => {
             btn.addEventListener("click", () => {
                 row.querySelectorAll(".modal__urgencia-btn")
-                   .forEach(b => b.classList.remove("modal__urgencia-btn--active"));
+                    .forEach(b => b.classList.remove("modal__urgencia-btn--active"));
                 btn.classList.add("modal__urgencia-btn--active");
             });
         });
@@ -94,10 +94,10 @@ async function initIncidencias() {
 
             const incidencias = Array.isArray(data) ? data : [];
 
-            const listaActivas   = document.getElementById("lista-activas");
+            const listaActivas = document.getElementById("lista-activas");
             const listaResueltas = document.getElementById("lista-resueltas");
 
-            listaActivas.innerHTML   = "";
+            listaActivas.innerHTML = "";
             listaResueltas.innerHTML = "";
 
             let contadores = { abierta: 0, en_curso: 0, resuelta: 0 };
@@ -109,11 +109,11 @@ async function initIncidencias() {
                 }
 
                 const icono = {
-                    fontaneria:   "💧",
+                    fontaneria: "💧",
                     electricidad: "⚡",
                     climatizacion: "❄️",
-                    carpinteria:  "🔧",
-                    otros:        "📋"
+                    carpinteria: "🔧",
+                    otros: "📋"
                 }[inc.tipo] || "📋";
 
                 const iconoHTML = inc.imagen
@@ -121,12 +121,12 @@ async function initIncidencias() {
                     : `<div class="incident-icon">${icono}</div>`;
 
                 const estadoClase =
-                    inc.estado === 'abierta'  ? 'open' :
-                    inc.estado === 'en_curso' ? 'progress' : 'done';
+                    inc.estado === 'abierta' ? 'open' :
+                        inc.estado === 'en_curso' ? 'progress' : 'done';
 
                 const prioridadClase =
-                    inc.urgencia === 'alta'  ? 'high' :
-                    inc.urgencia === 'media' ? 'medium' : 'low';
+                    inc.urgencia === 'alta' ? 'high' :
+                        inc.urgencia === 'media' ? 'medium' : 'low';
 
                 const notificarBadge = inc.notificar_admin == 1
                     ? `<span style="font-size:.7rem;background:#dbeafe;color:#1d4ed8;padding:2px 7px;border-radius:999px;font-weight:600;margin-left:6px;">Admin</span>`
@@ -137,10 +137,10 @@ async function initIncidencias() {
                         data-id="${inc.id}"
                         data-tipo="${inc.tipo}"
                         data-urgencia="${inc.urgencia}"
-                        data-titulo="${inc.titulo?.replace(/"/g,'&quot;')}"
-                        data-desc="${inc.descripcion?.replace(/"/g,'&quot;')}"
+                        data-titulo="${inc.titulo?.replace(/"/g, '&quot;')}"
+                        data-desc="${inc.descripcion?.replace(/"/g, '&quot;')}"
                         data-estado="${inc.estado}"
-                        data-fecha="${inc.fecha_creacion || ''}"
+                        data-fecha="${inc.fecha || inc.fecha_creacion || ''}"
                         data-imagen="${inc.imagen || ''}"
                         data-notificar="${inc.notificar_admin || 0}">
 
@@ -150,7 +150,7 @@ async function initIncidencias() {
                             <p class="incident-body__title">${inc.titulo}${notificarBadge}</p>
                             <p class="incident-body__desc">${inc.descripcion}</p>
                             <p class="incident-body__meta">
-                                Reportado · ${inc.fecha_creacion || 'Hoy'} · ${inc.tipo}
+                                Reportado · ${inc.fecha || inc.fecha_creacion} · ${inc.tipo}
                             </p>
                         </div>
 
@@ -177,10 +177,10 @@ async function initIncidencias() {
                 }
             });
 
-            document.getElementById("stat-abiertas").textContent  = contadores.abierta;
-            document.getElementById("stat-curso").textContent     = contadores.en_curso;
+            document.getElementById("stat-abiertas").textContent = contadores.abierta;
+            document.getElementById("stat-curso").textContent = contadores.en_curso;
             document.getElementById("stat-resueltas").textContent = contadores.resuelta;
-            document.getElementById("stat-total").textContent     = incidencias.length;
+            document.getElementById("stat-total").textContent = incidencias.length;
             document.getElementById("badge-incidencias").textContent =
                 contadores.abierta + contadores.en_curso;
 
@@ -201,11 +201,11 @@ async function initIncidencias() {
         if (e.target.closest(".btn-abrir-editar") || e.target.closest(".btn-abrir-eliminar")) return;
 
         const icono = {
-            fontaneria:   "💧",
+            fontaneria: "💧",
             electricidad: "⚡",
             climatizacion: "❄️",
-            carpinteria:  "🔧",
-            otros:        "📋"
+            carpinteria: "🔧",
+            otros: "📋"
         }[item.dataset.tipo] || "📋";
 
         // Icono título modal
@@ -213,25 +213,25 @@ async function initIncidencias() {
 
         // Estado badge
         const estadoClase =
-            item.dataset.estado === 'abierta'  ? 'open' :
-            item.dataset.estado === 'en_curso' ? 'progress' : 'done';
+            item.dataset.estado === 'abierta' ? 'open' :
+                item.dataset.estado === 'en_curso' ? 'progress' : 'done';
         const estadoBadge = document.getElementById("detalle-estado-badge");
         estadoBadge.className = `status-badge status-badge--${estadoClase}`;
         estadoBadge.textContent = item.dataset.estado;
 
         // Prioridad dot
         const prioClase =
-            item.dataset.urgencia === 'alta'  ? 'high' :
-            item.dataset.urgencia === 'media' ? 'medium' : 'low';
+            item.dataset.urgencia === 'alta' ? 'high' :
+                item.dataset.urgencia === 'media' ? 'medium' : 'low';
         const prioDot = document.getElementById("detalle-prioridad-dot");
         prioDot.className = `priority-dot priority-dot--${prioClase}`;
         prioDot.textContent = item.dataset.urgencia;
 
         // Campos texto
-        document.getElementById("detalle-tipo").textContent  = item.dataset.tipo;
+        document.getElementById("detalle-tipo").textContent = item.dataset.tipo;
         document.getElementById("detalle-fecha").textContent = item.dataset.fecha || "—";
         document.getElementById("detalle-titulo").textContent = item.dataset.titulo;
-        document.getElementById("detalle-desc").textContent  = item.dataset.desc;
+        document.getElementById("detalle-desc").textContent = item.dataset.desc;
 
         // Notificar admin
         document.getElementById("detalle-notificar").textContent =
@@ -239,7 +239,7 @@ async function initIncidencias() {
 
         // Imagen
         const imagenWrap = document.getElementById("detalle-imagen-wrap");
-        const imagenEl   = document.getElementById("detalle-imagen");
+        const imagenEl = document.getElementById("detalle-imagen");
         if (item.dataset.imagen) {
             imagenEl.src = item.dataset.imagen;
             imagenWrap.style.display = "block";
@@ -260,18 +260,18 @@ async function initIncidencias() {
 
     // ─── BOTONES EDITAR / ELIMINAR ──────────────────────────────────
     document.addEventListener("click", (e) => {
-        const btnEditar   = e.target.closest(".btn-abrir-editar");
+        const btnEditar = e.target.closest(".btn-abrir-editar");
         const btnEliminar = e.target.closest(".btn-abrir-eliminar");
 
         if (btnEditar) {
-            const item  = btnEditar.closest(".incident-item");
+            const item = btnEditar.closest(".incident-item");
             const modal = document.getElementById("modal-editar-incidencia");
 
             modal.dataset.incidenciaId = item.dataset.id;
 
             document.getElementById("editar-titulo").value = item.dataset.titulo;
-            document.getElementById("editar-desc").value   = item.dataset.desc;
-            document.getElementById("editar-tipo").value   = item.dataset.tipo;
+            document.getElementById("editar-desc").value = item.dataset.desc;
+            document.getElementById("editar-tipo").value = item.dataset.tipo;
 
             // Urgencia activa
             const urgencia = item.dataset.urgencia;
@@ -296,13 +296,13 @@ async function initIncidencias() {
     // ─── CREAR ──────────────────────────────────────────────────────
     document.getElementById("btn-enviar-incidencia")?.addEventListener("click", async () => {
 
-        const titulo      = document.getElementById("nueva-titulo").value.trim();
+        const titulo = document.getElementById("nueva-titulo").value.trim();
         const descripcion = document.getElementById("nueva-desc").value.trim();
-        const tipo        = document.getElementById("nueva-tipo").value;
+        const tipo = document.getElementById("nueva-tipo").value;
         const urgenciaBtn = document.querySelector(
             "#modal-nueva-incidencia .modal__urgencia-btn--active"
         );
-        const notificar   = document.getElementById("nueva-notificar-admin").checked ? 1 : 0;
+        const notificar = document.getElementById("nueva-notificar-admin").checked ? 1 : 0;
 
         if (!titulo || !descripcion || !tipo) {
             alert("Rellena todos los campos obligatorios.");
@@ -310,19 +310,19 @@ async function initIncidencias() {
         }
 
         const formData = new FormData();
-        formData.append("accion",          "crear");
-        formData.append("id_piso",         1);
-        formData.append("id_usuario",      1);
-        formData.append("titulo",          titulo);
-        formData.append("descripcion",     descripcion);
-        formData.append("tipo",            tipo);
-        formData.append("urgencia",        urgenciaBtn ? urgenciaBtn.dataset.urgencia : "bajo");
+        formData.append("accion", "crear");
+        formData.append("id_piso", 1);
+        formData.append("id_usuario", 1);
+        formData.append("titulo", titulo);
+        formData.append("descripcion", descripcion);
+        formData.append("tipo", tipo);
+        formData.append("urgencia", urgenciaBtn ? urgenciaBtn.dataset.urgencia : "bajo");
         formData.append("notificar_admin", notificar);
 
         const imagenFile = document.getElementById("nueva-imagen").files[0];
         if (imagenFile) formData.append("imagen", imagenFile);
 
-        const res    = await fetch("../php/incidencias.php", { method: "POST", body: formData });
+        const res = await fetch("../php/incidencias.php", { method: "POST", body: formData });
         const result = await res.json();
 
         if (result.success) {
@@ -336,13 +336,13 @@ async function initIncidencias() {
     // ─── EDITAR ─────────────────────────────────────────────────────
     document.getElementById("btn-confirmar-editar")?.addEventListener("click", async () => {
 
-        const modal       = document.getElementById("modal-editar-incidencia");
-        const id          = modal.dataset.incidenciaId;
-        const titulo      = document.getElementById("editar-titulo").value.trim();
+        const modal = document.getElementById("modal-editar-incidencia");
+        const id = modal.dataset.incidenciaId;
+        const titulo = document.getElementById("editar-titulo").value.trim();
         const descripcion = document.getElementById("editar-desc").value.trim();
-        const tipo        = document.getElementById("editar-tipo").value;
+        const tipo = document.getElementById("editar-tipo").value;
         const urgenciaBtn = modal.querySelector(".modal__urgencia-btn--active");
-        const notificar   = document.getElementById("editar-notificar-admin").checked ? 1 : 0;
+        const notificar = document.getElementById("editar-notificar-admin").checked ? 1 : 0;
 
         if (!titulo || !descripcion) {
             alert("Rellena título y descripción.");
@@ -350,18 +350,18 @@ async function initIncidencias() {
         }
 
         const formData = new FormData();
-        formData.append("accion",          "editar");
-        formData.append("id",              id);
-        formData.append("titulo",          titulo);
-        formData.append("descripcion",     descripcion);
-        formData.append("tipo",            tipo);
-        formData.append("urgencia",        urgenciaBtn ? urgenciaBtn.dataset.urgencia : "bajo");
+        formData.append("accion", "editar");
+        formData.append("id", id);
+        formData.append("titulo", titulo);
+        formData.append("descripcion", descripcion);
+        formData.append("tipo", tipo);
+        formData.append("urgencia", urgenciaBtn ? urgenciaBtn.dataset.urgencia : "bajo");
         formData.append("notificar_admin", notificar);
 
         const imagenFile = document.getElementById("editar-imagen").files[0];
         if (imagenFile) formData.append("imagen", imagenFile);
 
-        const res    = await fetch("../php/incidencias.php", { method: "POST", body: formData });
+        const res = await fetch("../php/incidencias.php", { method: "POST", body: formData });
         const result = await res.json();
 
         if (result.success) {
@@ -379,9 +379,9 @@ async function initIncidencias() {
 
         const formData = new FormData();
         formData.append("accion", "eliminar");
-        formData.append("id",     id);
+        formData.append("id", id);
 
-        const res    = await fetch("../php/incidencias.php", { method: "POST", body: formData });
+        const res = await fetch("../php/incidencias.php", { method: "POST", body: formData });
         const result = await res.json();
 
         if (result.success) {
@@ -398,9 +398,9 @@ async function initIncidencias() {
         if (!modal) return;
         modal.querySelectorAll("input, textarea, select").forEach(el => el.value = "");
         modal.querySelectorAll(".modal__urgencia-btn--active")
-             .forEach(b => b.classList.remove("modal__urgencia-btn--active"));
+            .forEach(b => b.classList.remove("modal__urgencia-btn--active"));
         modal.querySelectorAll("input[type=checkbox]")
-             .forEach(cb => cb.checked = false);
+            .forEach(cb => cb.checked = false);
     }
 }
 

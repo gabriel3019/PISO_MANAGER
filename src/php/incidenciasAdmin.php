@@ -46,7 +46,7 @@ switch ($accion) {
         $id = $_POST['id'] ?? null;
         $estado = $_POST['estado'] ?? null;
 
-        $estadosPermitidos = ['creada', 'en_proceso', 'finalizada'];
+        $estadosPermitidos = ['abierta', 'en_curso', 'resuelta'];
 
         if (!$id || !$estado) {
             echo json_encode(['success' => false, 'error' => 'Faltan datos']);
@@ -101,10 +101,10 @@ switch ($accion) {
 
         $stmt->close();
 
-        // 2. Cambiar incidencia a en_proceso
+        // 2. Cambiar incidencia a en_curso
         $stmt = $conn->prepare("
         UPDATE incidencias
-        SET estado = 'en_proceso'
+        SET estado = 'en_curso'
         WHERE id_incidencia = ?
     ");
 
@@ -196,10 +196,10 @@ switch ($accion) {
             exit;
         }
 
-        // 1. Marcar incidencia como finalizada
+        // 1. Marcar incidencia como resuelta
         $stmt = $conn->prepare("
         UPDATE incidencias
-        SET estado = 'finalizada'
+        SET estado = 'resuelta'
         WHERE id_incidencia = ?
     ");
 
@@ -246,7 +246,7 @@ switch ($accion) {
         ]);
         break;
 
-        
+
 
     default:
         echo json_encode(['success' => false, 'error' => 'Acción no válida']);

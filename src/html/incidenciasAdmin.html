@@ -25,6 +25,8 @@
                     <strong>Home</strong></a>
                 <a class="active" href="../html/incidenciasAdmin.html"><img src="../css/icons/circle-alert.svg"
                         class="icon"><strong>Incidencias</strong></a>
+                <a href="../html/companerosAdmin.html"><img src="../css/icons/users.svg"
+                        class="icon"><strong>Compañeros</strong></a>
             </nav>
 
             <button class="logout">Cerrar sesión</button>
@@ -73,6 +75,25 @@
             </section>
         </main>
 
+    </div>
+
+    <div id="modalDetalleIncidencia" class="modal hidden">
+        <div class="modal-content">
+            <button id="cerrarModalDetalle" class="modal-close">&times;</button>
+
+            <h2 id="detalleTitulo"></h2>
+            <p id="detalleDescripcion"></p>
+            <p><strong>Usuario:</strong> <span id="detalleUsuario"></span></p>
+            <p><strong>Estado:</strong> <span id="detalleEstado"></span></p>
+
+            <h3>Mensajes</h3>
+            <div id="listaMensajes"></div>
+
+            <textarea id="mensajeAdmin" placeholder="Escribe una respuesta..."></textarea>
+
+            <button id="btnEnviarRespuesta">Enviar respuesta</button>
+            <button id="btnMarcarResuelta">Marcar como resuelta</button>
+        </div>
     </div>
 
     <script src="../js/incidenciasAdmin.js"></script>

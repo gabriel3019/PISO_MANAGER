@@ -66,7 +66,7 @@ function pintarIncidencias() {
             <div class="info">
                 <h4>${incidencia.titulo}</h4>
                 <p class="meta">
-                    Reportado por ${incidencia.usuario} · ${formatearFecha(incidencia.fecha_creacion)}
+                    Reportado por ${incidencia.usuario} · ${formatearFecha(incidencia.fecha || incidencia.fecha_creacion)}
                 </p>
                 <p class="descripcion">${incidencia.descripcion}</p>
                 <p class="prioridad">${incidencia.urgencia} prioridad</p>
@@ -82,6 +82,10 @@ function pintarIncidencias() {
                     <option value="en_curso" ${incidencia.estado === "en_curso" ? "selected" : ""}>En curso</option>
                     <option value="resuelta" ${incidencia.estado === "resuelta" ? "selected" : ""}>Resuelta</option>
                 </select>
+
+                <button onclick="abrirDetalleAdmin(${incidencia.id_incidencia})">
+                    Ver detalle
+                </button>
 
                 <button onclick="abrirChat(${incidencia.id_incidencia})">
                     Ver mensajes
@@ -189,6 +193,98 @@ async function resolverIncidencia(idIncidencia) {
         console.error("Error al resolver incidencia:", error);
     }
 }
+
+let incidenciaSeleccionada = null;
+
+async function abrirDetalleAdmin(idIncidencia) {
+    incidenciaSeleccionada = idIncidencia;
+
+    const incidencia = incidencias.find(i => i.id_incidencia == idIncidencia);
+
+    document.getElementById("detalleTitulo").textContent = incidencia.titulo;
+    document.getElementById("detalleDescripcion").textContent = incidencia.descripcion;
+    document.getElementById("detalleUsuario").textContent = incidencia.usuario;
+    document.getElementById("detalleEstado").textContent = incidencia.estado;
+
+    document.getElementById("modalDetalleIncidencia").classList.remove("hidden");
+
+    await marcarEnCurso(idIncidencia);
+    await cargarMensajes(idIncidencia);
+    await cargarIncidencias();
+}
+
+async function marcarEnCurso(idIncidencia) {
+    const formData = new FormData();
+    formData.append("accion", "cambiar_estado");
+    formData.append("id", idIncidencia);
+    formData.append("estado", "en_curso");
+
+    await fetch("../php/incidenciasAdmin.php", {
+        method: "POST",
+        body: formData
+    });
+}
+
+async function cargarMensajes(idIncidencia) {
+    const res = await fetch(`../php/incidenciasAdmin.php?accion=mensajes&id_incidencia=${idIncidencia}`);
+    const data = await res.json();
+
+    const lista = document.getElementById("listaMensajes");
+    lista.innerHTML = "";
+
+    if (data.success && data.mensajes.length > 0) {
+        data.mensajes.forEach(m => {
+            lista.innerHTML += `
+                <div class="mensaje">
+                    <strong>${m.nombre}</strong>
+                    <p>${m.mensaje}</p>
+                    <small>${m.fecha_envio}</small>
+                </div>
+            `;
+        });
+    } else {
+        lista.innerHTML = "<p>No hay mensajes todavía.</p>";
+    }
+}
+
+document.getElementById("btnEnviarRespuesta").addEventListener("click", async () => {
+    const mensaje = document.getElementById("mensajeAdmin").value.trim();
+
+    if (!mensaje) return;
+
+    const formData = new FormData();
+    formData.append("accion", "responder");
+    formData.append("id_incidencia", incidenciaSeleccionada);
+    formData.append("id_usuario", 1);
+    formData.append("mensaje", mensaje);
+
+    await fetch("../php/incidenciasAdmin.php", {
+        method: "POST",
+        body: formData
+    });
+
+    document.getElementById("mensajeAdmin").value = "";
+    await cargarMensajes(incidenciaSeleccionada);
+    await cargarIncidencias();
+});
+
+document.getElementById("btnMarcarResuelta").addEventListener("click", async () => {
+    const formData = new FormData();
+    formData.append("accion", "resolver");
+    formData.append("id_incidencia", incidenciaSeleccionada);
+
+    await fetch("../php/incidenciasAdmin.php", {
+        method: "POST",
+        body: formData
+    });
+
+    document.getElementById("modalDetalleIncidencia").classList.add("hidden");
+    await cargarIncidencias();
+});
+
+document.getElementById("cerrarModalDetalle").addEventListener("click", () => {
+    document.getElementById("modalDetalleIncidencia").classList.add("hidden");
+});
 
 async function abrirChat(idIncidencia) {
     try {
