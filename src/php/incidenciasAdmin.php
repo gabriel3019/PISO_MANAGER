@@ -246,7 +246,57 @@ switch ($accion) {
         ]);
         break;
 
-        
+    // ═══════════════════════════════════════════════════════
+    // 🔔 NOTIFICACIONES ADMIN: Obtener pendientes
+    // ═══════════════════════════════════════════════════════
+    case 'obtener_notificaciones_admin':
+        $id_piso = intval($_REQUEST['id_piso'] ?? 0);
+        if (!$id_piso) {
+            echo json_encode(['success' => false, 'error' => 'Falta id_piso']);
+            exit;
+        }
+        $stmt = $conn->prepare("
+            SELECT i.id_incidencia, i.titulo, i.tipo, i.urgencia, i.fecha_creacion, 
+                   u.nombre as usuario_nombre
+            FROM incidencias i
+            LEFT JOIN usuarios u ON i.id_usuario = u.id_usuario
+            WHERE i.id_piso = ? AND i.notificar_admin = 1 AND i.leido_admin = 0
+            ORDER BY i.fecha_creacion DESC LIMIT 10
+        ");
+        $stmt->bind_param("i", $id_piso);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $notificaciones = [];
+        while ($row = $result->fetch_assoc()) $notificaciones[] = $row;
+        echo json_encode(['success' => true, 'notificaciones' => $notificaciones]);
+        $stmt->close();
+        break;
+
+    case 'marcar_notificacion_leida':
+        $id_incidencia = intval($_POST['id_incidencia'] ?? 0);
+        if (!$id_incidencia) { 
+            echo json_encode(['success' => false, 'error' => 'Falta ID']); 
+            exit; 
+        }
+        $stmt = $conn->prepare("UPDATE incidencias SET leido_admin = 1 WHERE id_incidencia = ?");
+        $stmt->bind_param("i", $id_incidencia);
+        $stmt->execute();
+        echo json_encode(['success' => true]);
+        $stmt->close();
+        break;
+
+    case 'marcar_todas_leidas':
+        $id_piso = intval($_POST['id_piso'] ?? 0);
+        if (!$id_piso) { 
+            echo json_encode(['success' => false, 'error' => 'Falta id_piso']); 
+            exit; 
+        }
+        $stmt = $conn->prepare("UPDATE incidencias SET leido_admin = 1 WHERE id_piso = ? AND notificar_admin = 1");
+        $stmt->bind_param("i", $id_piso);
+        $stmt->execute();
+        echo json_encode(['success' => true]);
+        $stmt->close();
+        break;
 
     default:
         echo json_encode(['success' => false, 'error' => 'Acción no válida']);

@@ -23,8 +23,12 @@
             <nav>
                 <a href="../html/homeAdmin.html"><img src="../css/icons/settings.svg" class="icon">
                     <strong>Home</strong></a>
-                <a class="active" href="../html/incidenciasAdmin.html"><img src="../css/icons/circle-alert.svg"
-                        class="icon"><strong>Incidencias</strong></a>
+                <a class="active" href="../html/incidenciasAdmin.html">
+                    <img src="../css/icons/circle-alert.svg" class="icon">
+                    <strong>Incidencias</strong>
+                    <!-- ✅ Badge de notificaciones -->
+                    <span class="badge-notif-admin" id="badge-notificaciones-admin" style="display:none; background:#dc2626; color:#fff; font-size:11px; padding:2px 7px; border-radius:999px; margin-left:8px; font-weight:700;">0</span>
+                </a>
             </nav>
 
             <button class="logout">Cerrar sesión</button>
@@ -73,6 +77,29 @@
             </section>
         </main>
 
+    </div>
+
+    <!-- 🔔 MODAL NOTIFICACIONES ADMIN -->
+    <div class="modal-overlay modal--hidden" id="modal-notificaciones-admin" role="dialog" aria-modal="true">
+        <div class="modal modal--notificaciones">
+            <div class="modal__header">
+                <div class="modal__header-left">
+                    <span class="modal__icon modal__icon--notify" aria-hidden="true">🔔</span>
+                    <h2 class="modal__title">Nuevas incidencias notificadas</h2>
+                </div>
+                <button class="modal__close" aria-label="Cerrar" data-modal-close="modal-notificaciones-admin">✕</button>
+            </div>
+            <hr class="modal__divider" />
+            <div class="modal__body">
+                <ul class="notify-list" id="lista-notificaciones"></ul>
+                <p class="notify-empty" id="notify-empty" style="display:none;">No hay notificaciones pendientes</p>
+            </div>
+            <hr class="modal__divider" />
+            <div class="modal__footer">
+                <button type="button" class="modal__btn modal__btn--primary" id="btn-marcar-todas-leidas">Marcar todas como leídas</button>
+                <button type="button" class="modal__btn modal__btn--cancel" data-modal-close="modal-notificaciones-admin">Cerrar</button>
+            </div>
+        </div>
     </div>
 
     <script src="../js/incidenciasAdmin.js"></script>
