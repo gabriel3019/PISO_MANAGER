@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json');
-ini_set('display_errors', 0); // ← Evita que errores PHP rompan el JSON
+ini_set('display_errors', 0);
 require_once("BBDD/conecta.php");
 
 if (isset($_POST['id'])) $_POST['id'] = intval($_POST['id']);
@@ -8,7 +8,8 @@ if (isset($_POST['id'])) $_POST['id'] = intval($_POST['id']);
 $accion = $_REQUEST['accion'] ?? '';
 
 // Helper para normalizar urgencia (JS envía "bajo"/"alto", la BD usa "baja"/"alta")
-function normalizarUrgencia($raw) {
+function normalizarUrgencia($raw)
+{
     $map = ['bajo' => 'baja', 'alto' => 'alta', 'medio' => 'media'];
     // Si ya viene en forma femenina (desde editar con valor guardado), lo devolvemos tal cual
     if (in_array($raw, ['baja', 'media', 'alta'])) return $raw;
@@ -91,10 +92,19 @@ switch ($accion) {
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
         // ii=id_piso,id_usuario | sssss=tipo,titulo,desc,urgencia,estado | s=imagen | i=notificar | ss=fechas
-        $stmt->bind_param("iissssssiss",
-            $id_piso, $id_usuario, $tipo, $titulo, $descripcion,
-            $urgencia, $estado, $imagen_path, $notificar_admin,
-            $fecha_inicio, $fecha_fin
+        $stmt->bind_param(
+            "iissssssiss",
+            $id_piso,
+            $id_usuario,
+            $tipo,
+            $titulo,
+            $descripcion,
+            $urgencia,
+            $estado,
+            $imagen_path,
+            $notificar_admin,
+            $fecha_inicio,
+            $fecha_fin
         );
 
         if ($stmt->execute()) {
@@ -128,7 +138,7 @@ switch ($accion) {
         // Validar estado: solo valores del ENUM
         $estado_raw = $_POST['estado'] ?? 'abierta';
         $estado     = in_array($estado_raw, ['abierta', 'en_curso', 'resuelta'])
-                        ? $estado_raw : 'abierta';
+            ? $estado_raw : 'abierta';
 
         // Validar urgencia: normalizar y luego verificar
         $urgencia_raw = $_POST['urgencia'] ?? 'baja';
@@ -169,9 +179,18 @@ switch ($accion) {
                  WHERE id_incidencia=?"
             );
             // sssss=titulo,desc,tipo,urgencia,estado | i=notificar | ss=fechas | s=imagen | i=id
-            $stmt->bind_param("ssssssissi",
-                $titulo, $descripcion, $tipo, $urgencia, $estado,
-                $notificar_admin, $fecha_inicio, $fecha_fin, $imagen_path, $id
+            $stmt->bind_param(
+                "ssssssissi",
+                $titulo,
+                $descripcion,
+                $tipo,
+                $urgencia,
+                $estado,
+                $notificar_admin,
+                $fecha_inicio,
+                $fecha_fin,
+                $imagen_path,
+                $id
             );
         } else {
             $stmt = $conn->prepare(
@@ -180,9 +199,17 @@ switch ($accion) {
                  WHERE id_incidencia=?"
             );
             // sssss=titulo,desc,tipo,urgencia,estado | i=notificar | ss=fechas | i=id
-            $stmt->bind_param("sssssissi",
-                $titulo, $descripcion, $tipo, $urgencia, $estado,
-                $notificar_admin, $fecha_inicio, $fecha_fin, $id
+            $stmt->bind_param(
+                "sssssissi",
+                $titulo,
+                $descripcion,
+                $tipo,
+                $urgencia,
+                $estado,
+                $notificar_admin,
+                $fecha_inicio,
+                $fecha_fin,
+                $id
             );
         }
 
@@ -206,27 +233,234 @@ switch ($accion) {
         break;
 
     case 'eliminar':
-        $id = intval($_POST['id'] ?? 0);
+        $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
 
-        $stmt = $conn->prepare("SELECT imagen FROM incidencias WHERE id_incidencia = ?");
-        $stmt->bind_param("i", $id);
+        if ($id <= 0) {
+            echo json_encode(['success' => false, 'error' => 'ID no válido']);
+            exit;
+        }
+
+        try {
+            // 1. Borrar mensajes relacionados
+            $stmtM = $conn->prepare("DELETE FROM incidencia_mensajes WHERE id_incidencia = ?");
+            $stmtM->bind_param("i", $id);
+            $stmtM->execute();
+            $stmtM->close();
+
+            // 2. Borrar notificaciones relacionadas (El error actual viene de aquí)
+            $stmtN = $conn->prepare("DELETE FROM notificaciones WHERE id_incidencia = ?");
+            $stmtN->bind_param("i", $id);
+            $stmtN->execute();
+            $stmtN->close();
+
+            // 3. (Opcional) Si tienes otra tabla como 'fotos_incidencia', añádela aquí también
+
+            // 4. Borrar la incidencia principal
+            $stmt2 = $conn->prepare("DELETE FROM incidencias WHERE id_incidencia = ?");
+            if ($stmt2) {
+                $stmt2->bind_param("i", $id);
+                if ($stmt2->execute()) {
+                    echo json_encode(['success' => true]);
+                } else {
+                    echo json_encode(['success' => false, 'error' => $stmt2->error]);
+                }
+                $stmt2->close();
+            }
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'error' => 'Error: ' . $e->getMessage()]);
+        }
+        break;
+
+    // ═══════════════════════════════════════════════════════════════
+    // CASE: obtener_notificaciones_usuario
+    // ═══════════════════════════════════════════════════════════════
+    case 'obtener_notificaciones_usuario':
+        $id_usuario = intval($_REQUEST['id_usuario'] ?? 0);
+        if (!$id_usuario) {
+            echo json_encode(['success' => false, 'error' => 'Falta id_usuario']);
+            exit;
+        }
+
+        // Obtener notificaciones no leídas del usuario, con datos de la incidencia
+        $stmt = $conn->prepare("
+            SELECT 
+                n.id_notificacion,
+                n.id_incidencia,
+                n.mensaje,
+                n.leida,
+                n.fecha_creacion,
+                i.titulo,
+                i.tipo,
+                i.urgencia,
+                i.estado
+            FROM notificaciones n
+            INNER JOIN incidencias i ON n.id_incidencia = i.id_incidencia
+            WHERE n.id_usuario = ?
+            AND n.leida = 0
+            ORDER BY n.fecha_creacion DESC
+            LIMIT 50
+        ");
+        $stmt->bind_param("i", $id_usuario);
         $stmt->execute();
-        $res = $stmt->get_result();
-        $row = $res->fetch_assoc();
+        $result = $stmt->get_result();
+
+        $notificaciones = [];
+        while ($row = $result->fetch_assoc()) {
+            $notificaciones[] = $row;
+        }
         $stmt->close();
 
-        $stmt2 = $conn->prepare("DELETE FROM incidencias WHERE id_incidencia = ?");
-        $stmt2->bind_param("i", $id);
+        echo json_encode([
+            'success' => true,
+            'notificaciones' => $notificaciones,
+            'total' => count($notificaciones)
+        ]);
+        break;
 
-        if ($stmt2->execute()) {
-            if (!empty($row['imagen']) && file_exists($row['imagen'])) {
-                unlink($row['imagen']);
-            }
+    // ═══════════════════════════════════════════════════════════════
+    // CASE: marcar_notificacion_usuario_leida
+    // ═══════════════════════════════════════════════════════════════
+    case 'marcar_notificacion_usuario_leida':
+        $id_notificacion = intval($_POST['id_notificacion'] ?? 0);
+        $id_usuario = intval($_POST['id_usuario'] ?? 0);
+
+        if (!$id_notificacion || !$id_usuario) {
+            echo json_encode(['success' => false, 'error' => 'Faltan datos']);
+            exit;
+        }
+
+        // Verificar que la notificación pertenece al usuario
+        $stmt = $conn->prepare("
+            UPDATE notificaciones 
+            SET leida = 1 
+            WHERE id_notificacion = ? AND id_usuario = ?
+        ");
+        $stmt->bind_param("ii", $id_notificacion, $id_usuario);
+
+        if ($stmt->execute()) {
             echo json_encode(['success' => true]);
         } else {
             echo json_encode(['success' => false, 'error' => $conn->error]);
         }
-        $stmt2->close();
+        $stmt->close();
+        break;
+
+    // ═══════════════════════════════════════════════════════════════
+    // CASE: obtener_incidencia (NUEVO - para el chat)
+    // ═══════════════════════════════════════════════════════════════
+    case 'obtener_incidencia':
+        $id = intval($_GET['id'] ?? 0);
+
+        if (!$id) {
+            echo json_encode(['success' => false, 'error' => 'Falta id de incidencia']);
+            exit;
+        }
+
+        $stmt = $conn->prepare("
+            SELECT * FROM incidencias 
+            WHERE id_incidencia = ?
+        ");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $incidencia = $result->fetch_assoc();
+        $stmt->close();
+
+        if ($incidencia) {
+            echo json_encode(['success' => true, 'incidencia' => $incidencia]);
+        } else {
+            echo json_encode(['success' => false, 'error' => 'Incidencia no encontrada']);
+        }
+        break;
+
+    // ═══════════════════════════════════════════════════════════════
+    // CASE: obtener_mensajes_incidencia (NUEVO - para el chat)
+    // ═══════════════════════════════════════════════════════════════
+    case 'obtener_mensajes_incidencia':
+        $id_incidencia = intval($_GET['id_incidencia'] ?? 0);
+
+        if (!$id_incidencia) {
+            echo json_encode(['success' => false, 'error' => 'Falta id_incidencia']);
+            exit;
+        }
+
+        // UNION de ambas tablas de mensajes: usuario y admin
+        $stmt = $conn->prepare("
+            SELECT 
+                m.id_mensaje,
+                m.id_incidencia,
+                m.id_usuario,
+                u.nombre,
+                m.mensaje,
+                m.fecha AS fecha_envio,
+                'usuario' AS origen
+            FROM mensajes_incidencia m
+            INNER JOIN usuarios u ON m.id_usuario = u.id_usuario
+            WHERE m.id_incidencia = ?
+            
+            UNION ALL
+            
+            SELECT 
+                m.id_mensaje,
+                m.id_incidencia,
+                m.id_usuario,
+                u.nombre,
+                m.mensaje,
+                m.fecha_envio,
+                'admin' AS origen
+            FROM incidencia_mensajes m
+            INNER JOIN usuarios u ON m.id_usuario = u.id_usuario
+            WHERE m.id_incidencia = ?
+            
+            ORDER BY fecha_envio ASC
+        ");
+
+        $stmt->bind_param("ii", $id_incidencia, $id_incidencia);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $mensajes = [];
+        while ($row = $result->fetch_assoc()) {
+            $mensajes[] = $row;
+        }
+        $stmt->close();
+
+        echo json_encode([
+            'success' => true,
+            'mensajes' => $mensajes
+        ]);
+        break;
+
+    // ═══════════════════════════════════════════════════════════════
+    // CASE: enviar_mensaje_admin (NUEVO - para responder desde usuario)
+    // ═══════════════════════════════════════════════════════════════
+    case 'enviar_mensaje_admin':
+        $id_incidencia = intval($_POST['id_incidencia'] ?? 0);
+        $id_usuario = intval($_POST['id_usuario'] ?? 0);
+        $mensaje = trim($_POST['mensaje'] ?? '');
+
+        if (!$id_incidencia || !$id_usuario || !$mensaje) {
+            echo json_encode(['success' => false, 'error' => 'Faltan datos obligatorios']);
+            exit;
+        }
+
+        // Insertar mensaje en la tabla de usuario -> admin
+        $stmt = $conn->prepare("
+            INSERT INTO mensajes_incidencia (id_incidencia, id_usuario, mensaje)
+            VALUES (?, ?, ?)
+        ");
+
+        $stmt->bind_param("iis", $id_incidencia, $id_usuario, $mensaje);
+
+        if ($stmt->execute()) {
+            // Opcional: crear notificación al admin si no existe
+            // (ya se crea desde el lado admin cuando responde, pero podemos asegurar)
+
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'error' => $stmt->error]);
+        }
+        $stmt->close();
         break;
 
     default:
@@ -234,10 +468,9 @@ switch ($accion) {
         echo json_encode([
             'success'     => false,
             'error'       => 'Acción no válida',
-            'debug_accion'=> $accion
+            'debug_accion' => $accion
         ]);
         break;
 }
 
 $conn->close();
-?>

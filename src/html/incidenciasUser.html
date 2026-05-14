@@ -141,7 +141,7 @@
       <div class="modal modal--detalle">
         <div class="modal__header">
           <div class="modal__header-left">
-            <span class="modal__icon" id="detalle-icono" aria-hidden="true">📋</span>
+            <span class="modal__icon" id="detalle-icono" aria-hidden="true"></span>
             <h2 class="modal__title" id="modal-detalle-title">Detalle de Incidencia</h2>
           </div>
           <button class="modal__close" aria-label="Cerrar" data-modal-close="modal-detalle-incidencia">✕</button>
@@ -262,20 +262,24 @@
           </div>
 
           <div class="modal__field">
-            <label class="modal__label" for="nueva-fecha-inicio">FECHA DE INICIO<span class="modal__required">*</span></label>
+            <label class="modal__label" for="nueva-fecha-inicio">FECHA DE INICIO<span
+                class="modal__required">*</span></label>
             <input class="modal__input" id="nueva-fecha-inicio" name="fecha_inicio" type="date" required />
-            <span class="modal__hint" id="nueva-fecha-inicio-error" style="color:#dc2626;font-size:.8rem;display:none;">La fecha no puede ser anterior a hoy</span>
+            <span class="modal__hint" id="nueva-fecha-inicio-error"
+              style="color:#dc2626;font-size:.8rem;display:none;">La fecha no puede ser anterior a hoy</span>
           </div>
 
           <div class="modal__field">
-            <label class="modal__label" for="nueva-fecha-fin">FECHA DE FIN <span class="modal__optional">(opcional)</span></label>
+            <label class="modal__label" for="nueva-fecha-fin">FECHA DE FIN <span
+                class="modal__optional">(opcional)</span></label>
             <input class="modal__input" id="nueva-fecha-fin" name="fecha_fin" type="date" />
             <span class="modal__hint">(Déjalo vacío si no sabes cuándo terminará)</span>
           </div>
 
           <div class="modal__field admin-only" id="nueva-comentario-admin-wrap" style="display:none;">
             <label class="modal__label" for="nueva-comentario-admin">COMENTARIO PARA EL ADMINISTRADOR</label>
-            <textarea class="modal__textarea" id="nueva-comentario-admin" name="comentario_admin" placeholder="Añade una nota interna para el administrador..."></textarea>
+            <textarea class="modal__textarea" id="nueva-comentario-admin" name="comentario_admin"
+              placeholder="Añade una nota interna para el administrador..."></textarea>
           </div>
 
           <div class="modal__field">
@@ -364,20 +368,24 @@
           </div>
 
           <div class="modal__field">
-            <label class="modal__label" for="editar-fecha-inicio">FECHA DE INICIO<span class="modal__required">*</span></label>
+            <label class="modal__label" for="editar-fecha-inicio">FECHA DE INICIO<span
+                class="modal__required">*</span></label>
             <input class="modal__input" id="editar-fecha-inicio" name="fecha_inicio" type="date" required />
-            <span class="modal__hint" id="editar-fecha-inicio-error" style="color:#dc2626;font-size:.8rem;display:none;">La fecha no puede ser anterior a hoy</span>
+            <span class="modal__hint" id="editar-fecha-inicio-error"
+              style="color:#dc2626;font-size:.8rem;display:none;">La fecha no puede ser anterior a hoy</span>
           </div>
 
           <div class="modal__field">
-            <label class="modal__label" for="editar-fecha-fin">FECHA DE FIN <span class="modal__optional">(opcional)</span></label>
+            <label class="modal__label" for="editar-fecha-fin">FECHA DE FIN <span
+                class="modal__optional">(opcional)</span></label>
             <input class="modal__input" id="editar-fecha-fin" name="fecha_fin" type="date" />
             <span class="modal__hint">Déjalo vacío si no sabes cuándo terminará</span>
           </div>
 
           <div class="modal__field admin-only" id="editar-comentario-admin-wrap" style="display:none;">
             <label class="modal__label" for="editar-comentario-admin">COMENTARIO PARA EL ADMINISTRADOR</label>
-            <textarea class="modal__textarea" id="editar-comentario-admin" name="comentario_admin" placeholder="Añade una nota interna para el administrador..."></textarea>
+            <textarea class="modal__textarea" id="editar-comentario-admin" name="comentario_admin"
+              placeholder="Añade una nota interna para el administrador..."></textarea>
           </div>
           <div class="modal__field">
             <label class="modal__checkbox-label">
@@ -389,7 +397,7 @@
           <div class="modal__field">
             <label class="modal__label">IMAGEN <span class="modal__optional">(opcional)</span></label>
             <label class="modal__dropzone" for="editar-imagen">
-              <span class="modal__dropzone-icon" aria-hidden="true">📷</span>
+              <span class="modal__dropzone-icon" aria-hidden="true"></span>
               <input type="file" id="editar-imagen" name="imagen" accept=".png,.jpg,.jpeg,.webp" hidden />
             </label>
           </div>
@@ -421,6 +429,85 @@
             data-modal-close="modal-eliminar-incidencia">Cancelar</button>
           <button type="button" class="modal__btn modal__btn--danger" id="btn-confirmar-eliminar">Eliminar
             incidencia</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ MODAL NOTIFICACIONES USUARIO ══════════════ -->
+    <div class="modal-overlay modal--hidden" id="modal-notificaciones-usuario" role="dialog" aria-modal="true">
+      <div class="modal modal--notificaciones">
+        <div class="modal__header">
+          <div class="modal__header-left">
+            <span class="modal__icon">🔔</span>
+            <h2 class="modal__title">Nuevas respuestas</h2>
+          </div>
+          <button class="modal__close" aria-label="Cerrar" data-modal-close="modal-notificaciones-usuario">✕</button>
+        </div>
+        <hr class="modal__divider" />
+
+        <div class="modal__body modal__body--scroll">
+          <ul id="lista-notificaciones-usuario" class="notify-list"></ul>
+          <p id="notify-vacio-usuario" class="notify-empty" style="display:none;">
+            ✅ No tienes nuevas respuestas
+          </p>
+        </div>
+
+        <hr class="modal__divider" />
+        <div class="modal__footer">
+          <button type="button" class="modal__btn modal__btn--secondary" id="btn-marcar-todas-leidas-usuario">
+            Marcar todas como leídas
+          </button>
+          <button type="button" class="modal__btn modal__btn--primary" data-modal-close="modal-notificaciones-usuario">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═════════════ MODAL CONVERSACIÓN CON ADMIN (NUEVO) ══════════════ -->
+    <div class="modal-overlay modal--hidden" id="modal-conversacion-admin" role="dialog" aria-modal="true">
+      <div class="modal modal--chat">
+        <div class="modal__header">
+          <div class="modal__header-left">
+            <span class="modal__icon">💬</span>
+            <div>
+              <h2 class="modal__title" id="chat-titulo-incidencia">Incidencia</h2>
+              <p class="modal__subtitle" id="chat-estado-incidencia">Estado: Abierta</p>
+            </div>
+          </div>
+          <button class="modal__close" aria-label="Cerrar" data-modal-close="modal-conversacion-admin">✕</button>
+        </div>
+        <hr class="modal__divider" />
+        
+        <!-- Área de mensajes -->
+        <div class="chat-container" id="chat-mensajes-container">
+          <div id="chat-mensajes-lista" class="chat-messages">
+            <!-- Los mensajes se cargan dinámicamente aquí -->
+          </div>
+        </div>
+        
+        <hr class="modal__divider" />
+        
+        <!-- Input para responder -->
+        <div class="chat-input-area">
+          <textarea 
+            id="chat-input-mensaje" 
+            class="chat-input" 
+            placeholder="Escribe una respuesta al administrador..."
+            rows="2"
+          ></textarea>
+          <button id="btn-enviar-mensaje-admin" class="btn btn-primary btn-enviar">
+            Enviar
+          </button>
+        </div>
+        
+        <div class="modal__footer">
+          <button type="button" class="modal__btn modal__btn--secondary" data-modal-close="modal-conversacion-admin">
+            Cerrar
+          </button>
+          <button type="button" class="modal__btn modal__btn--primary" id="btn-ver-detalle-completo">
+            Ver detalle completo
+          </button>
         </div>
       </div>
     </div>

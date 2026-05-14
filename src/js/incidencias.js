@@ -198,7 +198,6 @@ async function initIncidencias() {
             let contadores = { abierta: 0, en_curso: 0, resuelta: 0 };
 
             incidencias.forEach(inc => {
-                // Normalizar estado: minúsculas + trim para comparar sin errores
                 const estadoNorm = (inc.estado || '').toLowerCase().trim();
 
                 if (estadoNorm === 'abierta') {
@@ -321,9 +320,7 @@ async function initIncidencias() {
 
         document.getElementById("detalle-icono").textContent = icono;
 
-        // Normalizar estado para el modal también
         const estadoNorm = (item.dataset.estado || '').toLowerCase().trim();
-
         const estadoClase =
             estadoNorm === 'abierta' ? 'open' :
                 estadoNorm === 'en_curso' || estadoNorm === 'en curso' ? 'progress' : 'done';
@@ -351,7 +348,6 @@ async function initIncidencias() {
         document.getElementById("detalle-notificar").textContent =
             item.dataset.notificar === "1" ? "✅ Sí, notificado al administrador" : "No";
 
-        // Mostrar u ocultar el comentario según si existe
         const comentarioWrap = document.getElementById("detalle-comentario-wrap");
         const comentarioEl = document.getElementById("detalle-comentario");
         if (item.dataset.comentario) {
@@ -482,7 +478,6 @@ async function initIncidencias() {
 
         if (notificar) {
             const comentario = document.getElementById("nueva-comentario-admin")?.value.trim();
-
             if (comentario) {
                 formData.append("comentario_admin", comentario);
                 formData.append("id_usuario_comentario", idUsuario);
@@ -581,23 +576,55 @@ async function initIncidencias() {
         }
     });
 
-    // ─── ELIMINAR ────────────────────────────────────────────────────
-    document.getElementById("btn-confirmar-eliminar")?.addEventListener("click", async () => {
-        const id = document.getElementById("modal-eliminar-incidencia").dataset.incidenciaId;
-        const formData = new FormData();
-        formData.append("accion", "eliminar");
-        formData.append("id", id);
+   // ─── ELIMINAR ────────────────────────────────────────────────────
+document.getElementById("btn-confirmar-eliminar")?.addEventListener("click", async () => {
+    const modal = document.getElementById("modal-eliminar-incidencia");
+    const id = modal?.dataset.incidenciaId;
+    
+    console.log("🗑️ Intentando eliminar ID:", id, "tipo:", typeof id);
+    
+    if (!id || id === "undefined" || id === "null" || id.trim() === "") {
+        console.error("❌ ID no válido para eliminar");
+        alert("Error: No se pudo identificar la incidencia");
+        cerrarModal("modal-eliminar-incidencia");
+        return;
+    }
 
-        const res = await fetch("../php/incidencias.php", { method: "POST", body: formData });
-        const result = await res.json();
+    const formData = new FormData();
+    formData.append("accion", "eliminar");
+    formData.append("id", id.toString().trim());
+
+    console.log("📤 Enviando FormData:", Object.fromEntries(formData));
+
+    try {
+        const res = await fetch("../php/incidencias.php", { 
+            method: "POST", 
+            body: formData
+            // ✅ NO pongas headers manualmente con FormData
+        });
+
+        console.log("📡 Status:", res.status, "OK:", res.ok);
+        
+        const text = await res.text();
+        console.log("📥 Respuesta raw:", text);
+        
+        if (!text.trim()) {
+            throw new Error("Servidor devolvió respuesta vacía (HTTP " + res.status + ")");
+        }
+        
+        const result = JSON.parse(text);
 
         if (result.success) {
             cerrarModal("modal-eliminar-incidencia");
             cargarIncidencias();
         } else {
-            alert("Error al eliminar: " + (result.error || ""));
+            alert("Error: " + (result.error || "Desconocido"));
         }
-    });
+    } catch (error) {
+        console.error("💥 Error fatal en eliminar:", error);
+        alert("Error de conexión. Revisa la consola para más detalles.");
+    }
+});
 
     // ─── Util ────────────────────────────────────────────────────────
     function limpiarFormulario(modalId) {
@@ -618,6 +645,363 @@ async function initIncidencias() {
             if (hint.id?.includes('error')) hint.style.display = 'none';
         });
     }
+
+    // ═══════════════════════════════════════════════════════════════
+    // 🔔 SISTEMA DE NOTIFICACIONES PARA USUARIO
+    // ═══════════════════════════════════════════════════════════════
+
+    let idUsuarioActual = null;
+    let pollingNotificaciones = null;
+    let idIncidenciaChatActual = null;
+
+    async function comprobarNuevasNotificaciones() {
+        const idUsuario = obtenerIdUsuario();
+        if (!idUsuario) return;
+
+        idUsuarioActual = idUsuario;
+
+        try {
+            const resp = await fetch(
+                `../php/incidencias.php?accion=obtener_notificaciones_usuario&id_usuario=${idUsuario}`
+            );
+            const data = await resp.json();
+
+            if (data.success && data.notificaciones.length > 0) {
+                mostrarModalNotificaciones(data.notificaciones);
+                actualizarBadgeNotificaciones(data.notificaciones.length);
+            }
+        } catch (error) {
+            console.error("Error comprobando notificaciones:", error);
+        }
+    }
+
+    function mostrarModalNotificaciones(notificaciones) {
+        const modal = document.getElementById("modal-notificaciones-usuario");
+        const lista = document.getElementById("lista-notificaciones-usuario");
+        const vacio = document.getElementById("notify-vacio-usuario");
+
+        if (!lista || !modal) return;
+
+        lista.innerHTML = notificaciones.map(n => {
+            const icono = {
+                fontaneria: "💧", electricidad: "⚡", climatizacion: "❄️",
+                carpinteria: "🔧", otros: "📋"
+            }[n.tipo] || "📋";
+
+            const fecha = n.fecha_creacion
+                ? new Date(n.fecha_creacion).toLocaleDateString('es-ES', {
+                    day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
+                })
+                : 'Ahora';
+
+            return `
+            <li class="notify-item" 
+                data-id-notificacion="${n.id_notificacion}" 
+                data-id-inincidencia="${n.id_incidencia}"
+                data-urgencia="${n.urgencia}">
+                
+                <div class="notify-header">
+                    <p class="notify-title">${icono} ${n.titulo}</p>
+                    <span class="notify-fecha">${fecha}</span>
+                </div>
+                <p class="notify-mensaje">${n.mensaje}</p>
+                <p class="notify-meta">Estado: ${formatearEstado(n.estado)}</p>
+                
+                <div class="notify-actions" style="margin-top:12px;display:flex;gap:8px;">
+                    <button class="btn-ver-conversacion" 
+                            data-id-notif="${n.id_notificacion}"
+                            data-id-inc="${n.id_incidencia}"
+                            style="flex:1;padding:8px 12px;background:#3b82f6;color:white;border:none;border-radius:6px;cursor:pointer;font-size:0.85rem;font-weight:600;">
+                        💬 Ver conversación
+                    </button>
+                    <button class="btn-ver-detalle-notif"
+                            data-id-inc="${n.id_incidencia}"
+                            style="flex:1;padding:8px 12px;background:#f1f5f9;color:#334155;border:1px solid #cbd5e1;border-radius:6px;cursor:pointer;font-size:0.85rem;font-weight:600;">
+                        📋 Ver detalle
+                    </button>
+                </div>
+            </li>
+        `;
+        }).join('');
+
+        vacio.style.display = notificaciones.length > 0 ? 'none' : 'block';
+        lista.style.display = notificaciones.length > 0 ? 'flex' : 'none';
+
+        if (notificaciones.length > 0) {
+            modal.classList.remove("modal--hidden");
+            document.body.style.overflow = "hidden";
+        }
+    }
+
+    function actualizarBadgeNotificaciones(cantidad) {
+        const badge = document.getElementById("badge-incidencias");
+        if (!badge) return;
+
+        if (cantidad > 0) {
+            badge.textContent = cantidad;
+            badge.classList.add("show");
+            badge.style.display = "inline-block";
+        } else {
+            badge.classList.remove("show");
+            badge.style.display = "none";
+        }
+    }
+
+    function formatearEstado(estado) {
+        const estados = {
+            'abierta': 'Abierta',
+            'en_curso': 'En curso',
+            'resuelta': 'Resuelta'
+        };
+        return estados[estado] || estado;
+    }
+
+    async function marcarNotificacionLeida(idNotificacion) {
+        if (!idUsuarioActual) return;
+
+        const formData = new FormData();
+        formData.append("accion", "marcar_notificacion_usuario_leida");
+        formData.append("id_notificacion", idNotificacion);
+        formData.append("id_usuario", idUsuarioActual);
+
+        try {
+            await fetch("../php/incidencias.php", { method: "POST", body: formData });
+        } catch (error) {
+            console.error("Error marcando como leída:", error);
+        }
+    }
+
+    async function marcarTodasLeidas() {
+        if (!idUsuarioActual) return;
+
+        const items = document.querySelectorAll("#lista-notificaciones-usuario .notify-item");
+        for (const item of items) {
+            const idNotif = item.dataset.idNotificacion;
+            await marcarNotificacionLeida(idNotif);
+        }
+        comprobarNuevasNotificaciones();
+    }
+
+    function iniciarPollingNotificaciones() {
+        comprobarNuevasNotificaciones();
+        pollingNotificaciones = setInterval(comprobarNuevasNotificaciones, 30000);
+    }
+
+    function detenerPollingNotificaciones() {
+        if (pollingNotificaciones) {
+            clearInterval(pollingNotificaciones);
+            pollingNotificaciones = null;
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // 💬 CONVERSACIÓN CON ADMINISTRADOR
+    // ═══════════════════════════════════════════════════════════════
+
+    async function abrirConversacionAdmin(idIncidencia, idNotificacion = null) {
+        idIncidenciaChatActual = idIncidencia;
+
+        if (idNotificacion) {
+            await marcarNotificacionLeida(idNotificacion);
+        }
+
+        cerrarModal("modal-notificaciones-usuario");
+        await cargarInfoIncidenciaChat(idIncidencia);
+        await cargarMensajesChat(idIncidencia);
+
+        const modal = document.getElementById("modal-conversacion-admin");
+        modal.classList.remove("modal--hidden");
+        document.body.style.overflow = "hidden";
+        scrollToBottomChat();
+    }
+
+    async function cargarInfoIncidenciaChat(idIncidencia) {
+        try {
+            const resp = await fetch(`../php/incidencias.php?accion=obtener_incidencia&id=${idIncidencia}`);
+            const data = await resp.json();
+
+            if (data.success && data.incidencia) {
+                const inc = data.incidencia;
+                document.getElementById("chat-titulo-incidencia").textContent = inc.titulo;
+                document.getElementById("chat-estado-incidencia").textContent = `Estado: ${formatearEstado(inc.estado)}`;
+            }
+        } catch (error) {
+            console.error("Error cargando info incidencia:", error);
+        }
+    }
+
+    async function cargarMensajesChat(idIncidencia) {
+        const lista = document.getElementById("chat-mensajes-lista");
+
+        try {
+            const resp = await fetch(`../php/incidencias.php?accion=obtener_mensajes_incidencia&id_incidencia=${idIncidencia}`);
+            const data = await resp.json();
+
+            if (data.success && data.mensajes && data.mensajes.length > 0) {
+                lista.innerHTML = data.mensajes.map(msg => {
+                    const esUsuario = msg.origen === 'usuario' || msg.id_usuario == obtenerIdUsuario();
+                    const clase = esUsuario ? 'mensaje-chat--usuario' : 'mensaje-chat--admin';
+                    const autor = esUsuario ? 'Tú' : (msg.nombre || 'Administrador');
+                    const fecha = msg.fecha_envio ? formatearFechaHora(msg.fecha_envio) : 'Ahora';
+
+                    return `
+                        <div class="mensaje-chat ${clase}">
+                            <div class="mensaje-chat__autor">${autor}</div>
+                            <div class="mensaje-chat__texto">${escapeHtml(msg.mensaje)}</div>
+                            <div class="mensaje-chat__fecha">${fecha}</div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                lista.innerHTML = `
+                    <div class="chat-sin-mensajes">
+                        <div class="chat-sin-mensajes__icon">💬</div>
+                        <p>Aún no hay mensajes en esta conversación</p>
+                        <p style="font-size: 0.85rem; margin-top: 8px;">
+                            El administrador te responderá pronto
+                        </p>
+                    </div>
+                `;
+            }
+        } catch (error) {
+            console.error("Error cargando mensajes:", error);
+            lista.innerHTML = '<p style="text-align:center;color:#dc2626;">Error al cargar los mensajes</p>';
+        }
+    }
+
+    function scrollToBottomChat() {
+        const container = document.getElementById("chat-mensajes-container");
+        if (container) {
+            setTimeout(() => {
+                container.scrollTop = container.scrollHeight;
+            }, 100);
+        }
+    }
+
+    function formatearFechaHora(fechaStr) {
+        const fecha = new Date(fechaStr);
+        const ahora = new Date();
+        const esHoy = fecha.toDateString() === ahora.toDateString();
+
+        const hora = fecha.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+
+        if (esHoy) {
+            return `Hoy ${hora}`;
+        } else {
+            return fecha.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }) + ` ${hora}`;
+        }
+    }
+
+    function escapeHtml(texto) {
+        const div = document.createElement('div');
+        div.textContent = texto;
+        return div.innerHTML;
+    }
+
+    // Event: Enviar mensaje al admin
+    document.getElementById("btn-enviar-mensaje-admin")?.addEventListener("click", async () => {
+        const input = document.getElementById("chat-input-mensaje");
+        const mensaje = input.value.trim();
+
+        if (!mensaje || !idIncidenciaChatActual) return;
+
+        const formData = new FormData();
+        formData.append("accion", "enviar_mensaje_admin");
+        formData.append("id_incidencia", idIncidenciaChatActual);
+        formData.append("id_usuario", obtenerIdUsuario());
+        formData.append("mensaje", mensaje);
+
+        try {
+            const resp = await fetch("../php/incidencias.php", { method: "POST", body: formData });
+            const data = await resp.json();
+
+            if (data.success) {
+                input.value = "";
+                await cargarMensajesChat(idIncidenciaChatActual);
+                scrollToBottomChat();
+            } else {
+                alert("Error al enviar el mensaje: " + (data.error || ""));
+            }
+        } catch (error) {
+            console.error("Error enviando mensaje:", error);
+            alert("Error de conexión al enviar el mensaje");
+        }
+    });
+
+    // Event: Ver detalle completo desde el chat
+    document.getElementById("btn-ver-detalle-completo")?.addEventListener("click", () => {
+        cerrarModal("modal-conversacion-admin");
+        const incidenciaEl = document.querySelector(`.incident-item[data-id="${idIncidenciaChatActual}"]`);
+        if (incidenciaEl) {
+            incidenciaEl.click();
+        }
+    });
+
+    // Event: Enter para enviar mensaje (sin Shift)
+    document.getElementById("chat-input-mensaje")?.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            document.getElementById("btn-enviar-mensaje-admin").click();
+        }
+    });
+
+    // ═══════════════════════════════════════════════════════════════
+    // 🔔 EVENT LISTENERS PARA NOTIFICACIONES
+    // ═══════════════════════════════════════════════════════════════
+
+    iniciarPollingNotificaciones();
+
+    // Click en notificaciones (con botones)
+    document.getElementById("lista-notificaciones-usuario")?.addEventListener("click", async (e) => {
+        const btnConversacion = e.target.closest(".btn-ver-conversacion");
+        const btnDetalle = e.target.closest(".btn-ver-detalle-notif");
+        const notifyItem = e.target.closest(".notify-item");
+
+        if (btnConversacion) {
+            const idNotif = btnConversacion.dataset.idNotif;
+            const idInc = btnConversacion.dataset.idInc;
+            await abrirConversacionAdmin(idInc, idNotif);
+            return;
+        }
+
+        if (btnDetalle) {
+            const idInc = btnDetalle.dataset.idInc;
+            cerrarModal("modal-notificaciones-usuario");
+            const incidenciaEl = document.querySelector(`.incident-item[data-id="${idInc}"]`);
+            if (incidenciaEl) {
+                setTimeout(() => incidenciaEl.click(), 200);
+            }
+            return;
+        }
+
+        if (notifyItem && !btnConversacion && !btnDetalle) {
+            const idNotificacion = notifyItem.dataset.idNotificacion;
+            const idIncidencia = notifyItem.dataset.idInincidencia;
+
+            await marcarNotificacionLeida(idNotificacion);
+            cerrarModal("modal-notificaciones-usuario");
+
+            const incidenciaEl = document.querySelector(`.incident-item[data-id="${idIncidencia}"]`);
+            if (incidenciaEl) {
+                incidenciaEl.click();
+            }
+            comprobarNuevasNotificaciones();
+        }
+    });
+
+    document.getElementById("btn-marcar-todas-leidas-usuario")?.addEventListener("click", async () => {
+        await marcarTodasLeidas();
+    });
+
+    const modalNotifUsuario = document.getElementById("modal-notificaciones-usuario");
+    modalNotifUsuario?.addEventListener("click", (e) => {
+        if (e.target === modalNotifUsuario) {
+            cerrarModal("modal-notificaciones-usuario");
+            comprobarNuevasNotificaciones();
+        }
+    });
+
+    window.addEventListener("beforeunload", detenerPollingNotificaciones);
 }
 
 document.addEventListener("DOMContentLoaded", initIncidencias);
