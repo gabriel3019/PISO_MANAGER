@@ -948,6 +948,104 @@ body{
 }
 
 /* ================================================= */
+/* ================= DEUDAS DARK =================== */
+/* ================================================= */
+
+.dark .debts-count{
+  background:#4338ca;
+  color:#ffffff;
+  font-weight:700;
+  min-width:34px;
+  height:34px;
+  border-radius:999px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:
+    0 4px 12px rgba(79,70,229,0.35);
+}
+
+.dark .recibe{
+  background:#ecfdf5;
+  color:#16a34a;
+  border:none;
+}
+
+.dark .deuda{
+  background:#fef2f2;
+  color:#dc2626;
+  border:none;
+}
+
+.dark .resumen{
+  gap:14px;
+}
+
+.dark .recibe,
+.dark .deuda{
+  border-radius:16px;
+  padding:18px;
+  font-size:15px;
+  font-weight:700;
+}
+
+/* ================================================= */
+/* ================= DETALLE DARK ================== */
+/* ================================================= */
+
+.dark .detalle-top{
+  background:#1e293b;
+  border:1px solid #334155;
+}
+
+.dark .detalle-label{
+  color:#94a3b8;
+}
+
+.dark #detallePagador,
+.dark #detalleImporte{
+  color:#f8fafc;
+}
+
+.dark .participants-box{
+  background:#1e293b;
+  border:1px solid #334155;
+}
+
+.dark .participant-row{
+  border-bottom:1px solid #334155;
+}
+
+.dark .participant-name{
+  color:#ffffff;
+}
+
+.dark .participant-amount{
+  color:#f8fafc;
+}
+
+.dark .participant-status.pending{
+  background:#450a0a;
+  color:#fca5a5;
+}
+
+.dark .participant-status.paid{
+  background:#052e16;
+  color:#86efac;
+}
+
+.dark .modal-header{
+  border-bottom:1px solid #334155;
+}
+
+.dark .close{
+  color:#cbd5e1;
+}
+
+.dark .close:hover{
+  color:#ffffff;
+}
+/* ================================================= */
 /* ================= SCROLL ======================== */
 /* ================================================= */
 

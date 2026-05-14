@@ -634,19 +634,24 @@ button{
   opacity:1;
   transform:translateX(-50%) translateY(0);
 }
-
 /* ================================================= */
 /* ================= DARK MODE ===================== */
 /* ================================================= */
 
 body.dark{
-  background:#0f172a;
-  color:#e5e7eb;
+  background:#020617;
+  color:#f8fafc;
 }
+
+/* ================= SIDEBAR ================= */
 
 body.dark .sidebar{
   background:#020617;
-  border-color:#1e293b;
+  border-right:1px solid #172033;
+}
+
+body.dark .sidebar li a{
+  color:#cbd5e1;
 }
 
 body.dark .sidebar li:hover a{
@@ -654,34 +659,125 @@ body.dark .sidebar li:hover a{
 }
 
 body.dark .sidebar li.active a{
-  background:#1e3a8a;
+  background:#1e293b;
   color:white;
 }
 
-body.dark .task,
-body.dark .modal{
-  background:#020617;
+body.dark .subtitle,
+body.dark .section-title,
+body.dark .meta,
+body.dark .date{
+  color:#94a3b8;
 }
 
-body.dark .search-box,
+/* ================= ICONOS ================= */
+
+body.dark .icon{
+  filter:brightness(0) invert(1);
+}
+
+/* ================= TASKS ================= */
+
+body.dark .task{
+  background:#081120;
+  border:1px solid #1e293b;
+  box-shadow:none;
+}
+
+body.dark .task:hover{
+  background:#0f172a;
+  border-color:#334155;
+  box-shadow:0 8px 20px rgba(0,0,0,0.25);
+}
+
+body.dark .task-title{
+  color:#f8fafc;
+}
+
+body.dark .completed{
+  opacity:0.55;
+}
+
+/* ================= FILTROS ================= */
+
+body.dark .filters button{
+  background:#ffffff;
+  color:#111827;
+  border:1px solid #e5e7eb;
+  font-weight:600;
+}
+
+body.dark .filters button:hover{
+  background:#f3f4f6;
+}
+
+body.dark .filters .active{
+  background:#4f46e5;
+  border-color:#4f46e5;
+  color:white;
+}
+
+/* ================= SEARCH ================= */
+
+body.dark .search-box{
+  background:#081120;
+  border:1px solid #1e293b;
+}
+
+body.dark .search-box input{
+  color:#f8fafc;
+}
+
+body.dark .search-box input::placeholder{
+  color:#64748b;
+}
+
+/* ================= BOTONES ================= */
+
+body.dark .btn-light{
+  background:#111827;
+  border:1px solid #1e293b;
+  color:#f8fafc;
+}
+
+body.dark .btn-light:hover{
+  background:#172033;
+}
+
+/* ================= MODALES ================= */
+
+body.dark .modal{
+  background:#081120;
+  border:1px solid #1e293b;
+}
+
 body.dark .modal-body input,
 body.dark .modal-body textarea,
 body.dark .modal-body select{
   background:#0f172a;
-  border-color:#1e293b;
-  color:#e5e7eb;
+  border:1px solid #1e293b;
+  color:#f8fafc;
 }
 
-body.dark .filters button,
-body.dark .btn-light{
-  background:#0f172a;
-  border-color:#1e293b;
-  color:#e5e7eb;
+body.dark .modal-body input:focus,
+body.dark .modal-body textarea:focus,
+body.dark .modal-body select:focus{
+  border-color:#4f46e5;
+  box-shadow:0 0 0 3px rgba(79,70,229,0.15);
 }
 
-body.dark .filters button:hover,
-body.dark .btn-light:hover{
+/* ================= CHECKBOX ================= */
+
+body.dark input[type="checkbox"]{
+  accent-color:#6366f1;
+}
+
+/* ================= TOAST ================= */
+
+body.dark .toast{
   background:#111827;
+  border:1px solid #1e293b;
+  color:white;
 }
 
 /* ================================================= */

@@ -86,3 +86,17 @@ body.dark .btn-secondary {
   background: #1e293b;
   color: #e5e7eb;
 }
+
+
+
+/* ================================================= */
+/* ================= ICONOS DARK =================== */
+/* ================================================= */
+
+.dark .icon{
+  filter: brightness(0) invert(1);
+}
+
+.dark .sidebar li.active a .icon{
+  filter: brightness(0) invert(1);
+}
