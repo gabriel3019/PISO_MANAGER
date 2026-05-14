@@ -135,81 +135,97 @@
       </ul>
     </article>
 
-    <!-- ══════════════ MODAL DETALLE ══════════════ -->
-    <div class="modal-overlay modal--hidden" id="modal-detalle-incidencia" role="dialog" aria-modal="true"
-      aria-labelledby="modal-detalle-title">
-      <div class="modal modal--detalle">
-        <div class="modal__header">
-          <div class="modal__header-left">
-            <span class="modal__icon" id="detalle-icono" aria-hidden="true"></span>
-            <h2 class="modal__title" id="modal-detalle-title">Detalle de Incidencia</h2>
-          </div>
-          <button class="modal__close" aria-label="Cerrar" data-modal-close="modal-detalle-incidencia">✕</button>
+   <!-- ══════════════ MODAL DETALLE ══════════════ -->
+<div class="modal-overlay modal--hidden" id="modal-detalle-incidencia" role="dialog" aria-modal="true"
+  aria-labelledby="modal-detalle-title">
+  <div class="modal modal--detalle">
+    <div class="modal__header">
+      <div class="modal__header-left">
+        <span class="modal__icon" id="detalle-icono" aria-hidden="true"></span>
+        <h2 class="modal__title" id="modal-detalle-title">Detalle de Incidencia</h2>
+      </div>
+      <button class="modal__close" aria-label="Cerrar" data-modal-close="modal-detalle-incidencia">✕</button>
+    </div>
+    <hr class="modal__divider" />
+    <div class="modal__body modal__body--detalle">
+
+      <div id="detalle-imagen-wrap" class="detalle__imagen-wrap" style="display:none;">
+        <img id="detalle-imagen" src="" alt="Imagen incidencia" class="detalle__imagen" />
+      </div>
+
+      <div class="detalle__badges">
+        <span class="status-badge" id="detalle-estado-badge"></span>
+        <span class="priority-dot" id="detalle-prioridad-dot"></span>
+      </div>
+
+      <div class="detalle__grid">
+        <div class="detalle__campo">
+          <span class="detalle__label">TIPO</span>
+          <span class="detalle__valor" id="detalle-tipo"></span>
         </div>
-        <hr class="modal__divider" />
-        <div class="modal__body modal__body--detalle">
-
-          <div id="detalle-imagen-wrap" class="detalle__imagen-wrap" style="display:none;">
-            <img id="detalle-imagen" src="" alt="Imagen incidencia" class="detalle__imagen" />
-          </div>
-
-          <div class="detalle__badges">
-            <span class="status-badge" id="detalle-estado-badge"></span>
-            <span class="priority-dot" id="detalle-prioridad-dot"></span>
-          </div>
-
-          <div class="detalle__grid">
-            <div class="detalle__campo">
-              <span class="detalle__label">TIPO</span>
-              <span class="detalle__valor" id="detalle-tipo"></span>
-            </div>
-            <div class="detalle__campo">
-              <span class="detalle__label">FECHA</span>
-              <span class="detalle__valor" id="detalle-fecha"></span>
-            </div>
-          </div>
-
-          <div class="detalle__campo detalle__campo--full">
-            <span class="detalle__label">TÍTULO</span>
-            <span class="detalle__valor detalle__valor--titulo" id="detalle-titulo"></span>
-          </div>
-
-          <div class="detalle__campo detalle__campo--full">
-            <span class="detalle__label">DESCRIPCIÓN</span>
-            <p class="detalle__valor detalle__valor--desc" id="detalle-desc"></p>
-          </div>
-
-          <div class="detalle__campo detalle__campo--full">
-            <span class="detalle__label">NOTIFICAR ADMINISTRADOR</span>
-            <span class="detalle__valor" id="detalle-notificar"></span>
-          </div>
-
-          <!-- ✅ NUEVO: Comentario al administrador (solo visible si existe) -->
-          <div class="detalle__campo detalle__campo--full" id="detalle-comentario-wrap" style="display:none;">
-            <span class="detalle__label">COMENTARIO AL ADMINISTRADOR</span>
-            <p class="detalle__valor detalle__valor--desc" id="detalle-comentario"></p>
-          </div>
-
-          <!-- Fechas de incidencia -->
-          <div class="detalle__grid">
-            <div class="detalle__campo">
-              <span class="detalle__label">FECHA INICIO</span>
-              <span class="detalle__valor" id="detalle-fecha-inicio"></span>
-            </div>
-            <div class="detalle__campo">
-              <span class="detalle__label">FECHA FIN</span>
-              <span class="detalle__valor" id="detalle-fecha-fin"></span>
-            </div>
-          </div>
-
-        </div>
-        <hr class="modal__divider" />
-        <div class="modal__footer">
-          <button type="button" class="modal__btn modal__btn--cancel"
-            data-modal-close="modal-detalle-incidencia">Cerrar</button>
+        <div class="detalle__campo">
+          <span class="detalle__label">FECHA</span>
+          <span class="detalle__valor" id="detalle-fecha"></span>
         </div>
       </div>
+
+      <div class="detalle__campo detalle__campo--full">
+        <span class="detalle__label">TÍTULO</span>
+        <span class="detalle__valor detalle__valor--titulo" id="detalle-titulo"></span>
+      </div>
+
+      <div class="detalle__campo detalle__campo--full">
+        <span class="detalle__label">DESCRIPCIÓN</span>
+        <p class="detalle__valor detalle__valor--desc" id="detalle-desc"></p>
+      </div>
+
+      <div class="detalle__campo detalle__campo--full">
+        <span class="detalle__label">NOTIFICAR ADMINISTRADOR</span>
+        <span class="detalle__valor" id="detalle-notificar"></span>
+      </div>
+
+      <!-- ✅ Comentario al administrador (solo visible si existe) -->
+      <div class="detalle__campo detalle__campo--full" id="detalle-comentario-wrap" style="display:none;">
+        <span class="detalle__label">COMENTARIO AL ADMINISTRADOR</span>
+        <p class="detalle__valor detalle__valor--desc" id="detalle-comentario"></p>
+      </div>
+
+      <!-- Fechas de incidencia -->
+      <div class="detalle__grid">
+        <div class="detalle__campo">
+          <span class="detalle__label">FECHA INICIO</span>
+          <span class="detalle__valor" id="detalle-fecha-inicio"></span>
+        </div>
+        <div class="detalle__campo">
+          <span class="detalle__label">FECHA FIN</span>
+          <span class="detalle__valor" id="detalle-fecha-fin"></span>
+        </div>
+      </div>
+
     </div>
+    <hr class="modal__divider" />
+    
+    <!-- ✅ FOOTER CON LOS DOS BOTONES (CORREGIDO) -->
+    <div class="modal__footer">
+      <!-- Botón conversación (se muestra/oculta vía JS) -->
+      <button type="button" 
+              class="modal__btn modal__btn--chat" 
+              id="btn-ver-conversacion" 
+              title="Ver conversación con el administrador">
+        💬 Ver conversación
+      </button>
+      
+      <!-- Botón Cerrar (alineado a la derecha con margin-left: auto) -->
+      <button type="button" 
+              class="modal__btn modal__btn--cancel" 
+              data-modal-close="modal-detalle-incidencia"
+              style="margin-left: auto;">
+        Cerrar
+      </button>
+    </div>
+    
+  </div>
+</div>
 
     <!-- ══════════════ MODAL NUEVA INCIDENCIA ══════════════ -->
     <div class="modal-overlay modal--hidden" id="modal-nueva-incidencia" role="dialog" aria-modal="true"
@@ -357,7 +373,6 @@
           <div class="modal__field">
             <label class="modal__label">NIVEL DE URGENCIA</label>
             <div class="modal__urgencia-row" role="group" aria-label="Nivel de urgencia">
-              <!-- ✅ CORREGIDO: data-urgencia="baja/alta" en lugar de "bajo/alto" -->
               <button type="button" class="modal__urgencia-btn" data-urgencia="baja">
                 <span class="modal__urgencia-dot modal__urgencia-dot--low"></span>Bajo
               </button>
@@ -478,29 +493,25 @@
           <button class="modal__close" aria-label="Cerrar" data-modal-close="modal-conversacion-admin">✕</button>
         </div>
         <hr class="modal__divider" />
-        
+
         <!-- Área de mensajes -->
         <div class="chat-container" id="chat-mensajes-container">
           <div id="chat-mensajes-lista" class="chat-messages">
             <!-- Los mensajes se cargan dinámicamente aquí -->
           </div>
         </div>
-        
+
         <hr class="modal__divider" />
-        
+
         <!-- Input para responder -->
         <div class="chat-input-area">
-          <textarea 
-            id="chat-input-mensaje" 
-            class="chat-input" 
-            placeholder="Escribe una respuesta al administrador..."
-            rows="2"
-          ></textarea>
+          <textarea id="chat-input-mensaje" class="chat-input" placeholder="Escribe una respuesta al administrador..."
+            rows="2"></textarea>
           <button id="btn-enviar-mensaje-admin" class="btn btn-primary btn-enviar">
             Enviar
           </button>
         </div>
-        
+
         <div class="modal__footer">
           <button type="button" class="modal__btn modal__btn--secondary" data-modal-close="modal-conversacion-admin">
             Cerrar

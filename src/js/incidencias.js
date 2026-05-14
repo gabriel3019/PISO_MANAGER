@@ -242,9 +242,11 @@ async function initIncidencias() {
                     ? `<span style="font-size:.7rem;background:#dbeafe;color:#1d4ed8;padding:2px 7px;border-radius:999px;font-weight:600;margin-left:6px;">Admin</span>`
                     : '';
 
+                // 🔔 NUEVO: Añadimos data-id-usuario para validación de ownership en frontend
                 const html = `
                     <li class="incident-item"
                         data-id="${inc.id}"
+                        data-id-usuario="${inc.id_usuario}"
                         data-tipo="${inc.tipo}"
                         data-urgencia="${inc.urgencia}"
                         data-titulo="${inc.titulo?.replace(/"/g, '&quot;')}"
@@ -371,6 +373,12 @@ async function initIncidencias() {
         } else {
             imagenWrap.style.display = "none";
         }
+
+        actualizarBotonConversacion({
+            id_incidencia: item.dataset.id,
+            id_usuario: parseInt(item.dataset.idUsuario || 0),
+            notificar_admin: parseInt(item.dataset.notificar || 0)
+        });
 
         abrirModal("modal-detalle-incidencia");
     });
@@ -600,7 +608,6 @@ document.getElementById("btn-confirmar-eliminar")?.addEventListener("click", asy
         const res = await fetch("../php/incidencias.php", { 
             method: "POST", 
             body: formData
-            // ✅ NO pongas headers manualmente con FormData
         });
 
         console.log("📡 Status:", res.status, "OK:", res.ok);
@@ -942,6 +949,93 @@ document.getElementById("btn-confirmar-eliminar")?.addEventListener("click", asy
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
             document.getElementById("btn-enviar-mensaje-admin").click();
+        }
+    });
+
+    // ═══════════════════════════════════════════════════════════════
+    // 🔔 NUEVO: FUNCIONES PARA CONVERSACIÓN SEGURA DESDE DETALLE
+    // ═══════════════════════════════════════════════════════════════
+
+    // 🔔 NUEVO: Mostrar/ocultar botón conversación según condiciones
+    function actualizarBotonConversacion(incidenciaData) {
+        const btn = document.getElementById('btn-ver-conversacion');
+        if (!btn) return;
+        
+        const idUsuarioLogueado = obtenerIdUsuario();
+        const idCreador = parseInt(incidenciaData.id_usuario || 0);
+        const requiereAdmin = parseInt(incidenciaData.notificar_admin || 0) === 1;
+        
+        // ✅ Solo mostrar si: es el creador Y necesita revisión admin
+        if (idUsuarioLogueado && idCreador === idUsuarioLogueado && requiereAdmin) {
+            btn.style.display = 'inline-block';
+            btn.dataset.incidenciaId = incidenciaData.id_incidencia;
+        } else {
+            btn.style.display = 'none';
+            btn.dataset.incidenciaId = '';
+        }
+    }
+
+    // 🔔 NUEVO: Cargar conversación con validación de seguridad en backend
+    async function cargarConversacionSegura(idIncidencia) {
+        try {
+            const resp = await fetch(
+                `../php/incidencias.php?accion=obtener_conversacion_segura&id_incidencia=${idIncidencia}`,
+                { credentials: 'same-origin' }
+            );
+            const data = await resp.json();
+            
+            if (!data.success) {
+                console.warn('Acceso denegado a conversación:', data.error);
+                alert('No tienes permiso para ver esta conversación');
+                return null;
+            }
+            return data.mensajes;
+        } catch (error) {
+            console.error('Error cargando conversación:', error);
+            alert('Error de conexión al cargar la conversación');
+            return null;
+        }
+    }
+
+    // 🔔 NUEVO: Abrir modal de conversación desde el detalle de incidencia
+    async function abrirModalConversacionDesdeDetalle(idIncidencia) {
+        const mensajes = await cargarConversacionSegura(idIncidencia);
+        if (!mensajes) return; // Acceso denegado o error
+        
+        const lista = document.getElementById('chat-mensajes-lista');
+        if (lista) {
+            lista.innerHTML = mensajes.length > 0 
+                ? mensajes.map(msg => {
+                    const idUsuarioLogueado = obtenerIdUsuario();
+                    const esUsuario = msg.origen === 'usuario' || msg.id_usuario == idUsuarioLogueado;
+                    const clase = esUsuario ? 'mensaje-chat--usuario' : 'mensaje-chat--admin';
+                    const autor = esUsuario ? 'Tú' : (msg.nombre || 'Administrador');
+                    const fecha = msg.fecha_envio ? formatearFechaHora(msg.fecha_envio) : 'Ahora';
+                    
+                    return `
+                        <div class="mensaje-chat ${clase}">
+                            <div class="mensaje-chat__autor">${autor}</div>
+                            <div class="mensaje-chat__texto">${escapeHtml(msg.mensaje)}</div>
+                            <div class="mensaje-chat__fecha">${fecha}</div>
+                        </div>
+                    `;
+                }).join('')
+                : `<div class="chat-sin-mensajes"><p>Aún no hay mensajes en esta conversación</p></div>`;
+        }
+        
+        const modal = document.getElementById('modal-conversacion-admin');
+        if (modal) {
+            modal.classList.remove('modal--hidden');
+            document.body.style.overflow = 'hidden';
+            scrollToBottomChat();
+        }
+    }
+
+    // 🔔 NUEVO: Event listener para el botón de conversación en el detalle
+    document.getElementById('btn-ver-conversacion')?.addEventListener('click', (e) => {
+        const idIncidencia = e.currentTarget.dataset.incidenciaId;
+        if (idIncidencia) {
+            abrirModalConversacionDesdeDetalle(idIncidencia);
         }
     });
 

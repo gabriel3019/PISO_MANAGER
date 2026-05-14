@@ -966,6 +966,52 @@ body {
   box-shadow: 0 4px 14px rgba(220, 38, 38, 0.45);
 }
 
+/* 🔔 NUEVO: Botón de conversación con admin */
+.modal__btn--chat {
+  background: #1e293b; 
+  color: #ffffff;
+  border: none;
+  padding: 9px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s, transform .1s, box-shadow .15s;
+  box-shadow: 0 2px 8px rgba(30, 41, 59, 0.2);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Efecto al pasar el mouse: se aclara un poco */
+.modal__btn--chat:hover {
+  background: #334155; /* Slate 700 */
+  box-shadow: 0 4px 12px rgba(30, 41, 59, 0.3);
+  transform: translateY(-1px);
+}
+
+.modal__btn--chat:active {
+  transform: scale(0.97);
+}
+
+.modal__btn--chat:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* 🔔 NUEVO: Alineación específica para footer del modal detalle */
+.modal--detalle .modal__footer {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 12px;
+}
+
+.modal--detalle .modal__btn--cancel {
+  margin-left: auto; /* Empuja el botón "Cerrar" a la derecha */
+}
+
 .modal__confirm-text {
   font-size: .8rem;
   font-weight: 600;

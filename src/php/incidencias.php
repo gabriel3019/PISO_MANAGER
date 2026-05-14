@@ -463,6 +463,90 @@ switch ($accion) {
         $stmt->close();
         break;
 
+    // ═══════════════════════════════════════════════════════════════
+    // CASE: obtener_conversacion_segura (VALIDACIÓN DE SEGURIDAD)
+    // ═══════════════════════════════════════════════════════════════
+    case 'obtener_conversacion_segura':
+        // 🔐 Usar sesión para identificar al usuario (NO confiar en POST/GET)
+        session_start();
+        $id_usuario_logueado = $_SESSION['id_usuario'] ?? $_SESSION['user_id'] ?? 0;
+
+        $id_incidencia = intval($_GET['id_incidencia'] ?? 0);
+
+        if (!$id_incidencia || !$id_usuario_logueado) {
+            echo json_encode(['success' => false, 'error' => 'Datos inválidos']);
+            exit;
+        }
+
+        // 1️⃣ Verificar que la incidencia existe, pertenece al usuario Y tiene notificar_admin=1
+        $stmt = $conn->prepare("
+        SELECT id_usuario, notificar_admin, estado 
+        FROM incidencias 
+        WHERE id_incidencia = ?
+    ");
+        $stmt->bind_param("i", $id_incidencia);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $incidencia = $result->fetch_assoc();
+        $stmt->close();
+
+        // 🔒 Validación CRÍTICA: ownership + flag admin
+        if (
+            !$incidencia ||
+            $incidencia['id_usuario'] != $id_usuario_logueado ||
+            !$incidencia['notificar_admin']
+        ) {
+            echo json_encode(['success' => false, 'error' => 'Acceso denegado']);
+            exit;
+        }
+
+        // 2️⃣ Obtener mensajes combinados (tu lógica UNION ya es correcta)
+        $stmt = $conn->prepare("
+        SELECT 
+            m.id_mensaje,
+            m.id_incidencia,
+            m.id_usuario,
+            u.nombre,
+            m.mensaje,
+            m.fecha AS fecha_envio,
+            'usuario' AS origen
+        FROM mensajes_incidencia m
+        INNER JOIN usuarios u ON m.id_usuario = u.id_usuario
+        WHERE m.id_incidencia = ?
+        
+        UNION ALL
+        
+        SELECT 
+            m.id_mensaje,
+            m.id_incidencia,
+            m.id_usuario,
+            u.nombre,
+            m.mensaje,
+            m.fecha_envio,
+            'admin' AS origen
+        FROM incidencia_mensajes m
+        INNER JOIN usuarios u ON m.id_usuario = u.id_usuario
+        WHERE m.id_incidencia = ?
+        
+        ORDER BY fecha_envio ASC
+    ");
+        $stmt->bind_param("ii", $id_incidencia, $id_incidencia);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $mensajes = [];
+        while ($row = $result->fetch_assoc()) {
+            $mensajes[] = $row;
+        }
+        $stmt->close();
+
+        echo json_encode([
+            'success' => true,
+            'mensajes' => $mensajes,
+            'estado_incidencia' => $incidencia['estado']
+        ]);
+        break;
+
     default:
         error_log("ACCIÓN NO VÁLIDA RECIBIDA: $accion | POST: " . print_r($_POST, true));
         echo json_encode([
