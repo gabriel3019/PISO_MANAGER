@@ -7,6 +7,8 @@ const API_PAGOS = "../php/pagos.php";
 /* ================= ESTADO ======================== */
 /* ================================================= */
 
+let gastoEditando = null;
+
 let gastos = [];
 let usuarios = [];
 
@@ -647,6 +649,10 @@ function crearCardGasto(gasto) {
             Ver detalles
           </button>
 
+          <span class="edit-btn">
+            ✏️
+          </span>
+
           <span class="delete-btn">
             🗑️
           </span>
@@ -663,6 +669,11 @@ function crearCardGasto(gasto) {
     .querySelector(".detail-btn")
     .onclick = () =>
       abrirDetalle(gasto);
+
+  div
+    .querySelector(".edit-btn")
+    .onclick = () =>
+      editarGasto(gasto);
 
   div
     .querySelector(".delete-btn")
@@ -696,6 +707,53 @@ function abrirModal() {
   divisionContainer.innerHTML = "";
 
   modal.classList.remove("hidden");
+
+}
+
+function editarGasto(gasto) {
+
+  gastoEditando = gasto;
+
+  modal.classList.remove("hidden");
+
+  document
+    .getElementById("step1")
+    .classList
+    .remove("hidden");
+
+  document
+    .getElementById("step2")
+    .classList
+    .add("hidden");
+
+  tituloInput.value =
+    gasto.titulo;
+
+  importeInput.value =
+    gasto.importe;
+
+  usuariosCheckbox
+    .querySelectorAll("input")
+    .forEach(cb => {
+
+      cb.checked = false;
+
+    });
+
+  gasto.participantes.forEach(p => {
+
+    const checkbox =
+      usuariosCheckbox.querySelector(
+        `input[value="${p.id_usuario}"]`
+      );
+
+    if (checkbox) {
+
+      checkbox.checked = true;
+
+    }
+
+  });
 
 }
 

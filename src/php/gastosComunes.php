@@ -222,6 +222,186 @@ try {
     }
 
     /* ===================================================== */
+    /* ================= EDITAR ============================ */
+    /* ===================================================== */
+
+    if (
+        $accion === "editar" &&
+        $id_gasto
+    ) {
+
+        $id_gasto = (int)$id_gasto;
+
+        if (
+            empty($titulo) ||
+            $importe <= 0 ||
+            empty($participantes)
+        ) {
+
+            echo json_encode([
+                "success" => false,
+                "message" => "Datos incompletos"
+            ]);
+
+            exit;
+        }
+
+        /* ===================================================== */
+        /* ================= ACTUALIZAR GASTO ================== */
+        /* ===================================================== */
+
+        $sql = "
+        UPDATE gastos
+        SET
+            descripcion = ?,
+            monto_total = ?,
+            id_pagador = ?
+        WHERE id_gasto = ?
+        AND id_piso = ?
+        ";
+
+        $stmt = $conn->prepare($sql);
+
+        $stmt->bind_param(
+            "sdiii",
+            $titulo,
+            $importe,
+            $pagador,
+            $id_gasto,
+            $id_piso
+        );
+
+        $stmt->execute();
+
+        /* ===================================================== */
+        /* ========= ELIMINAR PARTICIPANTES ANTIGUOS =========== */
+        /* ===================================================== */
+
+        $sqlDelete = "
+        DELETE FROM gastos_participantes
+        WHERE id_gasto = ?
+        ";
+
+        $stmtDelete = $conn->prepare($sqlDelete);
+
+        $stmtDelete->bind_param(
+            "i",
+            $id_gasto
+        );
+
+        $stmtDelete->execute();
+
+        /* ===================================================== */
+        /* =============== REINSERTAR NUEVOS =================== */
+        /* ===================================================== */
+
+        if (!empty($importesManual)) {
+
+            foreach ($importesManual as $uid => $parte) {
+
+                $uid = (int)$uid;
+
+                $parte = (float)$parte;
+
+                if ($parte <= 0) {
+                    continue;
+                }
+
+                $pagado =
+                    ((int)$uid === (int)$pagador)
+                    ? 1
+                    : 0;
+
+                $sqlInsert = "
+                INSERT INTO gastos_participantes
+                (
+                    id_gasto,
+                    id_usuario,
+                    importe,
+                    pagado
+                )
+                VALUES (?, ?, ?, ?)
+                ";
+
+                $stmtInsert =
+                    $conn->prepare($sqlInsert);
+
+                $stmtInsert->bind_param(
+                    "iidi",
+                    $id_gasto,
+                    $uid,
+                    $parte,
+                    $pagado
+                );
+
+                $stmtInsert->execute();
+            }
+
+        } else {
+
+            $cantidad =
+                count($participantes);
+
+            $parteBase =
+                floor(($importe / $cantidad) * 100) / 100;
+
+            $totalAsignado =
+                $parteBase * $cantidad;
+
+            $diferencia =
+                round($importe - $totalAsignado, 2);
+
+            foreach ($participantes as $index => $uid) {
+
+                $uid = (int)$uid;
+
+                $parte = $parteBase;
+
+                if ($index === 0) {
+
+                    $parte += $diferencia;
+
+                }
+
+                $pagado =
+                    ((int)$uid === (int)$pagador)
+                    ? 1
+                    : 0;
+
+                $sqlInsert = "
+                INSERT INTO gastos_participantes
+                (
+                    id_gasto,
+                    id_usuario,
+                    importe,
+                    pagado
+                )
+                VALUES (?, ?, ?, ?)
+                ";
+
+                $stmtInsert =
+                    $conn->prepare($sqlInsert);
+
+                $stmtInsert->bind_param(
+                    "iidi",
+                    $id_gasto,
+                    $uid,
+                    $parte,
+                    $pagado
+                );
+
+                $stmtInsert->execute();
+            }
+        }
+
+        echo json_encode([
+            "success" => true
+        ]);
+
+        exit;
+    }
+
+    /* ===================================================== */
     /* ================= ELIMINAR ========================== */
     /* ===================================================== */
 
@@ -317,7 +497,20 @@ try {
                 u.id_usuario,
                 u.nombre,
                 gp.importe,
-                gp.pagado
+                gp.pagado,
+
+                COALESCE(
+                    (
+                        SELECT SUM(p.importe)
+                        FROM pagos p
+                        JOIN gastos g2
+                            ON g2.id_gasto = gp.id_gasto
+                        WHERE p.id_pagador = gp.id_usuario
+                        AND p.id_receptor = g2.id_pagador
+                        AND p.id_piso = g2.id_piso
+                    ),
+                    0
+                ) AS total_pagado
 
             FROM gastos_participantes gp
 
@@ -348,6 +541,16 @@ try {
                 $p = $res2->fetch_assoc()
             ) {
 
+                $importeParticipante =
+                    (float)$p['importe'];
+
+                $totalPagado =
+                    (float)$p['total_pagado'];
+
+                $estaPagado =
+                    $totalPagado >= $importeParticipante
+                    || (int)$p['pagado'] === 1;
+
                 $participantesDetalle[] = [
 
                     "id_usuario" =>
@@ -357,10 +560,10 @@ try {
                         $p['nombre'],
 
                     "importe" =>
-                        (float)$p['importe'],
+                        $importeParticipante,
 
                     "pagado" =>
-                        (int)$p['pagado']
+                        $estaPagado ? 1 : 0
 
                 ];
             }
@@ -397,10 +600,6 @@ try {
         $debes = [];
 
         $recibes = [];
-
-        /* ===================================================== */
-        /* ================= LO QUE DEBES ====================== */
-        /* ===================================================== */
 
         $sql = "
         SELECT
@@ -441,8 +640,6 @@ try {
 
             $id_pagador =
                 (int)$row['id_pagador'];
-
-            /* ================= RESTAR PAGOS ================= */
 
             $sqlPago = "
             SELECT
@@ -494,10 +691,6 @@ try {
             }
         }
 
-        /* ===================================================== */
-        /* ================= LO QUE TE DEBEN =================== */
-        /* ===================================================== */
-
         $sql = "
         SELECT
             gp.id_usuario,
@@ -537,8 +730,6 @@ try {
 
             $idDeudor =
                 (int)$row['id_usuario'];
-
-            /* ================= RESTAR PAGOS ================= */
 
             $sqlPago = "
             SELECT
