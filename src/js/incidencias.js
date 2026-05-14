@@ -9,6 +9,11 @@ function cargarUsuario() {
     return usuario;
 }
 
+function obtenerIdUsuario() {
+    const usuario = JSON.parse(sessionStorage.getItem("usuario"));
+    return usuario?.id_usuario || usuario?.id || null;
+}
+
 async function initIncidencias() {
 
     const usuario = cargarUsuario();
@@ -77,7 +82,7 @@ async function initIncidencias() {
         const error = document.getElementById(errorId);
         if (!input) return;
 
-        input.addEventListener('change', function() {
+        input.addEventListener('change', function () {
             const hoy = new Date().toISOString().split('T')[0];
             if (this.value && this.value < hoy) {
                 if (error) {
@@ -93,7 +98,7 @@ async function initIncidencias() {
             }
         });
 
-        input.addEventListener('blur', function() {
+        input.addEventListener('blur', function () {
             const hoy = new Date().toISOString().split('T')[0];
             if (this.value && this.value < hoy) {
                 if (error) error.style.display = 'block';
@@ -187,7 +192,7 @@ async function initIncidencias() {
 
             const listaActivas = document.getElementById("lista-activas");
             const listaResueltas = document.getElementById("lista-resueltas");
-            listaActivas.innerHTML   = "";
+            listaActivas.innerHTML = "";
             listaResueltas.innerHTML = "";
 
             let contadores = { abierta: 0, en_curso: 0, resuelta: 0 };
@@ -220,19 +225,19 @@ async function initIncidencias() {
 
                 const estadoClase =
                     estadoNorm === 'abierta' ? 'open' :
-                    estadoNorm === 'en_curso' || estadoNorm === 'en curso' ? 'progress' : 'done';
+                        estadoNorm === 'en_curso' || estadoNorm === 'en curso' ? 'progress' : 'done';
 
                 const estadoLabel =
                     estadoNorm === 'abierta' ? 'Abierta' :
-                    estadoNorm === 'en_curso' || estadoNorm === 'en curso' ? 'En curso' : 'Resuelta';
+                        estadoNorm === 'en_curso' || estadoNorm === 'en curso' ? 'En curso' : 'Resuelta';
 
                 const prioridadClase =
                     inc.urgencia === 'alta' || inc.urgencia === 'alto' ? 'high' :
-                    inc.urgencia === 'media' || inc.urgencia === 'medio' ? 'medium' : 'low';
+                        inc.urgencia === 'media' || inc.urgencia === 'medio' ? 'medium' : 'low';
 
                 const urgenciaLabel =
                     inc.urgencia === 'alto' || inc.urgencia === 'alta' ? 'Alta' :
-                    inc.urgencia === 'medio' || inc.urgencia === 'media' ? 'Media' : 'Baja';
+                        inc.urgencia === 'medio' || inc.urgencia === 'media' ? 'Media' : 'Baja';
 
                 const notificarBadge = inc.notificar_admin == 1
                     ? `<span style="font-size:.7rem;background:#dbeafe;color:#1d4ed8;padding:2px 7px;border-radius:999px;font-weight:600;margin-left:6px;">Admin</span>`
@@ -251,7 +256,7 @@ async function initIncidencias() {
                         data-notificar="${inc.notificar_admin || 0}"
                         data-fecha-inicio="${inc.fecha_inicio || ''}"
                         data-fecha-fin="${inc.fecha_fin || ''}"
-                        data-comentario="${(inc.comentario_admin || '').replace(/"/g,'&quot;')}">
+                        data-comentario="${(inc.comentario_admin || '').replace(/"/g, '&quot;')}">
 
                         ${iconoHTML}
 
@@ -321,34 +326,34 @@ async function initIncidencias() {
 
         const estadoClase =
             estadoNorm === 'abierta' ? 'open' :
-            estadoNorm === 'en_curso' || estadoNorm === 'en curso' ? 'progress' : 'done';
+                estadoNorm === 'en_curso' || estadoNorm === 'en curso' ? 'progress' : 'done';
         const estadoLabel =
             estadoNorm === 'abierta' ? 'Abierta' :
-            estadoNorm === 'en_curso' || estadoNorm === 'en curso' ? 'En curso' : 'Resuelta';
+                estadoNorm === 'en_curso' || estadoNorm === 'en curso' ? 'En curso' : 'Resuelta';
         const estadoBadge = document.getElementById("detalle-estado-badge");
         estadoBadge.className = `status-badge status-badge--${estadoClase}`;
         estadoBadge.textContent = estadoLabel;
 
         const prioClase =
             item.dataset.urgencia === 'alta' || item.dataset.urgencia === 'alto' ? 'high' :
-            item.dataset.urgencia === 'media' || item.dataset.urgencia === 'medio' ? 'medium' : 'low';
+                item.dataset.urgencia === 'media' || item.dataset.urgencia === 'medio' ? 'medium' : 'low';
         const urgenciaLabel =
             item.dataset.urgencia === 'alto' || item.dataset.urgencia === 'alta' ? 'Alta' :
-            item.dataset.urgencia === 'medio' || item.dataset.urgencia === 'media' ? 'Media' : 'Baja';
+                item.dataset.urgencia === 'medio' || item.dataset.urgencia === 'media' ? 'Media' : 'Baja';
         const prioDot = document.getElementById("detalle-prioridad-dot");
         prioDot.className = `priority-dot priority-dot--${prioClase}`;
         prioDot.textContent = urgenciaLabel;
 
-        document.getElementById("detalle-tipo").textContent  = item.dataset.tipo;
+        document.getElementById("detalle-tipo").textContent = item.dataset.tipo;
         document.getElementById("detalle-fecha").textContent = item.dataset.fecha || "—";
         document.getElementById("detalle-titulo").textContent = item.dataset.titulo;
-        document.getElementById("detalle-desc").textContent  = item.dataset.desc;
+        document.getElementById("detalle-desc").textContent = item.dataset.desc;
         document.getElementById("detalle-notificar").textContent =
             item.dataset.notificar === "1" ? "✅ Sí, notificado al administrador" : "No";
 
         // Mostrar u ocultar el comentario según si existe
         const comentarioWrap = document.getElementById("detalle-comentario-wrap");
-        const comentarioEl   = document.getElementById("detalle-comentario");
+        const comentarioEl = document.getElementById("detalle-comentario");
         if (item.dataset.comentario) {
             comentarioEl.textContent = item.dataset.comentario;
             comentarioWrap.style.display = "block";
@@ -442,9 +447,9 @@ async function initIncidencias() {
 
         const titulo = document.getElementById("nueva-titulo").value.trim();
         const descripcion = document.getElementById("nueva-desc").value.trim();
-        const tipo        = document.getElementById("nueva-tipo").value;
+        const tipo = document.getElementById("nueva-tipo").value;
         const fechaInicio = document.getElementById("nueva-fecha-inicio").value;
-        const fechaFin    = document.getElementById("nueva-fecha-fin").value || null;
+        const fechaFin = document.getElementById("nueva-fecha-fin").value || null;
         const urgenciaBtn = document.querySelector(
             "#modal-nueva-incidencia .modal__urgencia-btn--active"
         );
@@ -461,25 +466,31 @@ async function initIncidencias() {
             return;
         }
 
+        const idUsuario = obtenerIdUsuario();
+
         const formData = new FormData();
-        formData.append("accion",          "crear");
-        formData.append("id_piso",         1);
-        formData.append("id_usuario",      usuario?.id_usuario || 1);
-        formData.append("titulo",          titulo);
-        formData.append("descripcion",     descripcion);
-        formData.append("tipo",            tipo);
-        formData.append("fecha_inicio",    fechaInicio);
-        formData.append("fecha_fin",       fechaFin);
-        formData.append("urgencia",        urgenciaBtn ? urgenciaBtn.dataset.urgencia : "bajo");
+        formData.append("accion", "crear");
+        formData.append("id_piso", 1);
+        formData.append("id_usuario", idUsuario);
+        formData.append("titulo", titulo);
+        formData.append("descripcion", descripcion);
+        formData.append("tipo", tipo);
+        formData.append("fecha_inicio", fechaInicio);
+        formData.append("fecha_fin", fechaFin);
+        formData.append("urgencia", urgenciaBtn ? urgenciaBtn.dataset.urgencia : "bajo");
         formData.append("notificar_admin", notificar);
 
         if (notificar) {
             const comentario = document.getElementById("nueva-comentario-admin")?.value.trim();
+
             if (comentario) {
                 formData.append("comentario_admin", comentario);
-                formData.append("id_usuario_comentario", usuario?.id_usuario || 1);
+                formData.append("id_usuario_comentario", idUsuario);
             }
         }
+
+        console.log("ID USUARIO:", idUsuario);
+        console.log("DATOS:", Object.fromEntries(formData));
 
         const imagenFile = document.getElementById("nueva-imagen").files[0];
         if (imagenFile) formData.append("imagen", imagenFile);
@@ -503,10 +514,10 @@ async function initIncidencias() {
         const id = modal.dataset.incidenciaId;
         const titulo = document.getElementById("editar-titulo").value.trim();
         const descripcion = document.getElementById("editar-desc").value.trim();
-        const tipo        = document.getElementById("editar-tipo").value;
-        const estado      = document.getElementById("editar-estado").value;
+        const tipo = document.getElementById("editar-tipo").value;
+        const estado = document.getElementById("editar-estado").value;
         const fechaInicio = document.getElementById("editar-fecha-inicio").value;
-        const fechaFin    = document.getElementById("editar-fecha-fin").value || null;
+        const fechaFin = document.getElementById("editar-fecha-fin").value || null;
         const urgenciaBtn = modal.querySelector(".modal__urgencia-btn--active");
         const notificar = document.getElementById("editar-notificar-admin").checked ? 1 : 0;
 
@@ -522,22 +533,22 @@ async function initIncidencias() {
         }
 
         const formData = new FormData();
-        formData.append("accion",          "editar");
-        formData.append("id",              id);
-        formData.append("titulo",          titulo);
-        formData.append("descripcion",     descripcion);
-        formData.append("tipo",            tipo);
-        formData.append("estado",          estado);
-        formData.append("fecha_inicio",    fechaInicio);
-        formData.append("fecha_fin",       fechaFin);
-        formData.append("urgencia",        urgenciaBtn ? urgenciaBtn.dataset.urgencia : "bajo");
+        formData.append("accion", "editar");
+        formData.append("id", id);
+        formData.append("titulo", titulo);
+        formData.append("descripcion", descripcion);
+        formData.append("tipo", tipo);
+        formData.append("estado", estado);
+        formData.append("fecha_inicio", fechaInicio);
+        formData.append("fecha_fin", fechaFin);
+        formData.append("urgencia", urgenciaBtn ? urgenciaBtn.dataset.urgencia : "bajo");
         formData.append("notificar_admin", notificar);
 
         if (notificar) {
             const comentario = document.getElementById("editar-comentario-admin")?.value.trim();
             if (comentario) {
                 formData.append("comentario_admin", comentario);
-                formData.append("id_usuario_comentario", usuario?.id_usuario || 1);
+                formData.append("id_usuario_comentario", obtenerIdUsuario());
             }
         }
 
@@ -548,14 +559,14 @@ async function initIncidencias() {
         console.log("📋 Todos los datos:", Object.fromEntries(formData));
 
         try {
-            const res = await fetch("../php/incidencias.php", { 
-                method: "POST", 
-                body: formData 
+            const res = await fetch("../php/incidencias.php", {
+                method: "POST",
+                body: formData
             });
-            
+
             const text = await res.text();
             console.log("📥 Respuesta raw:", text);
-            
+
             const result = JSON.parse(text);
 
             if (result.success) {

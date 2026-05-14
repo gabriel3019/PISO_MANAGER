@@ -78,9 +78,6 @@ function pintarIncidencias() {
             </div>
 
             <div class="actions">
-                <span class="estado ${incidencia.estado}">
-                    ${formatearEstado(incidencia.estado)}
-                </span>
 
                 <select onchange="cambiarEstado(${incidencia.id_incidencia}, this.value)">
                     <option value="abierta" ${incidencia.estado === "abierta" ? "selected" : ""}>Abierta</option>
@@ -156,11 +153,6 @@ async function cargarMensajes(idIncidencia) {
         lista.innerHTML = "<p>No hay mensajes todavía.</p>";
     }
 }
-
-document.getElementById("cerrarModalDetalle").addEventListener("click", () => {
-    document.getElementById("modalDetalleIncidencia").classList.add("hidden");
-});
-
 filterButtons.forEach(button => {
     button.addEventListener("click", () => {
         filterButtons.forEach(btn => btn.classList.remove("active"));
@@ -266,14 +258,131 @@ async function abrirDetalleIncidencia(idIncidencia) {
         .getElementById("btnMarcarResuelta")
         .dataset.id = idIncidencia;
 }
+async function cargarNotificaciones() {
+    const badge = document.getElementById("badge-notificaciones-admin");
+    const lista = document.getElementById("lista-notificaciones");
+    const vacio = document.getElementById("notify-empty");
+    const modal = document.getElementById("modal-notificaciones-admin");
+
+    if (!lista || !modal) return;
+
+    function abrirModalNotif() {
+        modal.classList.remove("hidden");
+        document.body.style.overflow = "hidden";
+    }
+
+    function cerrarModalNotif() {
+        modal.classList.add("hidden");
+        document.body.style.overflow = "";
+    }
+
+
+    modal.querySelectorAll("[data-modal-close]").forEach(b =>
+        b.addEventListener("click", cerrarModalNotif)
+    );
+
+    modal.addEventListener("click", (e) => {
+        if (e.target === modal) {
+            cerrarModalNotif();
+        }
+    });
+
+    try {
+        const resp = await fetch(`../php/incidenciasAdmin.php?accion=obtener_notificaciones_admin&id_piso=1`);
+        const data = await resp.json();
+
+        if (data.success && Array.isArray(data.notificaciones) && data.notificaciones.length > 0) {
+            lista.innerHTML = "";
+            data.notificaciones.forEach(n => {
+                const urg = n.urgencia === 'alta' ? 'alta' : 'baja';
+                const icono = { fontaneria: "🚿", electricidad: "💡", internet: "🌐", limpieza: "🧹", otros: "⚠️" }[n.tipo] || "⚠️";
+                const fecha = n.fecha_creacion ? new Date(n.fecha_creacion).toLocaleDateString('es-ES') : 'Hoy';
+
+                const li = document.createElement("li");
+                li.className = "notify-item";
+                li.dataset.id = n.id_incidencia;
+                li.innerHTML = `
+    <div class="notify-card">
+        <div class="notify-icon">${icono}</div>
+
+        <div class="notify-info">
+            <h4>${n.titulo}</h4>
+            <p>${n.usuario_nombre || 'Usuario'} · ${fecha} · ${n.tipo}</p>
+        </div>
+
+        <span class="notify-priority ${urg}">
+            ${urg === 'alta' ? 'ALTA' : 'BAJA'}
+        </span>
+    </div>
+`;
+                lista.appendChild(li);
+            });
+            vacio.style.display = "none";
+            abrirModalNotif();
+            if (badge) {
+                badge.textContent = data.notificaciones.length;
+                badge.style.display = "inline-block";
+            }
+        } else {
+            cerrarModalNotif();
+            lista.innerHTML = "";
+
+            if (vacio) vacio.style.display = "block";
+
+            if (badge) {
+                badge.textContent = "0";
+                badge.style.display = "none";
+            }
+        }
+    } catch (e) {
+        console.error("Error cargando notificaciones admin:", e);
+    }
+
+    // Click en una notificación -> marcar leída
+    lista.addEventListener("click", async (e) => {
+        const item = e.target.closest(".notify-item");
+        if (!item) return;
+        const fd = new FormData();
+        fd.append("accion", "marcar_notificacion_leida");
+        fd.append("id_incidencia", item.dataset.id);
+        await fetch("../php/incidenciasAdmin.php", { method: "POST", body: fd });
+        cargarNotificaciones();
+    });
+
+    // Cerrar modal (botón X o click fuera)
+    modal.querySelectorAll("[data-modal-close]").forEach(b =>
+        b.addEventListener("click", cerrarModalNotif)
+    );
+    modal.addEventListener("click", (e) => {
+        if (e.target === modal) cerrarModalNotif();
+    });
+
+    // Marcar todas como leídas
+    document.getElementById("btn-marcar-todas-leidas")?.addEventListener("click", async () => {
+        const fd = new FormData();
+        fd.append("accion", "marcar_todas_leidas");
+        fd.append("id_piso", 1);
+        await fetch("../php/incidenciasAdmin.php", { method: "POST", body: fd });
+        cerrarModalNotif();
+        cargarNotificaciones();
+    });
+}
+
+document.getElementById("cerrarModalDetalle")?.addEventListener("click", () => {
+    document.getElementById("modalDetalleIncidencia").classList.add("hidden");
+});
 
 document
-    .getElementById("cerrarModalDetalle")
-    ?.addEventListener("click", () => {
+    .getElementById("modalDetalleIncidencia")
+    ?.addEventListener("click", (e) => {
 
-        document
-            .getElementById("modalDetalleIncidencia")
-            .classList.add("hidden");
+        // Si haces click fuera del contenido del modal
+        if (e.target.id === "modalDetalleIncidencia") {
+
+            document
+                .getElementById("modalDetalleIncidencia")
+                .classList.add("hidden");
+        }
     });
 
 document.getElementById("btnMarcarResuelta")?.addEventListener("click", async () => {
