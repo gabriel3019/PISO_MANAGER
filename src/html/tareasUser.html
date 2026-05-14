@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tareas</title>
 
-    <script>
+  <script>
     if (localStorage.getItem("darkMode") === "true") {
       document.documentElement.classList.add("dark");
     }
@@ -122,69 +122,237 @@
   </div>
 
   <!-- ================= MODAL ================= -->
+  <!-- ================= MODAL ================= -->
   <div id="taskModal" class="modal-overlay hidden">
-    <div class="modal">
 
+    <div class="modal modal-steps">
+
+      <!-- HEADER -->
       <div class="modal-header">
-        <h2>Nueva tarea</h2>
-        <span id="closeModal" class="close">&times;</span>
+        <div>
+          <h2 id="modalTitle">Nueva tarea</h2>
+          <span class="step-indicator">
+            Paso <span id="currentStep">1</span> de 2
+          </span>
+        </div>
+
+        <span id="closeModal" class="close">
+          &times;
+        </span>
       </div>
 
+      <!-- BODY -->
       <div class="modal-body">
 
         <input type="hidden" id="editIndex">
 
-        <div class="form-group">
-          <label for="titulo">Título*</label>
-          <input id="titulo" type="text">
-          <span id="errorTitulo" class="error-text"></span>
-        </div>
+        <!-- ================= STEP 1 ================= -->
+        <div id="step1" class="step-content">
 
-        <div class="form-group">
-          <label for="descripcion">Descripción</label>
-          <textarea id="descripcion"></textarea>
-        </div>
-
-        <div class="form-group">
-          <label for="frecuencia">Frecuencia</label>
-          <select id="frecuencia">
-            <option value="puntual">Puntual</option>
-            <option value="semanal">Semanal</option>
-            <option value="quincenal">Quincenal</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="asignados">Asignar a*</label>
-          <select id="asignados" multiple>
-            <!-- SE LLENA DESDE JS -->
-          </select>
-          <span id="errorAsignados" class="error-text"></span>
-        </div>
-
-        <div class="form-group">
-          <label>Prioridad*</label>
-          <div class="priority-selector">
-            <button type="button" class="prio baja active" data-value="baja">Baja</button>
-            <button type="button" class="prio media" data-value="media">Media</button>
-            <button type="button" class="prio alta" data-value="alta">Alta</button>
+          <div class="form-group">
+            <label for="titulo">Título*</label>
+            <input id="titulo" type="text">
+            <span id="errorTitulo" class="error-text"></span>
           </div>
+
+          <div class="form-group">
+            <label for="descripcion">Descripción</label>
+            <textarea id="descripcion"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="fecha">Fecha*</label>
+            <input type="date" id="fecha">
+            <span id="errorFecha" class="error-text"></span>
+          </div>
+
         </div>
 
-        <div class="form-group">
-          <label for="fecha">Fecha*</label>
-          <input type="date" id="fecha">
-          <span id="errorFecha" class="error-text"></span>
+        <!-- ================= STEP 2 ================= -->
+        <div id="step2" class="step-content hidden">
+
+          <div class="form-group">
+            <label for="frecuencia">Frecuencia</label>
+
+            <select id="frecuencia">
+              <option value="puntual">Puntual</option>
+              <option value="semanal">Semanal</option>
+              <option value="quincenal">Quincenal</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="asignados">Asignar a*</label>
+
+            <select id="asignados" multiple>
+              <!-- JS -->
+            </select>
+
+            <span id="errorAsignados" class="error-text"></span>
+          </div>
+
+          <div class="form-group">
+            <label>Prioridad*</label>
+
+            <div class="priority-selector">
+              <button type="button" class="prio baja active" data-value="baja">
+                Baja
+              </button>
+
+              <button type="button" class="prio media" data-value="media">
+                Media
+              </button>
+
+              <button type="button" class="prio alta" data-value="alta">
+                Alta
+              </button>
+            </div>
+          </div>
+
         </div>
 
       </div>
 
+      <!-- FOOTER -->
       <div class="modal-footer">
-        <button type="button" id="cancelModal" class="btn-cancel">Cancelar</button>
-        <button type="button" id="crearTarea" class="btn-primary">Crear</button>
+
+        <button type="button" id="backStep" class="btn-light hidden">
+          Volver
+        </button>
+
+        <div class="footer-right">
+
+          <button type="button" id="cancelModal" class="btn-cancel">
+            Cancelar
+          </button>
+
+          <button type="button" id="nextStep" class="btn-primary">
+            Continuar
+          </button>
+
+          <button type="button" id="crearTarea" class="btn-primary hidden">
+            Crear tarea
+          </button>
+
+        </div>
+
       </div>
 
     </div>
+
+  </div>
+
+  <!-- ================= DETALLE TAREA ================= -->
+
+  <div id="detailModal" class="modal-overlay hidden">
+
+    <div class="modal detail-modal">
+
+      <!-- HEADER -->
+      <div class="modal-header">
+
+        <div>
+          <h2 id="detailTitulo">Detalle tarea</h2>
+
+          <span class="detail-subtitle">
+            Información completa
+          </span>
+        </div>
+
+        <span id="closeDetailModal" class="close">
+          &times;
+        </span>
+
+      </div>
+
+      <!-- BODY -->
+      <div class="modal-body detail-body">
+
+        <!-- PRIORIDAD -->
+        <div class="detail-top">
+
+          <div class="detail-priority">
+
+            <span id="detailPrioridad" class="tag baja">
+              Baja
+            </span>
+
+          </div>
+
+          <div id="detailEstado" class="detail-status pendiente">
+            Pendiente
+          </div>
+
+        </div>
+
+        <!-- INFO -->
+        <div class="detail-grid">
+
+          <div class="detail-card">
+
+            <span class="detail-label">
+              Asignado a
+            </span>
+
+            <strong id="detailUsuario">
+              —
+            </strong>
+
+          </div>
+
+          <div class="detail-card">
+
+            <span class="detail-label">
+              Fecha
+            </span>
+
+            <strong id="detailFecha">
+              —
+            </strong>
+
+          </div>
+
+        </div>
+
+        <!-- FRECUENCIA -->
+        <div class="detail-box">
+
+          <span class="detail-label">
+            Frecuencia
+          </span>
+
+          <p id="detailFrecuencia">
+            Puntual
+          </p>
+
+        </div>
+
+        <!-- DESCRIPCION -->
+        <div class="detail-box">
+
+          <span class="detail-label">
+            Descripción
+          </span>
+
+          <p id="detailDescripcion">
+            Sin descripción
+          </p>
+
+        </div>
+
+      </div>
+
+      <!-- FOOTER -->
+      <div class="modal-footer center">
+
+        <button type="button" id="cerrarDetalleBtn" class="btn-light">
+          Cerrar
+        </button>
+
+      </div>
+
+    </div>
+
   </div>
 
   <!-- MODAL ELIMINAR -->

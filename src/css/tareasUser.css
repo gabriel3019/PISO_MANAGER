@@ -610,6 +610,171 @@ button{
   margin-bottom:20px;
 }
 
+.btn-detail{
+  border:none;
+  background:#eef2ff;
+  color:#4338ca;
+  padding:8px 12px;
+  border-radius:10px;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.btn-detail:hover{
+  background:#dbe4ff;
+}
+
+body.dark .btn-detail{
+  background:#1e293b;
+  color:#c7d2fe;
+}
+
+body.dark .btn-detail:hover{
+  background:#334155;
+}
+
+/* ================================================= */
+/* ================= MODAL 2 PASOS ================= */
+/* ================================================= */
+
+.modal-steps{
+  width:420px;
+  max-width:92%;
+  border-radius:24px;
+  overflow:hidden;
+}
+
+.step-indicator{
+  font-size:12px;
+  color:#6b7280;
+}
+
+.step-content{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+.step-content.hidden{
+  display:none;
+}
+
+.modal-body{
+  padding-top:10px;
+}
+
+.modal textarea{
+  min-height:110px;
+}
+
+.modal select[multiple]{
+  min-height:120px;
+}
+
+.footer-right{
+  display:flex;
+  gap:10px;
+}
+
+.modal-footer{
+  justify-content:space-between;
+  align-items:center;
+}
+
+/* ================= DARK ================= */
+
+body.dark .step-indicator{
+  color:#94a3b8;
+}
+
+/* ================================================= */
+/* ================= DETAIL MODAL ================== */
+/* ================================================= */
+
+.detail-modal{
+  width:440px;
+  max-width:92%;
+  border-radius:22px;
+}
+
+.detail-subtitle{
+  font-size:12px;
+  color:#9ca3af;
+}
+
+.detail-body{
+  gap:18px;
+}
+
+.detail-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.detail-status{
+  padding:7px 12px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:600;
+}
+
+.detail-status.pendiente{
+  background:#fef2f2;
+  color:#dc2626;
+}
+
+.detail-status.completada{
+  background:#ecfdf5;
+  color:#16a34a;
+}
+
+.detail-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.detail-card{
+  background:#f8fafc;
+  border:1px solid #e5e7eb;
+  border-radius:14px;
+  padding:16px;
+}
+
+.detail-box{
+  background:#f8fafc;
+  border:1px solid #e5e7eb;
+  border-radius:14px;
+  padding:18px;
+}
+
+.detail-label{
+  display:block;
+  font-size:12px;
+  color:#6b7280;
+  margin-bottom:8px;
+}
+
+.detail-box p{
+  line-height:1.5;
+  font-size:14px;
+}
+
+/* ================= DARK ================= */
+
+.dark .detail-card,
+.dark .detail-box{
+  background:#0f172a;
+  border-color:#1e293b;
+}
+
+.dark .detail-label{
+  color:#94a3b8;
+}
+
 /* ================================================= */
 /* ================= TOAST ========================= */
 /* ================================================= */
