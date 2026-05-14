@@ -1,26 +1,31 @@
 <?php
 header('Content-Type: application/json');
+ini_set('display_errors', 0); // ← Evita que errores PHP rompan el JSON
 require_once("BBDD/conecta.php");
+
+if (isset($_POST['id'])) $_POST['id'] = intval($_POST['id']);
 
 $accion = $_REQUEST['accion'] ?? '';
 
 // Helper para normalizar urgencia (JS envía "bajo"/"alto", la BD usa "baja"/"alta")
 function normalizarUrgencia($raw) {
     $map = ['bajo' => 'baja', 'alto' => 'alta', 'medio' => 'media'];
+    // Si ya viene en forma femenina (desde editar con valor guardado), lo devolvemos tal cual
+    if (in_array($raw, ['baja', 'media', 'alta'])) return $raw;
     return isset($map[$raw]) ? $map[$raw] : 'baja';
 }
 
 switch ($accion) {
 
     case 'listar':
-        $id_piso = $_REQUEST['id_piso'] ?? null;
+        $id_piso = intval($_REQUEST['id_piso'] ?? 0);
         if (!$id_piso) {
             echo json_encode(['success' => false, 'error' => 'Falta id_piso']);
             exit;
         }
 
-        // ✅ Se añade subquery para traer el último comentario de admin
-        $result = $conn->query("
+        // Subquery para traer el último comentario de admin, con prepare para seguridad
+        $stmt = $conn->prepare("
             SELECT i.*,
                    (SELECT mensaje 
                     FROM mensajes_incidencia 
@@ -28,40 +33,42 @@ switch ($accion) {
                     ORDER BY id_mensaje DESC 
                     LIMIT 1) AS comentario_admin
             FROM incidencias i
-            WHERE i.id_piso = $id_piso
+            WHERE i.id_piso = ?
             ORDER BY i.id_incidencia DESC
         ");
-        $incidencias = [];
+        $stmt->bind_param("i", $id_piso);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
+        $incidencias = [];
         while ($row = $result->fetch_assoc()) {
             $row['id'] = $row['id_incidencia'];
             $incidencias[] = $row;
         }
         echo json_encode($incidencias);
+        $stmt->close();
         break;
 
     case 'crear':
-        $id_piso         = $_POST['id_piso']         ?? 1;
-        $id_usuario      = $_POST['id_usuario']      ?? 1;
-        $tipo            = $_POST['tipo']            ?? '';
-        $titulo          = $_POST['titulo']          ?? '';
-        $descripcion     = $_POST['descripcion']     ?? '';
-        $urgencia_raw    = $_POST['urgencia']        ?? 'bajo';
+        $id_piso         = intval($_POST['id_piso']    ?? 1);
+        $id_usuario      = intval($_POST['id_usuario'] ?? 1);
+        $tipo            = trim($_POST['tipo']         ?? '');
+        $titulo          = trim($_POST['titulo']       ?? '');
+        $descripcion     = trim($_POST['descripcion']  ?? '');
+        $urgencia_raw    = $_POST['urgencia']          ?? 'baja';
         $urgencia        = normalizarUrgencia($urgencia_raw);
         $notificar_admin = (int)($_POST['notificar_admin'] ?? 0);
-        $estado          = 'abierta';
+        $estado          = 'abierta'; // Siempre empieza como abierta
+        $fecha_inicio    = $_POST['fecha_inicio'] ?? null;
+        $fecha_fin       = !empty($_POST['fecha_fin']) ? $_POST['fecha_fin'] : null;
 
-        $fecha_inicio  = $_POST['fecha_inicio']  ?? null;
-        $fecha_fin     = !empty($_POST['fecha_fin']) ? $_POST['fecha_fin'] : null;
-
-        // Validación servidor: fecha_inicio es obligatorio y >= hoy
+        // Validación servidor
         $hoy = date('Y-m-d');
         if (!$fecha_inicio || $fecha_inicio < $hoy) {
             echo json_encode(['success' => false, 'error' => 'La fecha de inicio es obligatoria y no puede ser anterior a hoy']);
             exit;
         }
 
-        // Procesar imagen
         $imagen_path = null;
         if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
             $dir = '../uploads/incidencias/';
@@ -83,20 +90,20 @@ switch ($accion) {
              (id_piso, id_usuario, tipo, titulo, descripcion, urgencia, estado, imagen, notificar_admin, fecha_inicio, fecha_fin)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
+        // ii=id_piso,id_usuario | sssss=tipo,titulo,desc,urgencia,estado | s=imagen | i=notificar | ss=fechas
         $stmt->bind_param("iissssssiss",
-            $id_piso, $id_usuario, $tipo, $titulo, $descripcion, 
-            $urgencia, $estado, $imagen_path, $notificar_admin, 
+            $id_piso, $id_usuario, $tipo, $titulo, $descripcion,
+            $urgencia, $estado, $imagen_path, $notificar_admin,
             $fecha_inicio, $fecha_fin
         );
 
         if ($stmt->execute()) {
             $id_incidencia = $stmt->insert_id;
 
-            // ✅ Si hay comentario de admin, guardarlo en mensajes_incidencia
             if (!empty($_POST['comentario_admin']) && !empty($_POST['id_usuario_comentario'])) {
-                $comentario = trim($_POST['comentario_admin']);
+                $comentario            = trim($_POST['comentario_admin']);
                 $id_usuario_comentario = (int)$_POST['id_usuario_comentario'];
-                
+
                 $stmt_msg = $conn->prepare(
                     "INSERT INTO mensajes_incidencia (id_incidencia, id_usuario, mensaje) VALUES (?, ?, ?)"
                 );
@@ -113,17 +120,24 @@ switch ($accion) {
         break;
 
     case 'editar':
-        $id              = $_POST['id']             ?? null;
-        $titulo          = $_POST['titulo']         ?? '';
-        $descripcion     = $_POST['descripcion']    ?? '';
-        $tipo            = $_POST['tipo']           ?? '';
-        $urgencia_raw    = $_POST['urgencia']       ?? 'bajo';
-        $urgencia        = normalizarUrgencia($urgencia_raw);
-        $notificar_admin = (int)($_POST['notificar_admin'] ?? 0);
+        $id          = intval($_POST['id']          ?? 0);
+        $titulo      = trim($_POST['titulo']        ?? '');
+        $descripcion = trim($_POST['descripcion']   ?? '');
+        $tipo        = trim($_POST['tipo']          ?? '');
 
-        $fecha_inicio  = $_POST['fecha_inicio'] ?? null;
-        $fecha_fin     = !empty($_POST['fecha_fin']) ? $_POST['fecha_fin'] : null;
-        
+        // Validar estado: solo valores del ENUM
+        $estado_raw = $_POST['estado'] ?? 'abierta';
+        $estado     = in_array($estado_raw, ['abierta', 'en_curso', 'resuelta'])
+                        ? $estado_raw : 'abierta';
+
+        // Validar urgencia: normalizar y luego verificar
+        $urgencia_raw = $_POST['urgencia'] ?? 'baja';
+        $urgencia     = normalizarUrgencia($urgencia_raw);
+
+        $notificar_admin = (int)($_POST['notificar_admin'] ?? 0);
+        $fecha_inicio    = $_POST['fecha_inicio'] ?? null;
+        $fecha_fin       = !empty($_POST['fecha_fin']) ? $_POST['fecha_fin'] : null;
+
         if ($fecha_inicio) {
             $hoy = date('Y-m-d');
             if ($fecha_inicio < $hoy) {
@@ -132,7 +146,6 @@ switch ($accion) {
             }
         }
 
-        // Procesar imagen si se sube una nueva
         $imagen_path = null;
         if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
             $dir = '../uploads/incidencias/';
@@ -152,31 +165,32 @@ switch ($accion) {
         if ($imagen_path) {
             $stmt = $conn->prepare(
                 "UPDATE incidencias
-                 SET titulo=?, descripcion=?, tipo=?, urgencia=?, notificar_admin=?, fecha_inicio=?, fecha_fin=?, imagen=?
+                 SET titulo=?, descripcion=?, tipo=?, urgencia=?, estado=?, notificar_admin=?, fecha_inicio=?, fecha_fin=?, imagen=?
                  WHERE id_incidencia=?"
             );
-            $stmt->bind_param("ssssisssi", 
-                $titulo, $descripcion, $tipo, $urgencia, $notificar_admin, 
-                $fecha_inicio, $fecha_fin, $imagen_path, $id
+            // sssss=titulo,desc,tipo,urgencia,estado | i=notificar | ss=fechas | s=imagen | i=id
+            $stmt->bind_param("ssssssissi",
+                $titulo, $descripcion, $tipo, $urgencia, $estado,
+                $notificar_admin, $fecha_inicio, $fecha_fin, $imagen_path, $id
             );
         } else {
             $stmt = $conn->prepare(
                 "UPDATE incidencias
-                 SET titulo=?, descripcion=?, tipo=?, urgencia=?, notificar_admin=?, fecha_inicio=?, fecha_fin=?
+                 SET titulo=?, descripcion=?, tipo=?, urgencia=?, estado=?, notificar_admin=?, fecha_inicio=?, fecha_fin=?
                  WHERE id_incidencia=?"
             );
-            $stmt->bind_param("ssssissi", 
-                $titulo, $descripcion, $tipo, $urgencia, $notificar_admin, 
-                $fecha_inicio, $fecha_fin, $id
+            // sssss=titulo,desc,tipo,urgencia,estado | i=notificar | ss=fechas | i=id
+            $stmt->bind_param("sssssissi",
+                $titulo, $descripcion, $tipo, $urgencia, $estado,
+                $notificar_admin, $fecha_inicio, $fecha_fin, $id
             );
         }
 
         if ($stmt->execute()) {
-            // ✅ Si hay comentario de admin, guardarlo en mensajes_incidencia
             if (!empty($_POST['comentario_admin']) && !empty($_POST['id_usuario_comentario'])) {
-                $comentario = trim($_POST['comentario_admin']);
+                $comentario            = trim($_POST['comentario_admin']);
                 $id_usuario_comentario = (int)$_POST['id_usuario_comentario'];
-                
+
                 $stmt_msg = $conn->prepare(
                     "INSERT INTO mensajes_incidencia (id_incidencia, id_usuario, mensaje) VALUES (?, ?, ?)"
                 );
@@ -192,20 +206,36 @@ switch ($accion) {
         break;
 
     case 'eliminar':
-        $id   = $_POST['id'] ?? null;
-        $stmt = $conn->prepare("DELETE FROM incidencias WHERE id_incidencia = ?");
-        $stmt->bind_param("i", $id);
+        $id = intval($_POST['id'] ?? 0);
 
-        if ($stmt->execute()) {
+        $stmt = $conn->prepare("SELECT imagen FROM incidencias WHERE id_incidencia = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        $row = $res->fetch_assoc();
+        $stmt->close();
+
+        $stmt2 = $conn->prepare("DELETE FROM incidencias WHERE id_incidencia = ?");
+        $stmt2->bind_param("i", $id);
+
+        if ($stmt2->execute()) {
+            if (!empty($row['imagen']) && file_exists($row['imagen'])) {
+                unlink($row['imagen']);
+            }
             echo json_encode(['success' => true]);
         } else {
             echo json_encode(['success' => false, 'error' => $conn->error]);
         }
-        $stmt->close();
+        $stmt2->close();
         break;
 
     default:
-        echo json_encode(['success' => false, 'error' => 'Acción no válida']);
+        error_log("ACCIÓN NO VÁLIDA RECIBIDA: $accion | POST: " . print_r($_POST, true));
+        echo json_encode([
+            'success'     => false,
+            'error'       => 'Acción no válida',
+            'debug_accion'=> $accion
+        ]);
         break;
 }
 

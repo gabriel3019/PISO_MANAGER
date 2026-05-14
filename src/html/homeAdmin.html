@@ -23,6 +23,8 @@
                 <strong>Home</strong></a>
             <a href="../html/incidenciasAdmin.html"><img src="../css/icons/circle-alert.svg"
                     class="icon"><strong>Incidencias</strong></a>
+            <a href="../html/companerosAdmin.html"><img src="../css/icons/users.svg"
+                    class="icon"><strong>Compañeros</strong></a>
         </nav>
 
         <button class="logout" id="btn-cerrar-sesion">Cerrar sesión</button>
@@ -36,6 +38,12 @@
 
         <section class="card">
             <h2>Información del piso</h2>
+
+            <label>Seleccionar piso</label>
+            <select id="selectorPiso"></select>">
+
+            <label>Nombre del casero</label>
+            <input id="nombre_casero" type="text">
 
             <label>Dirección</label>
             <input id="calle" type="text">
@@ -69,12 +77,56 @@
 
         <section class="card danger">
             <h2>Zona de peligro</h2>
-            <button>Eliminar piso</button>
+            <button class="danger">Eliminar piso</button>
             <button>Descargarse contrato</button>
+        </section>
+
+        <section id="sinPiso" class="hidden empty-flat">
+            <h2>No tienes ningún piso creado</h2>
+            <p>Añade un piso para empezar a gestionar compañeros, tareas e incidencias.</p>
+            <button type="button" id="btnAbrirCrearPiso">Añadir piso</button>
         </section>
 
         <button class="save-btn">Guardar cambios</button>
     </main>
+
+    <div id="modalEliminarPiso" class="modal hidden">
+        <div class="modal-content delete-modal">
+            <h3 id="textoEliminarPiso">
+                ¿Seguro que quieres eliminar el piso?
+            </h3>
+
+            <div class="modal-actions">
+                <button type="button" id="cancelarEliminarPiso" class="btn-secondary">Cancelar</button>
+                <button type="button" id="confirmarEliminarPiso" class="btn-danger">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalCrearPiso" class="modal hidden">
+        <div class="modal-content create-modal">
+            <h2>Crear piso</h2>
+
+            <div class="form-grid">
+                <label for="nuevoNombreCasero">Nombre del casero</label>
+                <input type="text" id="nuevoNombreCasero" placeholder="Nombre del casero">
+
+                <label for="nuevaCalle">Calle</label>
+                <input type="text" id="nuevaCalle" placeholder="Calle">
+
+                <label for="nuevaCiudad">Ciudad</label>
+                <input type="text" id="nuevaCiudad" placeholder="Ciudad">
+
+                <label for="nuevoCodigoPostal">Código postal</label>
+                <input type="text" id="nuevoCodigoPostal" placeholder="Código postal">
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" id="cancelarCrearPiso" class="btn-secondary">Cancelar</button>
+                <button type="button" id="guardarNuevoPiso" class="btn-primary">Crear piso</button>
+            </div>
+        </div>
+    </div>
 
     <script src="../js/homeAdmin.js"></script>
 </body>

@@ -25,6 +25,8 @@
                     <strong>Home</strong></a>
                 <a class="active" href="../html/incidenciasAdmin.html"><img src="../css/icons/circle-alert.svg"
                         class="icon"><strong>Incidencias</strong></a>
+                <a href="../html/companerosAdmin.html"><img src="../css/icons/users.svg"
+                        class="icon"><strong>Compañeros</strong></a>
             </nav>
 
             <button class="logout">Cerrar sesión</button>
@@ -45,7 +47,7 @@
                 </div>
 
                 <div class="card">
-                    <h2 id="countEnCurso">0</h2>
+                    <h2 id="count-en-curso">0</h2>
                     <p>En proceso</p>
                 </div>
 
@@ -64,15 +66,78 @@
 
                 <div class="filters">
                     <button class="filter active" data-filter="todas">Todas</button>
-                    <button class="filter" data-filter="creada">Abiertas</button>
-                    <button class="filter" data-filter="en_proceso">En proceso</button>
-                    <button class="filter" data-filter="finalizada">Resueltas</button>
+                    <button class="filter" data-filter="abierta">Abiertas</button>
+                    <button class="filter" data-filter="en_curso">En curso</button>
+                    <button class="filter" data-filter="resuelta">Resueltas</button>
                 </div>
 
                 <div id="incidenciasList" class="incidencias-list"></div>
             </section>
         </main>
 
+    </div>
+
+    <div id="modalDetalleIncidencia" class="modal hidden">
+
+        <div class="modal-content incidencia-modal">
+
+            <button id="cerrarModalDetalle" class="modal-close">
+                &times;
+            </button>
+
+            <h2 id="detalleTitulo"></h2>
+
+            <p id="detalleDescripcion" class="detalle-desc"></p>
+
+            <div class="detalle-info">
+                <p>
+                    <strong>Usuario:</strong>
+                    <span id="detalleUsuario"></span>
+                </p>
+
+                <p>
+                    <strong>Estado:</strong>
+                    <span id="detalleEstado"></span>
+                </p>
+            </div>
+
+            <h3 class="chat-title">Conversación</h3>
+
+            <div id="listaMensajes" class="chat-box"></div>
+
+            <textarea id="mensajeAdmin" class="chat-textarea" placeholder="Escribe una respuesta..."></textarea>
+
+            <div class="modal-actions">
+                <button id="btnEnviarRespuesta" class="btn-primary">
+                    Enviar respuesta
+                </button>
+
+                <button id="btnMarcarResuelta" class="btn-danger">
+                    Marcar como resuelta
+                </button>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div id="modal-notificaciones-admin" class="modal hidden">
+        <div class="modal-content incidencia-modal">
+            <button class="modal-close" data-modal-close="modal-notificaciones-admin">&times;</button>
+
+            <h2>Nueva incidencia</h2>
+            <p>Se ha creado una nueva incidencia en el piso.</p>
+
+            <ul id="lista-notificaciones"></ul>
+
+            <p id="notify-empty">No hay notificaciones nuevas.</p>
+
+            <div class="modal-actions">
+                <button id="btn-marcar-todas-leidas" class="btn-primary">
+                    Marcar como leídas
+                </button>
+            </div>
+        </div>
     </div>
 
     <script src="../js/incidenciasAdmin.js"></script>

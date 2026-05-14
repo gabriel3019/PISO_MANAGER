@@ -131,10 +131,12 @@ CREATE TABLE IF NOT EXISTS incidencias (
     descripcion TEXT,
     imagen VARCHAR(255) DEFAULT NULL,
     notificar_admin BOOLEAN DEFAULT FALSE,
+    leido_admin BOOLEAN DEFAULT FALSE,
     urgencia ENUM('baja','media','alta') DEFAULT 'media',
     estado ENUM('abierta','en_curso','resuelta') DEFAULT 'abierta',
+    fecha DATE NULL,
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    fecha_inicio DATE NOT NULL,
+    fecha_inicio DATE NULL,
     fecha_fin DATE NULL,
     FOREIGN KEY (id_piso) REFERENCES pisos(id_piso) ON DELETE CASCADE,
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
@@ -149,6 +151,27 @@ CREATE TABLE IF NOT EXISTS mensajes_incidencia (
     leido BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (id_incidencia) REFERENCES incidencias(id_incidencia) ON DELETE CASCADE,
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS incidencia_mensajes (
+    id_mensaje INT AUTO_INCREMENT PRIMARY KEY,
+    id_incidencia INT NOT NULL,
+    id_usuario INT NOT NULL,
+    mensaje TEXT NOT NULL,
+    fecha_envio DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_incidencia) REFERENCES incidencias(id_incidencia),
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
+);
+
+CREATE TABLE IF NOT EXISTS notificaciones (
+    id_notificacion INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    id_incidencia INT NULL,
+    mensaje VARCHAR(255) NOT NULL,
+    leida TINYINT(1) DEFAULT 0,
+    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario),
+    FOREIGN KEY (id_incidencia) REFERENCES incidencias(id_incidencia)
 );
 
 /* ===== CALENDARIO ===== */
@@ -228,13 +251,13 @@ if ($row['total'] == 0) {
     (NULL,1,'Reunión','Viernes a las 20:00');
 
     /* ===== INCIDENCIAS ===== */
-    INSERT INTO incidencias (id_piso, id_usuario, tipo, titulo, descripcion, imagen, notificar_admin, urgencia, estado, fecha_inicio, fecha_fin) VALUES
-    (1, 2, 'fontaneria',   'Fuga baño',          'Pierde agua por la junta del grifo', NULL, 0, 'alta',  'abierta',   '2026-05-11', NULL),
-    (1, 3, 'electricidad', 'Enchufe roto',        'El enchufe del salón no funciona',   NULL, 0, 'baja', 'abierta',   '2026-05-12', NULL),
-    (1, 4, 'carpinteria',  'Puerta no cierra',    'La puerta de entrada no cierra bien, está rozando', NULL, 1, 'baja',  'en_curso',  '2026-05-08', '2026-05-15'),
-    (2, 2, 'fontaneria',   'Gotera cocina',       'Hay una gotera en el techo de la cocina', NULL, 0, 'alta',  'abierta',   '2026-05-11', NULL),
-    (2, 3, 'electricidad', 'Luz escalera fundida', 'La bombilla de la escalera está fundida', NULL, 0, 'alta', 'resuelta',  '2026-05-01', '2026-05-05');
+    INSERT INTO incidencias (id_piso, id_usuario, tipo, titulo, descripcion, imagen, notificar_admin, urgencia, estado, fecha, fecha_inicio, fecha_fin) 
+VALUES
+(1, 2, 'fontaneria', 'Fuga baño', 'Pierde agua por la junta del grifo', NULL, 0, 'alta', 'abierta', '2026-05-08', '2026-05-08', NULL),
+(1, 3, 'electricidad', 'Enchufe roto', 'El enchufe del salón no funciona', NULL, 0, 'baja', 'abierta', '2026-05-08', '2026-05-08', NULL),
+(1, 4, 'carpinteria', 'Puerta no cierra', 'La puerta de entrada no cierra bien, está rozando', NULL, 1, 'baja', 'en_curso', '2026-05-08', '2026-05-08', NULL);
 
+    
     /* ===== MENSAJES ===== */
     INSERT INTO mensajes_incidencia (id_incidencia,id_usuario,mensaje) VALUES
     (1,2,'Hay una fuga'),
@@ -244,17 +267,19 @@ if ($row['total'] == 0) {
     /* ===== CALENDARIO ===== */
 
     INSERT INTO calendario_eventos 
-    (id_piso, titulo, tipo, fecha, fecha_inicio, fecha_fin, hora, estado) 
-    VALUES
-    (1, 'Cena del piso', 'evento', '2026-04-20', '2026-04-20', NULL, '21:30:00', 'pendiente');
-
-    SET @id_evento_cena = LAST_INSERT_ID();
-
-    INSERT INTO calendario_evento_personas (id_evento, id_usuario) 
-    VALUES
-    (@id_evento_cena, 2),
-    (@id_evento_cena, 3),
-    (@id_evento_cena, 4);
+    (id_piso, titulo, tipo, fecha, fecha_inicio, fecha_fin, hora, estado)
+    SELECT 
+        id_piso,
+        titulo,
+        'incidencia',
+        COALESCE(fecha, DATE(fecha_creacion)),
+        NULL,
+        NULL,
+        NULL,
+        estado
+    FROM incidencias
+    WHERE id_piso = 1
+    AND estado != 'resuelta';
 
 
     /* ===== 3 EVENTOS EL MISMO DÍA ===== */
@@ -295,33 +320,6 @@ if ($row['total'] == 0) {
     INSERT INTO calendario_evento_personas (id_evento, id_usuario) 
     VALUES
     (@id_tarea_cocina, 3);
-
-
-    /* ===== INCIDENCIAS ===== */
-
-    INSERT INTO calendario_eventos 
-    (id_piso, titulo, tipo, fecha, fecha_inicio, fecha_fin, hora, estado) 
-    VALUES
-    (1, 'Fuga de agua en el baño', 'incidencia', '2026-05-24', '2026-05-26', NULL, NULL, 'pendiente');
-
-    SET @id_incidencia_agua = LAST_INSERT_ID();
-
-    INSERT INTO calendario_evento_personas (id_evento, id_usuario) 
-    VALUES
-    (@id_incidencia_agua, 2),
-    (@id_incidencia_agua, 4);
-
-
-    INSERT INTO calendario_eventos 
-    (id_piso, titulo, tipo, fecha, fecha_inicio, fecha_fin, hora, estado) 
-    VALUES
-    (1, 'Bombilla del pasillo fundida', 'incidencia', '2026-05-28', '2026-05-28', NULL, NULL, 'pendiente');
-
-    SET @id_incidencia_bombilla = LAST_INSERT_ID();
-
-    INSERT INTO calendario_evento_personas (id_evento, id_usuario) 
-    VALUES
-    (@id_incidencia_bombilla, 3);
     ";
 
     $conn->multi_query($sqlDatos);
