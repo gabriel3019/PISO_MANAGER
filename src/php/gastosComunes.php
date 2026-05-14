@@ -84,8 +84,6 @@ try {
             exit;
         }
 
-        /* ================= INSERT GASTO ================= */
-
         $sql = "
         INSERT INTO gastos
         (
@@ -109,17 +107,17 @@ try {
 
         $stmt->execute();
 
-        $id_gasto = $stmt->insert_id;
+        $id_gasto_creado = $stmt->insert_id;
 
-        /* ===================================================== */
-        /* ================= DIVISION MANUAL =================== */
-        /* ===================================================== */
+        /* ================= DIVISION MANUAL ================= */
 
         if (!empty($importesManual)) {
 
             foreach ($importesManual as $uid => $parte) {
 
-                $parte = floatval($parte);
+                $uid = (int)$uid;
+
+                $parte = (float)$parte;
 
                 if ($parte <= 0) {
                     continue;
@@ -141,29 +139,32 @@ try {
                 VALUES (?, ?, ?, ?)
                 ";
 
-                $stmt = $conn->prepare($sql);
+                $stmt2 = $conn->prepare($sql);
 
-                $stmt->bind_param(
+                $stmt2->bind_param(
                     "iidi",
-                    $id_gasto,
+                    $id_gasto_creado,
                     $uid,
                     $parte,
                     $pagado
                 );
 
-                $stmt->execute();
+                $stmt2->execute();
             }
 
         } else {
 
-            /* ===================================================== */
-            /* ================= DIVISION IGUAL ==================== */
-            /* ===================================================== */
+            /* ================= DIVISION IGUAL ================= */
 
             $parte =
-                $importe / count($participantes);
+                round(
+                    $importe / count($participantes),
+                    2
+                );
 
             foreach ($participantes as $uid) {
+
+                $uid = (int)$uid;
 
                 $pagado =
                     ($uid == $pagador)
@@ -181,17 +182,17 @@ try {
                 VALUES (?, ?, ?, ?)
                 ";
 
-                $stmt = $conn->prepare($sql);
+                $stmt2 = $conn->prepare($sql);
 
-                $stmt->bind_param(
+                $stmt2->bind_param(
                     "iidi",
-                    $id_gasto,
+                    $id_gasto_creado,
                     $uid,
                     $parte,
                     $pagado
                 );
 
-                $stmt->execute();
+                $stmt2->execute();
             }
         }
 
@@ -211,8 +212,6 @@ try {
         $id_gasto
     ) {
 
-        /* ELIMINAR PARTICIPANTES */
-
         $sql = "
         DELETE FROM gastos_participantes
         WHERE id_gasto = ?
@@ -226,8 +225,6 @@ try {
         );
 
         $stmt->execute();
-
-        /* ELIMINAR GASTO */
 
         $sql = "
         DELETE FROM gastos
@@ -266,6 +263,7 @@ try {
             g.monto_total AS importe,
             g.fecha,
             u.nombre AS pagador
+
         FROM gastos g
 
         JOIN usuarios u
@@ -292,7 +290,7 @@ try {
         while ($row = $res->fetch_assoc()) {
 
             $id_gasto_actual =
-                $row['id_gasto'];
+                (int)$row['id_gasto'];
 
             /* ================= PARTICIPANTES ================= */
 
@@ -302,6 +300,7 @@ try {
                 u.nombre,
                 gp.importe,
                 gp.pagado
+
             FROM gastos_participantes gp
 
             JOIN usuarios u
@@ -348,6 +347,17 @@ try {
                 ];
             }
 
+            /* ================= NORMALIZAR ================= */
+
+            $row['id_gasto'] =
+                (int)$row['id_gasto'];
+
+            $row['id_pagador'] =
+                (int)$row['id_pagador'];
+
+            $row['importe'] =
+                (float)$row['importe'];
+
             $row['participantes'] =
                 $participantesDetalle;
 
@@ -372,14 +382,13 @@ try {
 
         $recibes = [];
 
-        /* ===================================================== */
-        /* ================= LO QUE DEBES ====================== */
-        /* ===================================================== */
+        /* ================= LO QUE DEBES ================= */
 
         $sql = "
         SELECT
+            g.id_pagador,
             u.nombre,
-            SUM(gp.importe) as total
+            SUM(gp.importe) as total_gastos
 
         FROM gastos_participantes gp
 
@@ -410,29 +419,62 @@ try {
 
         $res = $stmt->get_result();
 
-        while (
-            $row = $res->fetch_assoc()
-        ) {
+        while ($row = $res->fetch_assoc()) {
 
-            $debes[] = [
+            $id_pagador = $row['id_pagador'];
 
-                "nombre" =>
-                    $row['nombre'],
+            $sqlPago = "
+            SELECT
+                COALESCE(SUM(importe),0) as total_pagado
+            FROM pagos
+            WHERE id_pagador = ?
+            AND id_receptor = ?
+            AND id_piso = ?
+            ";
 
-                "importe" =>
-                    (float)$row['total']
+            $stmtPago = $conn->prepare($sqlPago);
 
-            ];
+            $stmtPago->bind_param(
+                "iii",
+                $id_usuario,
+                $id_pagador,
+                $id_piso
+            );
+
+            $stmtPago->execute();
+
+            $resPago = $stmtPago->get_result();
+
+            $pago = $resPago->fetch_assoc();
+
+            $totalPagado =
+                (float)$pago['total_pagado'];
+
+            $pendiente =
+                (float)$row['total_gastos']
+                - $totalPagado;
+
+            if ($pendiente > 0) {
+
+                $debes[] = [
+
+                    "nombre" =>
+                        $row['nombre'],
+
+                    "importe" =>
+                        round($pendiente, 2)
+
+                ];
+            }
         }
 
-        /* ===================================================== */
-        /* ================= LO QUE TE DEBEN =================== */
-        /* ===================================================== */
+        /* ================= LO QUE TE DEBEN ================= */
 
         $sql = "
         SELECT
+            gp.id_usuario,
             u.nombre,
-            SUM(gp.importe) as total
+            SUM(gp.importe) as total_gastos
 
         FROM gastos_participantes gp
 
@@ -463,19 +505,53 @@ try {
 
         $res = $stmt->get_result();
 
-        while (
-            $row = $res->fetch_assoc()
-        ) {
+        while ($row = $res->fetch_assoc()) {
 
-            $recibes[] = [
+            $idDeudor = $row['id_usuario'];
 
-                "nombre" =>
-                    $row['nombre'],
+            $sqlPago = "
+            SELECT
+                COALESCE(SUM(importe),0) as total_pagado
+            FROM pagos
+            WHERE id_pagador = ?
+            AND id_receptor = ?
+            AND id_piso = ?
+            ";
 
-                "importe" =>
-                    (float)$row['total']
+            $stmtPago = $conn->prepare($sqlPago);
 
-            ];
+            $stmtPago->bind_param(
+                "iii",
+                $idDeudor,
+                $id_usuario,
+                $id_piso
+            );
+
+            $stmtPago->execute();
+
+            $resPago = $stmtPago->get_result();
+
+            $pago = $resPago->fetch_assoc();
+
+            $totalPagado =
+                (float)$pago['total_pagado'];
+
+            $pendiente =
+                (float)$row['total_gastos']
+                - $totalPagado;
+
+            if ($pendiente > 0) {
+
+                $recibes[] = [
+
+                    "nombre" =>
+                        $row['nombre'],
+
+                    "importe" =>
+                        round($pendiente, 2)
+
+                ];
+            }
         }
 
         echo json_encode([

@@ -418,34 +418,40 @@
   </div>
 
 
-  <!-- ================================================= -->
-  <!-- ================= MODAL GASTO =================== -->
-  <!-- ================================================= -->
+<!-- ================================================= -->
+<!-- ================= MODAL GASTO =================== -->
+<!-- ================================================= -->
 
-  <div
-    id="gastoModal"
-    class="modal-overlay hidden"
-  >
+<div
+  id="gastoModal"
+  class="modal-overlay hidden"
+>
 
-    <div class="modal splitwise">
+  <div class="modal splitwise">
 
-      <div class="modal-header">
+    <!-- HEADER -->
 
-        <h2>
-          Añadir gasto
-        </h2>
+    <div class="modal-header">
 
-        <span
-          id="closeGastoModal"
-          class="close"
-        >
-          &times;
-        </span>
+      <h2>
+        Añadir gasto
+      </h2>
 
-      </div>
+      <span
+        id="closeGastoModal"
+        class="close"
+      >
+        &times;
+      </span>
+
+    </div>
 
 
-      <!-- BODY -->
+    <!-- ================================================= -->
+    <!-- ================= PASO 1 ======================== -->
+    <!-- ================================================= -->
+
+    <div id="step1">
 
       <div class="modal-body">
 
@@ -481,7 +487,12 @@
             Pagado por
           </span>
 
-          <select id="gastoPagador"></select>
+          <!-- SOLO USUARIO LOGEADO -->
+
+          <select
+            id="gastoPagador"
+            disabled
+          ></select>
 
         </div>
 
@@ -497,6 +508,53 @@
         </div>
 
         <div id="usuariosCheckbox"></div>
+
+      </div>
+
+
+      <!-- FOOTER -->
+
+      <div class="modal-footer">
+
+        <button
+          id="cancelGasto"
+          class="btn-light"
+        >
+          Cancelar
+        </button>
+
+        <button
+          id="btnContinuar"
+          class="btn-primary"
+        >
+          Continuar
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- ================= PASO 2 ======================== -->
+    <!-- ================================================= -->
+
+    <div
+      id="step2"
+      class="hidden"
+    >
+
+      <div class="modal-body">
+
+        <!-- DIVISION -->
+
+        <div class="split-row">
+
+          <span>
+            ¿Cómo quieres dividirlo?
+          </span>
+
+        </div>
 
 
         <!-- BOTONES -->
@@ -520,7 +578,7 @@
         </div>
 
 
-        <!-- DIVISION -->
+        <!-- DIVISION CONTAINER -->
 
         <div id="divisionContainer"></div>
 
@@ -532,10 +590,10 @@
       <div class="modal-footer">
 
         <button
-          id="cancelGasto"
+          id="btnVolver"
           class="btn-light"
         >
-          Cancelar
+          Volver
         </button>
 
         <button
@@ -550,6 +608,8 @@
     </div>
 
   </div>
+
+</div>
 
 
   <!-- ================================================= -->

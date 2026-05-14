@@ -62,24 +62,10 @@ document.addEventListener(
 );
 
 /* ================================================= */
-/* ================= REFRESH ======================= */
-/* ================================================= */
-
-async function refreshData(){
-
-  await cargarGastos();
-
-  await cargarBalance();
-
-  await cargarResumen();
-
-}
-
-/* ================================================= */
 /* ================= DOM =========================== */
 /* ================================================= */
 
-function initDOM(){
+function initDOM() {
 
   modal =
     document.getElementById(
@@ -104,11 +90,6 @@ function initDOM(){
   confirmarPagoModal =
     document.getElementById(
       "confirmarPagoModal"
-    );
-
-  textoConfirmarPago =
-    document.getElementById(
-      "textoConfirmarPago"
     );
 
   tituloInput =
@@ -141,15 +122,34 @@ function initDOM(){
       "usuariosCheckbox"
     );
 
+  textoConfirmarPago =
+    document.getElementById(
+      "textoConfirmarPago"
+    );
+
 }
 
 /* ================================================= */
 /* ================= EVENTOS ======================= */
 /* ================================================= */
 
-function initEventos(){
+function initEventos() {
 
-  /* ================= GASTOS ================= */
+  document
+    .getElementById("btnContinuar")
+    .onclick = continuarPaso2;
+
+  document
+    .getElementById("btnVolver")
+    .onclick = volverPaso1;
+
+  document
+    .getElementById("btnIgual")
+    .onclick = dividirIgual;
+
+  document
+    .getElementById("btnManual")
+    .onclick = dividirManual;
 
   document
     .querySelector(".add-btn")
@@ -167,8 +167,6 @@ function initEventos(){
     .getElementById("guardarGasto")
     .onclick = guardarGasto;
 
-  /* ================= DELETE ================= */
-
   document
     .getElementById("confirmDelete")
     .onclick = eliminarGasto;
@@ -182,18 +180,6 @@ function initEventos(){
         .add("hidden");
 
     };
-
-  /* ================= DIVISION ================= */
-
-  document
-    .getElementById("btnIgual")
-    .onclick = dividirIgual;
-
-  document
-    .getElementById("btnManual")
-    .onclick = dividirManual;
-
-  /* ================= PAGOS ================= */
 
   document
     .getElementById("btnPagar")
@@ -211,17 +197,9 @@ function initEventos(){
     .getElementById("confirmPago")
     .onclick = guardarPago;
 
-  /* ================= DETALLE ================= */
-
   document
     .getElementById("closeDetalleModal")
     .onclick = cerrarDetalle;
-
-  document
-    .getElementById("btnSaldar")
-    .onclick = abrirConfirmacionPago;
-
-  /* ================= CONFIRMAR PAGO ================= */
 
   document
     .getElementById("closeConfirmarPago")
@@ -235,7 +213,9 @@ function initEventos(){
     .getElementById("aceptarConfirmarPago")
     .onclick = confirmarSaldarDeuda;
 
-  /* ================= FILTROS ================= */
+  document
+    .getElementById("btnSaldar")
+    .onclick = abrirConfirmacionPago;
 
   document
     .getElementById("filterTodos")
@@ -257,11 +237,9 @@ function initEventos(){
     .onclick = () =>
       cambiarFiltro("mes");
 
-  /* ================= SEARCH ================= */
-
   document
     .getElementById("searchInput")
-    ?.addEventListener(
+    .addEventListener(
       "input",
       renderLista
     );
@@ -269,51 +247,18 @@ function initEventos(){
 }
 
 /* ================================================= */
-/* ================= FILTROS ======================= */
+/* ================= REFRESH ======================= */
 /* ================================================= */
 
-function cambiarFiltro(filtro){
+async function refreshData() {
 
-  filtroActivo = filtro;
+  await cargarUsuarios();
 
-  document
-    .querySelectorAll(
-      ".filters button"
-    )
-    .forEach(btn => {
+  await cargarGastos();
 
-      btn.classList.remove("active");
+  await cargarBalance();
 
-    });
-
-  const btnMap = {
-
-    todos:
-      "filterTodos",
-
-    pendientes:
-      "filterPendientes",
-
-    liquidados:
-      "filterLiquidados",
-
-    mes:
-      "filterMes"
-
-  };
-
-  const btn =
-    document.getElementById(
-      btnMap[filtro]
-    );
-
-  if(btn){
-
-    btn.classList.add("active");
-
-  }
-
-  renderLista();
+  await cargarResumen();
 
 }
 
@@ -321,7 +266,7 @@ function cambiarFiltro(filtro){
 /* ================= USUARIO ======================= */
 /* ================================================= */
 
-function cargarUsuario(){
+function cargarUsuario() {
 
   document.getElementById(
     "nombreUsuario"
@@ -331,24 +276,124 @@ function cargarUsuario(){
 }
 
 /* ================================================= */
+/* ================= USUARIOS ====================== */
+/* ================================================= */
+
+async function cargarUsuarios() {
+
+  const res =
+    await fetch(API_USUARIOS, {
+      method: "POST",
+      credentials: "same-origin"
+    });
+
+  const data =
+    await res.json();
+
+  if (!data.success) {
+
+    return;
+
+  }
+
+  usuarios =
+    data.usuarios;
+
+  selectPagador.innerHTML = "";
+
+  usuariosCheckbox.innerHTML = "";
+
+  const selectPago =
+    document.getElementById(
+      "pagoReceptor"
+    );
+
+  selectPago.innerHTML = "";
+
+  usuarios.forEach(u => {
+
+    const esActual =
+
+      Number(u.id_usuario)
+      ===
+      Number(usuarioActual.id);
+
+    /* ================= PAGADOR ================= */
+
+    if (esActual) {
+
+      selectPagador.innerHTML += `
+
+        <option
+          value="${u.id_usuario}"
+          selected
+        >
+          ${u.nombre}
+        </option>
+
+      `;
+
+    }
+
+    /* ================= CHECKBOX ================= */
+
+    usuariosCheckbox.innerHTML += `
+
+      <label class="checkbox-user">
+
+        <input
+          type="checkbox"
+          value="${u.id_usuario}"
+          checked
+          ${esActual ? "disabled" : ""}
+        >
+
+        ${u.nombre}
+
+      </label>
+
+    `;
+
+    /* ================= PAGOS ================= */
+
+    if (!esActual) {
+
+      selectPago.innerHTML += `
+
+        <option value="${u.id_usuario}">
+          ${u.nombre}
+        </option>
+
+      `;
+
+    }
+
+  });
+
+  selectPagador.disabled = true;
+
+}
+
+/* ================================================= */
 /* ================= BALANCE ======================= */
 /* ================================================= */
 
-async function cargarBalance(){
+async function cargarBalance() {
 
   const res =
-    await fetch(API_BALANCE,{
-
-      method:"POST",
-
-      credentials:"same-origin"
-
+    await fetch(API_BALANCE, {
+      method: "POST",
+      credentials: "same-origin"
     });
 
   const json =
     await res.json();
 
-  if(!json.success) return;
+  if (!json.success) {
+
+    return;
+
+  }
 
   const b =
     json.data.balance;
@@ -375,131 +420,13 @@ async function cargarBalance(){
 
   balanceEl.textContent =
 
-    `${b.neto >= 0 ? "+" : ""}` +
-    `${b.neto.toFixed(2)} €`;
+    `${b.neto >= 0 ? "+" : ""}${b.neto.toFixed(2)} €`;
 
   balanceEl.className =
-
-    `amount ${
-      b.neto >= 0
-        ? "positive"
-        : "negative"
+    `amount ${b.neto >= 0
+      ? "positive"
+      : "negative"
     }`;
-
-}
-
-/* ================================================= */
-/* ================= USUARIOS ====================== */
-/* ================================================= */
-
-async function cargarUsuarios(){
-
-  const res =
-    await fetch(API_USUARIOS,{
-
-      method:"POST",
-
-      credentials:"same-origin"
-
-    });
-
-  const data =
-    await res.json();
-
-  if(!data.success) return;
-
-  usuarios =
-    data.usuarios;
-
-  selectPagador.innerHTML = "";
-
-  const selectPago =
-    document.getElementById(
-      "pagoReceptor"
-    );
-
-  selectPago.innerHTML = "";
-
-  usuarios.forEach(u => {
-
-    /* ================= PAGADOR ================= */
-
-    const option =
-      document.createElement(
-        "option"
-      );
-
-    option.value =
-      u.id_usuario;
-
-    option.textContent =
-      u.nombre;
-
-    selectPagador
-      .appendChild(option);
-
-    /* ================= PAGO ================= */
-
-    if(
-      u.id_usuario !=
-      usuarioActual.id_usuario
-    ){
-
-      const opt =
-        document.createElement(
-          "option"
-        );
-
-      opt.value =
-        u.id_usuario;
-
-      opt.textContent =
-        u.nombre;
-
-      selectPago
-        .appendChild(opt);
-
-    }
-
-  });
-
-  renderCheckboxes();
-
-}
-
-/* ================================================= */
-/* ================= CHECKBOXES ==================== */
-/* ================================================= */
-
-function renderCheckboxes(){
-
-  usuariosCheckbox.innerHTML = "";
-
-  usuarios.forEach(u => {
-
-    const div =
-      document.createElement("div");
-
-    div.innerHTML = `
-
-      <label class="checkbox-user">
-
-        <input
-          type="checkbox"
-          value="${u.id_usuario}"
-          checked
-        >
-
-        ${u.nombre}
-
-      </label>
-
-    `;
-
-    usuariosCheckbox
-      .appendChild(div);
-
-  });
 
 }
 
@@ -507,7 +434,7 @@ function renderCheckboxes(){
 /* ================= GASTOS ======================== */
 /* ================================================= */
 
-async function cargarGastos(){
+async function cargarGastos() {
 
   const fd =
     new FormData();
@@ -518,20 +445,20 @@ async function cargarGastos(){
   );
 
   const res =
-    await fetch(API_GASTOS,{
-
-      method:"POST",
-
-      body:fd,
-
-      credentials:"same-origin"
-
+    await fetch(API_GASTOS, {
+      method: "POST",
+      body: fd,
+      credentials: "same-origin"
     });
 
   const data =
     await res.json();
 
-  if(!data.success) return;
+  if (!data.success) {
+
+    return;
+
+  }
 
   gastos =
     data.gastos;
@@ -541,34 +468,104 @@ async function cargarGastos(){
 }
 
 /* ================================================= */
+/* ================= FILTROS ======================= */
+/* ================================================= */
+
+function cambiarFiltro(filtro) {
+
+  filtroActivo = filtro;
+
+  document
+    .querySelectorAll(
+      ".filters button"
+    )
+    .forEach(btn => {
+
+      btn.classList.remove("active");
+
+    });
+
+  const mapa = {
+
+    todos: "filterTodos",
+    pendientes: "filterPendientes",
+    liquidados: "filterLiquidados",
+    mes: "filterMes"
+
+  };
+
+  document
+    .getElementById(mapa[filtro])
+    .classList
+    .add("active");
+
+  renderLista();
+
+}
+
+/* ================================================= */
 /* ================= RENDER ======================== */
 /* ================================================= */
 
-function renderLista(){
+function renderLista() {
 
   lista.innerHTML = "";
 
-  let gastosFiltrados =
-    filtrarGastosUsuario();
+  let listaFinal =
+    [...gastos];
 
-  gastosFiltrados =
-    aplicarFiltros(
-      gastosFiltrados
-    );
+  if (filtroActivo === "pendientes") {
 
-  gastosFiltrados =
-    aplicarBusqueda(
-      gastosFiltrados
-    );
+    listaFinal =
+      listaFinal.filter(g =>
 
-  if(!gastosFiltrados.length){
+        g.participantes.some(
+          p => Number(p.pagado) === 0
+        )
+
+      );
+
+  }
+
+  if (filtroActivo === "liquidados") {
+
+    listaFinal =
+      listaFinal.filter(g =>
+
+        g.participantes.every(
+          p => Number(p.pagado) === 1
+        )
+
+      );
+
+  }
+
+  const texto =
+    document
+      .getElementById("searchInput")
+      .value
+      .toLowerCase()
+      .trim();
+
+  if (texto) {
+
+    listaFinal =
+      listaFinal.filter(g =>
+
+        g.titulo
+          .toLowerCase()
+          .includes(texto)
+
+      );
+
+  }
+
+  if (!listaFinal.length) {
 
     lista.innerHTML = `
 
       <div class="empty-debts">
-
-        No hay gastos disponibles
-
+        No hay gastos
       </div>
 
     `;
@@ -577,7 +574,7 @@ function renderLista(){
 
   }
 
-  gastosFiltrados.forEach(gasto => {
+  listaFinal.forEach(gasto => {
 
     lista.appendChild(
       crearCardGasto(gasto)
@@ -588,166 +585,10 @@ function renderLista(){
 }
 
 /* ================================================= */
-/* ================= HELPERS ======================= */
-/* ================================================= */
-
-function filtrarGastosUsuario(){
-
-  return gastos.filter(g => {
-
-    const soyPagador =
-
-      g.pagador ===
-      usuarioActual.nombre;
-
-    const participo =
-
-      g.participantes?.some(
-        p =>
-          p.nombre ===
-          usuarioActual.nombre
-      );
-
-    return (
-      soyPagador ||
-      participo
-    );
-
-  });
-
-}
-
-function aplicarFiltros(
-  listaGastos
-){
-
-  /* ================= PENDIENTES ================= */
-
-  if(
-    filtroActivo ===
-    "pendientes"
-  ){
-
-    return listaGastos.filter(g => {
-
-      return g.participantes?.some(
-        p => p.pagado == 0
-      );
-
-    });
-
-  }
-
-  /* ================= LIQUIDADOS ================= */
-
-  if(
-    filtroActivo ===
-    "liquidados"
-  ){
-
-    return listaGastos.filter(g => {
-
-      return g.participantes?.every(
-        p => p.pagado == 1
-      );
-
-    });
-
-  }
-
-  /* ================= MES ================= */
-
-  if(
-    filtroActivo ===
-    "mes"
-  ){
-
-    const ahora =
-      new Date();
-
-    return listaGastos.filter(g => {
-
-      if(!g.fecha){
-
-        return true;
-
-      }
-
-      const fecha =
-        new Date(g.fecha);
-
-      return (
-
-        fecha.getMonth() ===
-        ahora.getMonth()
-
-        &&
-
-        fecha.getFullYear() ===
-        ahora.getFullYear()
-
-      );
-
-    });
-
-  }
-
-  return listaGastos;
-
-}
-
-function aplicarBusqueda(
-  listaGastos
-){
-
-  const input =
-    document.getElementById(
-      "searchInput"
-    );
-
-  if(!input){
-
-    return listaGastos;
-
-  }
-
-  const texto =
-
-    input.value
-      .toLowerCase()
-      .trim();
-
-  if(!texto){
-
-    return listaGastos;
-
-  }
-
-  return listaGastos.filter(g => {
-
-    return (
-
-      g.titulo
-        .toLowerCase()
-        .includes(texto)
-
-      ||
-
-      g.pagador
-        .toLowerCase()
-        .includes(texto)
-
-    );
-
-  });
-
-}
-
-/* ================================================= */
 /* ================= CARD GASTO ==================== */
 /* ================================================= */
 
-function crearCardGasto(gasto){
+function crearCardGasto(gasto) {
 
   const div =
     document.createElement("div");
@@ -757,8 +598,8 @@ function crearCardGasto(gasto){
 
   const pendiente =
 
-    gasto.participantes?.some(
-      p => p.pagado == 0
+    gasto.participantes.some(
+      p => Number(p.pagado) === 0
     );
 
   div.innerHTML = `
@@ -783,18 +624,10 @@ function crearCardGasto(gasto){
 
           <div class="
             expense-status
-            ${
-              pendiente
-                ? "pending"
-                : "paid"
-            }
+            ${pendiente ? "pending" : "paid"}
           ">
 
-            ${
-              pendiente
-                ? "Pendiente"
-                : "Liquidado"
-            }
+            ${pendiente ? "Pendiente" : "Liquidado"}
 
           </div>
 
@@ -805,11 +638,7 @@ function crearCardGasto(gasto){
       <div class="right">
 
         <div class="amount">
-
-          ${parseFloat(
-            gasto.importe
-          ).toFixed(2)} €
-
+          ${parseFloat(gasto.importe).toFixed(2)} €
         </div>
 
         <div class="expense-actions">
@@ -831,311 +660,16 @@ function crearCardGasto(gasto){
   `;
 
   div
-    .querySelector(".delete-btn")
-    .onclick = () =>
-      abrirDelete(gasto);
-
-  div
     .querySelector(".detail-btn")
     .onclick = () =>
       abrirDetalle(gasto);
 
+  div
+    .querySelector(".delete-btn")
+    .onclick = () =>
+      abrirDelete(gasto);
+
   return div;
-
-}
-
-/* ================================================= */
-/* ================= DETALLE ======================= */
-/* ================================================= */
-
-function abrirDetalle(gasto){
-
-  gastoDetalleActual = gasto;
-
-  document.getElementById(
-    "detalleTitulo"
-  ).textContent =
-    gasto.titulo;
-
-  document.getElementById(
-    "detallePagador"
-  ).textContent =
-    gasto.pagador;
-
-  document.getElementById(
-    "detalleImporte"
-  ).textContent =
-
-    parseFloat(
-      gasto.importe
-    ).toFixed(2) + " €";
-
-  const contenedor =
-    document.getElementById(
-      "detalleParticipantes"
-    );
-
-  contenedor.innerHTML = "";
-
-  let puedoSaldar = false;
-
-  gasto.participantes?.forEach(p => {
-
-    if(
-
-      p.nombre ===
-      usuarioActual.nombre
-
-      &&
-
-      p.pagado == 0
-
-    ){
-
-      puedoSaldar = true;
-
-    }
-
-    contenedor.innerHTML += `
-
-      <div class="participant-row">
-
-        <div class="participant-left">
-
-          <div class="participant-name">
-            ${p.nombre}
-          </div>
-
-          <div class="
-            participant-status
-            ${
-              p.pagado
-                ? "paid"
-                : "pending"
-            }
-          ">
-
-            ${
-              p.pagado
-                ? "Pagado"
-                : "Pendiente"
-            }
-
-          </div>
-
-        </div>
-
-        <div class="participant-amount">
-
-          ${parseFloat(
-            p.importe
-          ).toFixed(2)} €
-
-        </div>
-
-      </div>
-
-    `;
-
-  });
-
-  const btnSaldar =
-    document.getElementById(
-      "btnSaldar"
-    );
-
-  if(
-
-    puedoSaldar
-
-    &&
-
-    gasto.pagador !==
-    usuarioActual.nombre
-
-  ){
-
-    btnSaldar
-      .classList
-      .remove("hidden");
-
-  }else{
-
-    btnSaldar
-      .classList
-      .add("hidden");
-
-  }
-
-  detalleModal
-    .classList
-    .remove("hidden");
-
-}
-
-function cerrarDetalle(){
-
-  detalleModal
-    .classList
-    .add("hidden");
-
-}
-
-/* ================================================= */
-/* ================= CONFIRMAR PAGO ================ */
-/* ================================================= */
-
-function abrirConfirmacionPago(){
-
-  if(!gastoDetalleActual){
-
-    return;
-
-  }
-
-  const miParte =
-
-    gastoDetalleActual
-      .participantes
-      .find(
-        p =>
-          p.nombre ===
-          usuarioActual.nombre
-      );
-
-  if(!miParte){
-
-    return;
-
-  }
-
-  textoConfirmarPago.textContent =
-
-    `¿Quieres saldar ${parseFloat(miParte.importe).toFixed(2)} € con ${gastoDetalleActual.pagador}?`;
-
-  confirmarPagoModal
-    .classList
-    .remove("hidden");
-
-}
-
-function cerrarConfirmacionPago(){
-
-  confirmarPagoModal
-    .classList
-    .add("hidden");
-
-}
-
-/* ================================================= */
-/* ================= SALDAR ======================== */
-/* ================================================= */
-
-async function confirmarSaldarDeuda(){
-
-  if(!gastoDetalleActual){
-
-    return;
-
-  }
-
-  const miParte =
-
-    gastoDetalleActual
-      .participantes
-      .find(
-        p =>
-          p.nombre ===
-          usuarioActual.nombre
-      );
-
-  if(!miParte){
-
-    return;
-
-  }
-
-  const btn =
-    document.getElementById(
-      "aceptarConfirmarPago"
-    );
-
-  btn.disabled = true;
-
-  btn.textContent =
-    "Procesando...";
-
-  try{
-
-    const fd =
-      new FormData();
-
-    fd.append(
-      "accion",
-      "crear"
-    );
-
-    fd.append(
-      "receptor",
-      gastoDetalleActual.id_pagador
-    );
-
-    fd.append(
-      "importe",
-      miParte.importe
-    );
-
-    const res =
-      await fetch(API_PAGOS,{
-
-        method:"POST",
-
-        body:fd,
-
-        credentials:"same-origin"
-
-      });
-
-    const data =
-      await res.json();
-
-    if(!data.success){
-
-      mostrarToast(
-        data.message || "Error al registrar el pago",
-        "error"
-      );
-
-      return;
-
-    }
-
-    mostrarToast(
-      "Pago registrado correctamente",
-      "success"
-    );
-
-    cerrarConfirmacionPago();
-
-    cerrarDetalle();
-
-    await refreshData();
-
-  }catch(error){
-
-    mostrarToast(
-      "Error inesperado",
-      "error"
-    );
-
-  }finally{
-
-    btn.disabled = false;
-
-    btn.textContent =
-      "Confirmar pago";
-
-  }
 
 }
 
@@ -1143,27 +677,17 @@ async function confirmarSaldarDeuda(){
 /* ================= MODAL GASTO =================== */
 /* ================================================= */
 
-function abrirModal(){
+function abrirModal() {
 
-  limpiarFormulario();
-
-  renderCheckboxes();
-
-  modal
+  document
+    .getElementById("step1")
     .classList
     .remove("hidden");
 
-}
-
-function cerrarModal(){
-
-  modal
+  document
+    .getElementById("step2")
     .classList
     .add("hidden");
-
-}
-
-function limpiarFormulario(){
 
   tituloInput.value = "";
 
@@ -1171,26 +695,97 @@ function limpiarFormulario(){
 
   divisionContainer.innerHTML = "";
 
+  modal.classList.remove("hidden");
+
+}
+
+function cerrarModal() {
+
+  modal.classList.add("hidden");
+
+}
+
+/* ================================================= */
+/* ================= PASOS ========================= */
+/* ================================================= */
+
+function continuarPaso2() {
+
+  const titulo =
+    tituloInput.value.trim();
+
+  const importe =
+    parseFloat(
+      importeInput.value
+    );
+
+  const participantes =
+    getSeleccionados();
+
+  if (
+    !titulo ||
+    isNaN(importe) ||
+    participantes.length === 0
+  ) {
+
+    mostrarToast(
+      "Completa todos los campos",
+      "error"
+    );
+
+    return;
+
+  }
+
+  document
+    .getElementById("step1")
+    .classList
+    .add("hidden");
+
+  document
+    .getElementById("step2")
+    .classList
+    .remove("hidden");
+
+  dividirIgual();
+
+}
+
+function volverPaso1() {
+
+  document
+    .getElementById("step2")
+    .classList
+    .add("hidden");
+
+  document
+    .getElementById("step1")
+    .classList
+    .remove("hidden");
+
+}
+
+/* ================================================= */
+/* ================= HELPERS ======================= */
+/* ================================================= */
+
+function getSeleccionados() {
+
+  return [
+
+    ...usuariosCheckbox.querySelectorAll(
+      "input:checked"
+    )
+
+  ].map(cb => cb.value);
+
 }
 
 /* ================================================= */
 /* ================= DIVISION ====================== */
 /* ================================================= */
 
-function getSeleccionados(){
-
-  return [
-
-    ...usuariosCheckbox
-      .querySelectorAll(
-        "input:checked"
-      )
-
-  ];
-
-}
-
-function dividirIgual(){
+function dividirIgual() {
 
   const total =
     parseFloat(
@@ -1200,22 +795,14 @@ function dividirIgual(){
   const seleccionados =
     getSeleccionados();
 
-  if(
-
-    !total
-
-    ||
-
+  if (
+    !total ||
     seleccionados.length === 0
-
-  ){
-
+  ) {
     return;
-
   }
 
   const parte =
-
     (
       total /
       seleccionados.length
@@ -1223,14 +810,14 @@ function dividirIgual(){
 
   divisionContainer.innerHTML = "";
 
-  seleccionados.forEach(cb => {
+  seleccionados.forEach(idUsuario => {
 
     const user =
-
       usuarios.find(
         u =>
-          u.id_usuario ==
-          cb.value
+          Number(u.id_usuario)
+          ===
+          Number(idUsuario)
       );
 
     divisionContainer.innerHTML += `
@@ -1255,21 +842,21 @@ function dividirIgual(){
 
 }
 
-function dividirManual(){
+function dividirManual() {
 
   const seleccionados =
     getSeleccionados();
 
   divisionContainer.innerHTML = "";
 
-  seleccionados.forEach(cb => {
+  seleccionados.forEach(idUsuario => {
 
     const user =
-
       usuarios.find(
         u =>
-          u.id_usuario ==
-          cb.value
+          Number(u.id_usuario)
+          ===
+          Number(idUsuario)
       );
 
     divisionContainer.innerHTML += `
@@ -1297,14 +884,12 @@ function dividirManual(){
 /* ================= GUARDAR ======================= */
 /* ================================================= */
 
-async function guardarGasto(){
+async function guardarGasto() {
 
   const titulo =
-
     tituloInput.value.trim();
 
   const importe =
-
     parseFloat(
       importeInput.value
     );
@@ -1313,24 +898,13 @@ async function guardarGasto(){
     selectPagador.value;
 
   const participantes =
+    getSeleccionados();
 
-    getSeleccionados().map(
-      cb => cb.value
-    );
-
-  if(
-
-    !titulo
-
-    ||
-
-    isNaN(importe)
-
-    ||
-
-    participantes.length === 0
-
-  ){
+  if (
+    !titulo ||
+    !importe ||
+    !participantes.length
+  ) {
 
     mostrarToast(
       "Completa todos los campos",
@@ -1370,23 +944,19 @@ async function guardarGasto(){
   );
 
   const res =
-    await fetch(API_GASTOS,{
-
-      method:"POST",
-
-      body:fd,
-
-      credentials:"same-origin"
-
+    await fetch(API_GASTOS, {
+      method: "POST",
+      body: fd,
+      credentials: "same-origin"
     });
 
   const data =
     await res.json();
 
-  if(!data.success){
+  if (!data.success) {
 
     mostrarToast(
-      data.message || "Error",
+      data.message,
       "error"
     );
 
@@ -1405,10 +975,10 @@ async function guardarGasto(){
 }
 
 /* ================================================= */
-/* ================= ELIMINAR ====================== */
+/* ================= DELETE ======================== */
 /* ================================================= */
 
-function abrirDelete(gasto){
+function abrirDelete(gasto) {
 
   gastoAEliminar = gasto;
 
@@ -1418,9 +988,9 @@ function abrirDelete(gasto){
 
 }
 
-async function eliminarGasto(){
+async function eliminarGasto() {
 
-  if(!gastoAEliminar){
+  if (!gastoAEliminar) {
 
     return;
 
@@ -1439,14 +1009,10 @@ async function eliminarGasto(){
     gastoAEliminar.id_gasto
   );
 
-  await fetch(API_GASTOS,{
-
-    method:"POST",
-
-    body:fd,
-
-    credentials:"same-origin"
-
+  await fetch(API_GASTOS, {
+    method: "POST",
+    body: fd,
+    credentials: "same-origin"
   });
 
   deleteModal
@@ -1462,10 +1028,87 @@ async function eliminarGasto(){
 }
 
 /* ================================================= */
+/* ================= DETALLE ======================= */
+/* ================================================= */
+
+function abrirDetalle(gasto) {
+
+  gastoDetalleActual = gasto;
+
+  document.getElementById(
+    "detalleTitulo"
+  ).textContent =
+    gasto.titulo;
+
+  document.getElementById(
+    "detallePagador"
+  ).textContent =
+    gasto.pagador;
+
+  document.getElementById(
+    "detalleImporte"
+  ).textContent =
+    parseFloat(gasto.importe).toFixed(2) + " €";
+
+  const contenedor =
+    document.getElementById(
+      "detalleParticipantes"
+    );
+
+  contenedor.innerHTML = "";
+
+  gasto.participantes.forEach(p => {
+
+    contenedor.innerHTML += `
+
+      <div class="participant-row">
+
+        <div class="participant-left">
+
+          <div class="participant-name">
+            ${p.nombre}
+          </div>
+
+          <div class="
+            participant-status
+            ${p.pagado ? "paid" : "pending"}
+          ">
+
+            ${p.pagado ? "Pagado" : "Pendiente"}
+
+          </div>
+
+        </div>
+
+        <div class="participant-amount">
+          ${parseFloat(p.importe).toFixed(2)} €
+        </div>
+
+      </div>
+
+    `;
+
+  });
+
+  detalleModal
+    .classList
+    .remove("hidden");
+
+}
+
+function cerrarDetalle() {
+
+  detalleModal
+    .classList
+    .add("hidden");
+
+}
+
+/* ================================================= */
 /* ================= PAGOS ========================= */
 /* ================================================= */
 
-function abrirPago(){
+function abrirPago() {
 
   pagoModal
     .classList
@@ -1473,7 +1116,7 @@ function abrirPago(){
 
 }
 
-function cerrarPago(){
+function cerrarPago() {
 
   pagoModal
     .classList
@@ -1481,7 +1124,7 @@ function cerrarPago(){
 
 }
 
-async function guardarPago(){
+async function guardarPago() {
 
   const receptor =
     document.getElementById(
@@ -1493,7 +1136,7 @@ async function guardarPago(){
       "pagoImporte"
     ).value;
 
-  if(!importe){
+  if (!importe) {
 
     mostrarToast(
       "Introduce un importe",
@@ -1523,23 +1166,19 @@ async function guardarPago(){
   );
 
   const res =
-    await fetch(API_PAGOS,{
-
-      method:"POST",
-
-      body:fd,
-
-      credentials:"same-origin"
-
+    await fetch(API_PAGOS, {
+      method: "POST",
+      body: fd,
+      credentials: "same-origin"
     });
 
   const data =
     await res.json();
 
-  if(!data.success){
+  if (!data.success) {
 
     mostrarToast(
-      data.message || "Error",
+      data.message,
       "error"
     );
 
@@ -1550,7 +1189,7 @@ async function guardarPago(){
   cerrarPago();
 
   mostrarToast(
-    "Pago registrado correctamente"
+    "Pago registrado"
   );
 
   await refreshData();
@@ -1561,7 +1200,7 @@ async function guardarPago(){
 /* ================= RESUMEN ======================= */
 /* ================================================= */
 
-async function cargarResumen(){
+async function cargarResumen() {
 
   const fd =
     new FormData();
@@ -1572,20 +1211,16 @@ async function cargarResumen(){
   );
 
   const res =
-    await fetch(API_GASTOS,{
-
-      method:"POST",
-
-      body:fd,
-
-      credentials:"same-origin"
-
+    await fetch(API_GASTOS, {
+      method: "POST",
+      body: fd,
+      credentials: "same-origin"
     });
 
   const data =
     await res.json();
 
-  if(!data.success){
+  if (!data.success) {
 
     return;
 
@@ -1600,8 +1235,6 @@ async function cargarResumen(){
 
   let total = 0;
 
-  /* ================= DEBES ================= */
-
   data.debes.forEach(d => {
 
     total++;
@@ -1611,24 +1244,15 @@ async function cargarResumen(){
       <div class="deuda">
 
         Debes
-
-        <strong>
-          ${d.importe.toFixed(2)} €
-        </strong>
-
+        <strong>${d.importe.toFixed(2)} €</strong>
         a
-
-        <strong>
-          ${d.nombre}
-        </strong>
+        <strong>${d.nombre}</strong>
 
       </div>
 
     `;
 
   });
-
-  /* ================= RECIBES ================= */
 
   data.recibes.forEach(r => {
 
@@ -1638,15 +1262,9 @@ async function cargarResumen(){
 
       <div class="recibe">
 
-        <strong>
-          ${r.nombre}
-        </strong>
-
+        <strong>${r.nombre}</strong>
         te debe
-
-        <strong>
-          ${r.importe.toFixed(2)} €
-        </strong>
+        <strong>${r.importe.toFixed(2)} €</strong>
 
       </div>
 
@@ -1658,27 +1276,50 @@ async function cargarResumen(){
     "deudasCount"
   ).textContent = total;
 
-  if(
-
-    !data.debes.length
-
-    &&
-
+  if (
+    !data.debes.length &&
     !data.recibes.length
-
-  ){
+  ) {
 
     contenedor.innerHTML = `
 
       <div class="empty-debts">
-
         Todo está saldado ✅
-
       </div>
 
     `;
 
   }
+
+}
+
+/* ================================================= */
+/* ================= CONFIRMAR ===================== */
+/* ================================================= */
+
+function abrirConfirmacionPago() {
+
+  confirmarPagoModal
+    .classList
+    .remove("hidden");
+
+}
+
+function cerrarConfirmacionPago() {
+
+  confirmarPagoModal
+    .classList
+    .add("hidden");
+
+}
+
+async function confirmarSaldarDeuda() {
+
+  cerrarConfirmacionPago();
+
+  mostrarToast(
+    "Pago confirmado"
+  );
 
 }
 
@@ -1689,7 +1330,7 @@ async function cargarResumen(){
 function mostrarToast(
   mensaje,
   tipo = "success"
-){
+) {
 
   const toast =
     document.createElement("div");
@@ -1700,14 +1341,13 @@ function mostrarToast(
   toast.textContent =
     mensaje;
 
-  document.body
-    .appendChild(toast);
+  document.body.appendChild(toast);
 
   setTimeout(() => {
 
     toast.classList.add("show");
 
-  },100);
+  }, 100);
 
   setTimeout(() => {
 
@@ -1717,8 +1357,8 @@ function mostrarToast(
 
       toast.remove();
 
-    },300);
+    }, 300);
 
-  },3000);
+  }, 3000);
 
 }
