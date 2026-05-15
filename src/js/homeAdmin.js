@@ -1,3 +1,8 @@
+let nombrePisoActual = "este piso";
+
+let pisos = [];
+let pisoSeleccionado = null;
+
 /* ================= INIT ================= */
 document.addEventListener("DOMContentLoaded", () => {
   inicializar();
@@ -8,6 +13,7 @@ function inicializar() {
   inicializarLogout();
   inicializarGuardar();
   inicializarRotacion();
+  inicializarEliminarPiso();
 }
 
 
@@ -42,15 +48,42 @@ async function cargarDatos() {
     }
 
     /* ===== PISO ===== */
-    if (data.piso) {
-      document.getElementById("calle").value = data.piso.calle || "";
-      document.getElementById("ciudad").value = data.piso.ciudad || "";
-      document.getElementById("codigo_postal").value = data.piso.codigo_postal || "";
+    if (data.pisos) {
+      pisos = data.pisos;
+
+      const selector = document.getElementById("selectorPiso");
+      selector.innerHTML = "";
+
+      pisos.forEach(piso => {
+        const option = document.createElement("option");
+        option.value = piso.id_piso;
+        option.textContent = `${piso.calle} - ${piso.nombre_casero}`;
+        selector.appendChild(option);
+      });
+
+      pisoSeleccionado = pisos[0];
+      pintarPiso(pisoSeleccionado);
+
+      selector.addEventListener("change", () => {
+        pisoSeleccionado = pisos.find(p => p.id_piso == selector.value);
+        pintarPiso(pisoSeleccionado);
+      });
     }
 
   } catch (err) {
     console.error("Error cargando datos:", err);
   }
+}
+
+function pintarPiso(piso) {
+  if (!piso) return;
+
+  nombrePisoActual = piso.calle || "este piso";
+
+  document.getElementById("nombre_casero").value = piso.nombre_casero || "";
+  document.getElementById("calle").value = piso.calle || "";
+  document.getElementById("ciudad").value = piso.ciudad || "";
+  document.getElementById("codigo_postal").value = piso.codigo_postal || "";
 }
 
 
@@ -190,4 +223,138 @@ function mostrarToast(mensaje) {
   setTimeout(() => {
     toast.style.opacity = "0";
   }, 2000);
+}
+
+/* ================= ELIMINAR / CREAR PISO ================= */
+function inicializarEliminarPiso() {
+
+  const modalEliminarPiso = document.getElementById("modalEliminarPiso");
+  const modalCrearPiso = document.getElementById("modalCrearPiso");
+  const sinPiso = document.getElementById("sinPiso");
+
+  const btnEliminar = document.querySelector(".danger");
+  const btnCancelarEliminar = document.getElementById("cancelarEliminarPiso");
+  const btnConfirmarEliminar = document.getElementById("confirmarEliminarPiso");
+
+  const btnAbrirCrear = document.getElementById("btnAbrirCrearPiso");
+  const btnCancelarCrear = document.getElementById("cancelarCrearPiso");
+  const btnGuardarPiso = document.getElementById("guardarNuevoPiso");
+
+  /* ===== ABRIR MODAL ELIMINAR ===== */
+  btnEliminar?.addEventListener("click", () => {
+
+    const nombrePiso = nombrePisoActual;
+
+    const texto = document.getElementById("textoEliminarPiso");
+
+    if (texto) {
+      texto.innerHTML =
+        `¿Seguro que quieres eliminar el piso de la <span>${nombrePiso}</span>?`;
+    }
+
+    modalEliminarPiso.classList.remove("hidden");
+  });
+
+  /* ===== CANCELAR ELIMINAR ===== */
+  btnCancelarEliminar?.addEventListener("click", () => {
+    modalEliminarPiso.classList.add("hidden");
+  });
+
+  /* ===== CONFIRMAR ELIMINAR ===== */
+  btnConfirmarEliminar?.addEventListener("click", () => {
+
+    modalEliminarPiso.classList.add("hidden");
+
+    document.querySelectorAll(".card, .save").forEach(el => {
+      el.style.display = "none";
+    });
+
+    sinPiso.classList.remove("hidden");
+  });
+
+  /* ===== ABRIR CREAR PISO ===== */
+  btnAbrirCrear?.addEventListener("click", (e) => {
+    e.preventDefault();
+    modalCrearPiso.classList.remove("hidden");
+  });
+
+  /* ===== CANCELAR CREAR ===== */
+  btnCancelarCrear?.addEventListener("click", () => {
+    modalCrearPiso.classList.add("hidden");
+  });
+
+  /* ===== GUARDAR NUEVO PISO ===== */
+  btnGuardarPiso?.addEventListener("click", async () => {
+
+    const nombre_casero = document.getElementById("nuevoNombreCasero").value.trim();
+    const calle = document.getElementById("nuevaCalle").value.trim();
+    const ciudad = document.getElementById("nuevaCiudad").value.trim();
+    const cp = document.getElementById("nuevoCodigoPostal").value.trim();
+
+    if (!nombre_casero || !calle || !ciudad || !cp) {
+      mostrarToast("Rellena todos los campos");
+      return;
+    }
+
+    /* ===== GUARDAR EN BBDD ===== */
+    try {
+
+      const res = await fetch("../php/crearPiso.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          nombre_casero,
+          calle,
+          ciudad,
+          codigo_postal: cp
+        })
+      });
+
+      const data = await res.json();
+
+      if (!data.success) {
+        mostrarToast("Error al crear piso");
+        return;
+      }
+
+    } catch (err) {
+      console.error(err);
+      mostrarToast("Error de conexión");
+      return;
+    }
+
+    /* cerrar modal */
+    modalCrearPiso.classList.add("hidden");
+
+    /* ocultar pantalla sin piso */
+    sinPiso.classList.add("hidden");
+
+    /* volver a mostrar contenido */
+    document.querySelectorAll(".card, .save").forEach(el => {
+      el.style.display = "";
+    });
+
+    /* actualizar formulario */
+    document.getElementById("nombre_casero").value = nombre_casero;
+    document.getElementById("calle").value = calle;
+    document.getElementById("ciudad").value = ciudad;
+    document.getElementById("codigo_postal").value = cp;
+
+    mostrarToast("Piso creado correctamente ");
+  });
+
+  /* ===== CERRAR MODALES AL PULSAR FUERA ===== */
+  window.addEventListener("click", (e) => {
+
+    if (e.target === modalEliminarPiso) {
+      modalEliminarPiso.classList.add("hidden");
+    }
+
+    if (e.target === modalCrearPiso) {
+      modalCrearPiso.classList.add("hidden");
+    }
+
+  });
 }

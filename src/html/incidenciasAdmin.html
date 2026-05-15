@@ -23,12 +23,10 @@
             <nav>
                 <a href="../html/homeAdmin.html"><img src="../css/icons/settings.svg" class="icon">
                     <strong>Home</strong></a>
-                <a class="active" href="../html/incidenciasAdmin.html">
-                    <img src="../css/icons/circle-alert.svg" class="icon">
-                    <strong>Incidencias</strong>
-                    <!-- ✅ Badge de notificaciones -->
-                    <span class="badge-notif-admin" id="badge-notificaciones-admin" style="display:none; background:#dc2626; color:#fff; font-size:11px; padding:2px 7px; border-radius:999px; margin-left:8px; font-weight:700;">0</span>
-                </a>
+                <a class="active" href="../html/incidenciasAdmin.html"><img src="../css/icons/circle-alert.svg"
+                        class="icon"><strong>Incidencias</strong></a>
+                <a href="../html/companerosAdmin.html"><img src="../css/icons/users.svg"
+                        class="icon"><strong>Compañeros</strong></a>
             </nav>
 
             <button class="logout">Cerrar sesión</button>
@@ -79,25 +77,65 @@
 
     </div>
 
-    <!-- 🔔 MODAL NOTIFICACIONES ADMIN -->
-    <div class="modal-overlay modal--hidden" id="modal-notificaciones-admin" role="dialog" aria-modal="true">
-        <div class="modal modal--notificaciones">
-            <div class="modal__header">
-                <div class="modal__header-left">
-                    <span class="modal__icon modal__icon--notify" aria-hidden="true">🔔</span>
-                    <h2 class="modal__title">Nuevas incidencias notificadas</h2>
-                </div>
-                <button class="modal__close" aria-label="Cerrar" data-modal-close="modal-notificaciones-admin">✕</button>
+    <div id="modalDetalleIncidencia" class="modal hidden">
+
+        <div class="modal-content incidencia-modal">
+
+            <button id="cerrarModalDetalle" class="modal-close">
+                &times;
+            </button>
+
+            <h2 id="detalleTitulo"></h2>
+
+            <p id="detalleDescripcion" class="detalle-desc"></p>
+
+            <div class="detalle-info">
+                <p>
+                    <strong>Usuario:</strong>
+                    <span id="detalleUsuario"></span>
+                </p>
+
+                <p>
+                    <strong>Estado:</strong>
+                    <span id="detalleEstado"></span>
+                </p>
             </div>
-            <hr class="modal__divider" />
-            <div class="modal__body">
-                <ul class="notify-list" id="lista-notificaciones"></ul>
-                <p class="notify-empty" id="notify-empty" style="display:none;">No hay notificaciones pendientes</p>
+
+            <h3 class="chat-title">Conversación</h3>
+
+            <div id="listaMensajes" class="chat-box"></div>
+
+            <textarea id="mensajeAdmin" class="chat-textarea" placeholder="Escribe una respuesta..."></textarea>
+
+            <div class="modal-actions">
+                <button id="btnEnviarRespuesta" class="btn-primary">
+                    Enviar respuesta
+                </button>
+
+                <button id="btnMarcarResuelta" class="btn-danger">
+                    Marcar como resuelta
+                </button>
             </div>
-            <hr class="modal__divider" />
-            <div class="modal__footer">
-                <button type="button" class="modal__btn modal__btn--primary" id="btn-marcar-todas-leidas">Marcar todas como leídas</button>
-                <button type="button" class="modal__btn modal__btn--cancel" data-modal-close="modal-notificaciones-admin">Cerrar</button>
+
+        </div>
+
+    </div>
+
+    <div id="modal-notificaciones-admin" class="modal hidden">
+        <div class="modal-content incidencia-modal">
+            <button class="modal-close" data-modal-close="modal-notificaciones-admin">&times;</button>
+
+            <h2>Nueva incidencia</h2>
+            <p>Se ha creado una nueva incidencia en el piso.</p>
+
+            <ul id="lista-notificaciones"></ul>
+
+            <p id="notify-empty">No hay notificaciones nuevas.</p>
+
+            <div class="modal-actions">
+                <button id="btn-marcar-todas-leidas" class="btn-primary">
+                    Marcar como leídas
+                </button>
             </div>
         </div>
     </div>

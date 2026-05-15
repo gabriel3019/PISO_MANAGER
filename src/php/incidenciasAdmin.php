@@ -46,7 +46,7 @@ switch ($accion) {
         $id = $_POST['id'] ?? null;
         $estado = $_POST['estado'] ?? null;
 
-        $estadosPermitidos = ['creada', 'en_proceso', 'finalizada'];
+        $estadosPermitidos = ['abierta', 'en_curso', 'resuelta'];
 
         if (!$id || !$estado) {
             echo json_encode(['success' => false, 'error' => 'Faltan datos']);
@@ -101,10 +101,10 @@ switch ($accion) {
 
         $stmt->close();
 
-        // 2. Cambiar incidencia a en_proceso
+        // 2. Cambiar incidencia a en_curso
         $stmt = $conn->prepare("
         UPDATE incidencias
-        SET estado = 'en_proceso'
+        SET estado = 'en_curso'
         WHERE id_incidencia = ?
     ");
 
@@ -157,20 +157,36 @@ switch ($accion) {
         }
 
         $stmt = $conn->prepare("
-        SELECT 
-            m.id_mensaje,
-            m.id_incidencia,
-            m.id_usuario,
-            u.nombre,
-            m.mensaje,
-            m.fecha_envio
-        FROM incidencia_mensajes m
-        INNER JOIN usuarios u ON m.id_usuario = u.id_usuario
-        WHERE m.id_incidencia = ?
-        ORDER BY m.fecha_envio ASC
-    ");
+    SELECT 
+        m.id_mensaje,
+        m.id_incidencia,
+        m.id_usuario,
+        u.nombre,
+        m.mensaje,
+        m.fecha AS fecha_envio,
+        'usuario' AS origen
+    FROM mensajes_incidencia m
+    INNER JOIN usuarios u ON m.id_usuario = u.id_usuario
+    WHERE m.id_incidencia = ?
 
-        $stmt->bind_param("i", $id_incidencia);
+    UNION ALL
+
+    SELECT 
+        m.id_mensaje,
+        m.id_incidencia,
+        m.id_usuario,
+        u.nombre,
+        m.mensaje,
+        m.fecha_envio,
+        'admin' AS origen
+    FROM incidencia_mensajes m
+    INNER JOIN usuarios u ON m.id_usuario = u.id_usuario
+    WHERE m.id_incidencia = ?
+
+    ORDER BY fecha_envio ASC
+");
+
+        $stmt->bind_param("ii", $id_incidencia, $id_incidencia);
         $stmt->execute();
 
         $result = $stmt->get_result();
@@ -196,10 +212,10 @@ switch ($accion) {
             exit;
         }
 
-        // 1. Marcar incidencia como finalizada
+        // 1. Marcar incidencia como resuelta
         $stmt = $conn->prepare("
         UPDATE incidencias
-        SET estado = 'finalizada'
+        SET estado = 'resuelta'
         WHERE id_incidencia = ?
     ");
 
@@ -246,60 +262,62 @@ switch ($accion) {
         ]);
         break;
 
-    // ═══════════════════════════════════════════════════════
-    // 🔔 NOTIFICACIONES ADMIN: Obtener pendientes
-    // ═══════════════════════════════════════════════════════
     case 'obtener_notificaciones_admin':
-        $id_piso = intval($_REQUEST['id_piso'] ?? 0);
-        if (!$id_piso) {
-            echo json_encode(['success' => false, 'error' => 'Falta id_piso']);
-            exit;
-        }
+        $id_piso = $_GET['id_piso'] ?? null;
+
         $stmt = $conn->prepare("
-            SELECT i.id_incidencia, i.titulo, i.tipo, i.urgencia, i.fecha_creacion, 
-                   u.nombre as usuario_nombre
-            FROM incidencias i
-            LEFT JOIN usuarios u ON i.id_usuario = u.id_usuario
-            WHERE i.id_piso = ? AND i.notificar_admin = 1 AND i.leido_admin = 0
-            ORDER BY i.fecha_creacion DESC LIMIT 10
-        ");
+        SELECT 
+            i.id_incidencia,
+            i.titulo,
+            i.tipo,
+            i.urgencia,
+            i.fecha_creacion,
+            u.nombre AS usuario_nombre
+        FROM incidencias i
+        INNER JOIN usuarios u ON i.id_usuario = u.id_usuario
+        WHERE i.id_piso = ?
+        AND i.notificar_admin = 1
+        AND i.leido_admin = 0
+        AND i.estado != 'resuelta'
+        ORDER BY i.fecha_creacion DESC
+    ");
+
         $stmt->bind_param("i", $id_piso);
         $stmt->execute();
+
         $result = $stmt->get_result();
         $notificaciones = [];
-        while ($row = $result->fetch_assoc()) $notificaciones[] = $row;
-        echo json_encode(['success' => true, 'notificaciones' => $notificaciones]);
-        $stmt->close();
+
+        while ($row = $result->fetch_assoc()) {
+            $notificaciones[] = $row;
+        }
+
+        echo json_encode([
+            'success' => true,
+            'notificaciones' => $notificaciones
+        ]);
         break;
 
-    case 'marcar_notificacion_leida':
-        $id_incidencia = intval($_POST['id_incidencia'] ?? 0);
-        if (!$id_incidencia) { 
-            echo json_encode(['success' => false, 'error' => 'Falta ID']); 
-            exit; 
-        }
-        $stmt = $conn->prepare("UPDATE incidencias SET leido_admin = 1 WHERE id_incidencia = ?");
-        $stmt->bind_param("i", $id_incidencia);
-        $stmt->execute();
-        echo json_encode(['success' => true]);
-        $stmt->close();
-        break;
-
-    case 'marcar_todas_leidas':
-        $id_piso = intval($_POST['id_piso'] ?? 0);
-        if (!$id_piso) { 
-            echo json_encode(['success' => false, 'error' => 'Falta id_piso']); 
-            exit; 
-        }
-        $stmt = $conn->prepare("UPDATE incidencias SET leido_admin = 1 WHERE id_piso = ? AND notificar_admin = 1");
-        $stmt->bind_param("i", $id_piso);
-        $stmt->execute();
-        echo json_encode(['success' => true]);
-        $stmt->close();
-        break;
 
     default:
         echo json_encode(['success' => false, 'error' => 'Acción no válida']);
+        break;
+
+    case 'marcar_todas_leidas':
+        $id_piso = $_POST['id_piso'] ?? null;
+
+        $stmt = $conn->prepare("
+        UPDATE incidencias
+        SET leido_admin = 1
+        WHERE id_piso = ?
+        AND notificar_admin = 1
+        AND leido_admin = 0
+    ");
+
+        $stmt->bind_param("i", $id_piso);
+        $stmt->execute();
+
+        echo json_encode(['success' => true]);
         break;
 }
 

@@ -58,23 +58,41 @@ function obtenerEventos($conn)
     $id_piso = isset($_GET['id_piso']) ? (int)$_GET['id_piso'] : 1;
 
     $sql = "
-        SELECT 
-            e.id_evento,
-            e.titulo,
-            e.tipo,
-            e.fecha,
-            e.fecha_inicio,
-            e.fecha_fin,
-            TIME_FORMAT(e.hora, '%H:%i') AS hora,
-            e.estado,
-            u.nombre AS persona
-        FROM calendario_eventos e
-        LEFT JOIN calendario_evento_personas ep ON e.id_evento = ep.id_evento
-        LEFT JOIN usuarios u ON ep.id_usuario = u.id_usuario
-        WHERE e.id_piso = ?
-        AND NOT (e.tipo = 'incidencia' AND e.estado = 'finalizada')
-        ORDER BY COALESCE(e.fecha_inicio, e.fecha), e.hora, e.id_evento
-    ";
+    SELECT 
+        e.id_evento,
+        e.titulo,
+        e.tipo,
+        e.fecha,
+        e.fecha_inicio,
+        e.fecha_fin,
+        TIME_FORMAT(e.hora, '%H:%i') AS hora,
+        e.estado,
+        u.nombre AS persona
+    FROM calendario_eventos e
+    LEFT JOIN calendario_evento_personas ep ON e.id_evento = ep.id_evento
+    LEFT JOIN usuarios u ON ep.id_usuario = u.id_usuario
+    WHERE e.id_piso = ?
+    AND e.tipo != 'incidencia'
+
+    UNION ALL
+
+    SELECT
+        i.id_incidencia + 100000 AS id_evento,
+        i.titulo,
+        'incidencia' AS tipo,
+        COALESCE(i.fecha, DATE(i.fecha_creacion)) AS fecha,
+        NULL AS fecha_inicio,
+        NULL AS fecha_fin,
+        NULL AS hora,
+        i.estado,
+        u.nombre AS persona
+    FROM incidencias i
+    INNER JOIN usuarios u ON i.id_usuario = u.id_usuario
+    WHERE i.id_piso = ?
+    AND i.estado != 'resuelta'
+
+    ORDER BY fecha, hora, id_evento
+";
 
     $stmt = $conn->prepare($sql);
 
@@ -86,7 +104,7 @@ function obtenerEventos($conn)
         return;
     }
 
-    $stmt->bind_param("i", $id_piso);
+    $stmt->bind_param("ii", $id_piso, $id_piso);
 
     if (!$stmt->execute()) {
         echo json_encode([
@@ -153,6 +171,42 @@ function crearEvento($conn, $data)
         echo json_encode([
             'success' => false,
             'message' => 'Faltan campos obligatorios'
+        ]);
+        return;
+    }
+
+    if ($tipo === 'incidencia') {
+        $id_usuario = 2;
+        $urgencia = $data['urgencia'] ?? 'media';
+        $descripcion = $data['descripcion'] ?? $titulo;
+        $estado = 'abierta';
+
+        $sqlIncidencia = "
+        INSERT INTO incidencias 
+        (id_piso, id_usuario, tipo, titulo, descripcion, imagen, notificar_admin, urgencia, estado, fecha)
+        VALUES (?, ?, ?, ?, ?, NULL, 1, ?, ?, ?)
+    ";
+
+        $stmtIncidencia = $conn->prepare($sqlIncidencia);
+
+        $stmtIncidencia->bind_param(
+            "iissssss",
+            $id_piso,
+            $id_usuario,
+            $tipo,
+            $titulo,
+            $descripcion,
+            $urgencia,
+            $estado,
+            $fecha
+        );
+
+        $stmtIncidencia->execute();
+        $stmtIncidencia->close();
+
+        echo json_encode([
+            'success' => true,
+            'message' => 'Incidencia creada correctamente'
         ]);
         return;
     }
@@ -236,18 +290,25 @@ function actualizarEstadoEvento($conn, $data)
         return;
     }
 
-    $sql = "UPDATE calendario_eventos SET estado = ? WHERE id_evento = ?";
-    $stmt = $conn->prepare($sql);
+    if ($id_evento >= 100000) {
+        $id_incidencia = $id_evento - 100000;
 
-    if (!$stmt) {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Error en prepare actualizar: ' . $conn->error
-        ]);
-        return;
+        $stmt = $conn->prepare("
+            UPDATE incidencias
+            SET estado = ?
+            WHERE id_incidencia = ?
+        ");
+
+        $stmt->bind_param("si", $estado, $id_incidencia);
+    } else {
+        $stmt = $conn->prepare("
+            UPDATE calendario_eventos
+            SET estado = ?
+            WHERE id_evento = ?
+        ");
+
+        $stmt->bind_param("si", $estado, $id_evento);
     }
-
-    $stmt->bind_param("si", $estado, $id_evento);
 
     if (!$stmt->execute()) {
         echo json_encode([

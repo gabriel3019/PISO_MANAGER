@@ -18,11 +18,8 @@ const addEventForm = document.getElementById("add-event-form");
 const eventTitleInput = document.getElementById("event-title");
 const eventTypeInput = document.getElementById("event-type");
 const eventDateInput = document.getElementById("event-date");
-const eventStartDateInput = document.getElementById("event-start-date");
-const eventEndDateInput = document.getElementById("event-end-date");
 const eventTimeInput = document.getElementById("event-time");
 
-const incidenciaFields = document.getElementById("incidencia-fields");
 const generalFields = document.getElementById("general-fields");
 const peopleFields = document.getElementById("people-fields");
 const timeFields = document.getElementById("time-fields");
@@ -333,14 +330,14 @@ function incidenciaVisibleEnMes(incidencia, year, month) {
 
     const { firstDay, lastDay } = getMonthRange(year, month);
 
-    const fechaFin = incidencia.fechaFin || lastDay;
+    const fechaInicio = incidencia.fechaInicio || incidencia.fecha;
+    const fechaFin = incidencia.fechaFin || fechaInicio;
 
-    return incidencia.fechaInicio <= lastDay && fechaFin >= firstDay;
+    return fechaInicio <= lastDay && fechaFin >= firstDay;
 }
 
 function getEventMainDate(evento) {
-    if (evento.tipo === "incidencia") return evento.fechaInicio;
-    return evento.fecha;
+    return evento.fechaInicio || evento.fecha;
 }
 
 function getVisibleEventsForDate(fullDate) {
@@ -349,8 +346,11 @@ function getVisibleEventsForDate(fullDate) {
 
         if (evento.tipo === "incidencia") {
             if (evento.estado === "resuelta") return false;
-            const fechaFin = evento.fechaFin || fullDate;
-            return fullDate >= evento.fechaInicio && fullDate <= fechaFin;
+
+            const fechaInicio = evento.fechaInicio || evento.fecha;
+            const fechaFin = evento.fechaFin || fechaInicio;
+
+            return fullDate >= fechaInicio && fullDate <= fechaFin;
         }
 
         return evento.fecha === fullDate;
@@ -604,12 +604,12 @@ function renderUpcomingEvents() {
         .sort((a, b) => {
             const fechaA =
                 a.tipo === "incidencia"
-                    ? a.fechaInicio
+                    ? (a.fechaInicio || a.fecha)
                     : `${a.fecha}T${a.hora || "00:00"}`;
 
             const fechaB =
                 b.tipo === "incidencia"
-                    ? b.fechaInicio
+                    ? (b.fechaInicio || b.fecha)
                     : `${b.fecha}T${b.hora || "00:00"}`;
 
             return fechaA.localeCompare(fechaB);
@@ -620,9 +620,11 @@ function renderUpcomingEvents() {
 
             let meta = "";
             if (evento.tipo === "incidencia") {
+                const fechaInicio = evento.fechaInicio || evento.fecha;
+
                 const textoFecha = evento.fechaFin
-                    ? formatRangeText(evento.fechaInicio, evento.fechaFin)
-                    : `${formatDateText(evento.fechaInicio)} - sin fecha de fin`;
+                    ? formatRangeText(fechaInicio, evento.fechaFin)
+                    : formatDateText(fechaInicio);
 
                 meta = `${typeNames[evento.tipo]} · ${textoFecha}`;
             } else if (evento.tipo === "tarea") {
@@ -701,9 +703,11 @@ function showEventDetails(evento) {
 
     if (evento.tipo === "incidencia") {
         detailDayLabel.textContent = "Fecha / rango";
+        const fechaInicio = evento.fechaInicio || evento.fecha;
+
         detailDay.textContent = evento.fechaFin
-            ? formatRangeText(evento.fechaInicio, evento.fechaFin)
-            : `${formatDateText(evento.fechaInicio)} - sin fecha de fin`;
+            ? formatRangeText(fechaInicio, evento.fechaFin)
+            : formatDateText(fechaInicio);
         detailTimeBox.classList.add("hidden");
         detailPerson.textContent = "No aplica";
         detailStatus.textContent = evento.estado === "resuelta" ? "Resuelta" : "Activa";
@@ -766,15 +770,10 @@ function showEventDetails(evento) {
 function updateFormByType() {
     const tipo = eventTypeInput.value;
 
-    incidenciaFields.classList.add("hidden");
     generalFields.classList.add("hidden");
     peopleFields.classList.add("hidden");
     timeFields.classList.add("hidden");
     repeatFields.classList.add("hidden");
-
-    if (tipo === "incidencia") {
-        incidenciaFields.classList.remove("hidden");
-    }
 
     if (tipo === "tarea") {
         generalFields.classList.remove("hidden");
@@ -963,12 +962,7 @@ function setMinDates() {
     const todayString = `${yyyy}-${mm}-${dd}`;
 
     eventDateInput.min = todayString;
-    eventStartDateInput.min = todayString;
-    eventEndDateInput.min = todayString;
 }
-eventStartDateInput.addEventListener("change", () => {
-    eventEndDateInput.min = eventStartDateInput.value;
-});
 
 eventTypeInput.addEventListener("change", updateFormByType);
 
@@ -1154,37 +1148,6 @@ addEventForm.addEventListener("submit", async (e) => {
 
     if (!titulo || !tipo) {
         return;
-    }
-
-    if (tipo === "incidencia") {
-        const fechaInicio = eventStartDateInput.value;
-        const fechaFin = eventEndDateInput.value;
-
-        if (!fechaInicio) {
-            eventWarning.textContent = "Selecciona la fecha de inicio de la incidencia.";
-            eventWarning.classList.add("show");
-            return;
-        }
-
-        if (fechaFin && fechaFin < fechaInicio) {
-            eventWarning.textContent = "La fecha de fin no puede ser anterior a la de inicio.";
-            eventWarning.classList.add("show");
-            return;
-        }
-
-        const nuevoEvento = {
-            titulo,
-            tipo,
-            fechaInicio,
-            fechaFin: fechaFin || null,
-            estado: "activa",
-            personas: []
-        };
-
-        await guardarEventoEnBD(nuevoEvento);
-
-        const [anio, mes] = fechaInicio.split("-").map(Number);
-        currentDate = new Date(anio, mes - 1, 1);
     }
 
     if (tipo === "tarea") {
