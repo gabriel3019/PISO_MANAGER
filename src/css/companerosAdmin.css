@@ -1,0 +1,229 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Inter", Arial, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background: #f4f4f3;
+    color: #1f2937;
+    display: flex;
+}
+
+/* SIDEBAR */
+.sidebar-admin {
+    width: 250px;
+    height: 100vh;
+    background: #ffffff;
+    border-right: 1px solid #e5e7eb;
+    padding: 28px 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid #eeeeee;
+}
+
+.avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: #222;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.admin-info h3 {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.admin-info p {
+    font-size: 10px;
+    color: #888;
+    font-weight: 700;
+}
+
+nav {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+nav a {
+    height: 52px;
+    display: grid;
+    grid-template-columns: 32px 1fr auto;
+    align-items: center;
+    gap: 12px;
+
+    padding: 0 14px;
+    border-radius: 2px;
+    font-size: 14px;
+    color: #444;
+    text-decoration: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+nav a.active {
+    background: #efede9;
+    color: #111;
+    font-weight: 700;
+    border-right: 4px solid #222;
+}
+
+nav a span {
+    background: #222;
+    color: white;
+    font-size: 11px;
+    padding: 2px 7px;
+    border-radius: 999px;
+}
+
+.logout {
+    margin-top: auto;
+    padding: 16px 12px;
+    border: none;
+    border-top: 1px solid #eee;
+    background: transparent;
+    color: #ef4444;
+    text-align: left;
+    cursor: pointer;
+}
+
+/* ================= CONTENEDOR ================= */
+
+#companerosContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 20px;
+}
+
+/* ================= CARD COMPAÑERO ================= */
+
+.companero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 16px 18px;
+  border-radius: 14px;
+
+  background: white;
+  border: 1px solid #f1f5f9;
+
+  transition: all 0.25s ease;
+}
+
+/* HOVER */
+.companero:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+}
+
+
+
+/* ================= IZQUIERDA ================= */
+
+.companero .left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ================= AVATAR ================= */
+
+.avatar-mini {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+
+  background: #e5e7eb;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-weight: 600;
+  font-size: 14px;
+  color: #374151;
+}
+
+/* ================= INFO ================= */
+
+.companero p {
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.email {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+/* ================= ROL ================= */
+
+.rol {
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-weight: 500;
+}
+
+/* ADMIN */
+.rol.admin {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* MIEMBRO */
+.rol.miembro {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+/* ================= DARLE ESPACIO AL CONTENIDO PRINCIPAL ================= */
+
+.app {
+    display: flex;
+    width: 100%;
+}
+
+.main {
+    flex: 1;
+    padding: 32px;
+}
+
+.topbar h1 {
+    font-size: 28px;
+    margin-bottom: 20px;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 600px) {
+  .companero {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .rol {
+    align-self: flex-end;
+  }
+}
