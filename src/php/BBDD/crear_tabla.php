@@ -22,17 +22,35 @@ $conn->select_db("piso_manager");
 $sql = "
 
 CREATE TABLE IF NOT EXISTS usuarios (
+
     id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+
     nombre VARCHAR(100),
     apellidos VARCHAR(150),
+
+    dni VARCHAR(20),
+    fecha_nacimiento DATE,
+    nacionalidad VARCHAR(80),
+
     email VARCHAR(100) UNIQUE,
     password VARCHAR(255),
 
     telefono VARCHAR(20),
+    numero_cuenta VARCHAR(34),
+
     direccion VARCHAR(255),
+    ciudad VARCHAR(100),
+    codigo_postal VARCHAR(10),
+
+    fecha_entrada DATE,
+
+    contacto_emergencia VARCHAR(150),
+    telefono_emergencia VARCHAR(20),
+
     foto VARCHAR(255),
 
     modo_oscuro BOOLEAN DEFAULT FALSE,
+
     debe_cambiar_password BOOLEAN DEFAULT TRUE
 );
 
@@ -214,11 +232,11 @@ if ($row['total'] == 0) {
     $sqlDatos = "
 
     /* ===== USUARIOS ===== */
-    INSERT INTO usuarios (nombre, apellidos, email, password, telefono, direccion, debe_cambiar_password) VALUES
-    ('Admin','Principal','admin@mail.com','$passAdmin','600000001','Calle Mayor 12 - Piso 1A', 0),
-    ('Carlos','Gomez','carlos@mail.com','$passUser','600000002','Calle Mayor 12 - Habitación 1', 0),
-    ('Celia','Lopez','celia@mail.com','$passUser','600000003','Calle Mayor 12 - Habitación 2', 0),
-    ('Gabriel','Gimenes','gabriel@mail.com','$passUser','600000004','Calle Mayor 12 - Habitación 3', 0);
+    INSERT INTO usuarios (nombre,apellidos,dni,fecha_nacimiento,nacionalidad,email,password,telefono,numero_cuenta,direccion,ciudad,codigo_postal,fecha_entrada,contacto_emergencia,telefono_emergencia,debe_cambiar_password)VALUES
+   ('Admin','Principal','11111111A','1985-04-12','Española','admin@mail.com','$passAdmin','600000001','ES9121000418450200051332','Calle Mayor 12 - Piso 1A','Madrid','28001','2026-01-01','Maria Principal','611111111',0),
+('Carlos','Gomez','22222222B','2000-02-10','Española','carlos@mail.com','$passUser','600000002','ES5521000418450200051333','Calle Mayor 12 - Habitación 1','Madrid','28001','2026-01-10','Ana Gomez','622222222',0),
+('Celia','Lopez','33333333C','1999-07-15','Española','celia@mail.com','$passUser','600000003','ES6621000418450200051334','Calle Mayor 12 - Habitación 2','Madrid','28001','2026-01-12','Laura Lopez','633333333',0),
+('Gabriel','Gimenes','44444444D','2004-03-12','Española','gabriel@mail.com','$passUser','600000004','ES7721000418450200051335','Calle Mayor 12 - Habitación 3','Madrid','28001','2026-01-15','Pedro Gimenes','644444444',0);
 
     /* ===== PISO ===== */
     INSERT INTO pisos (nombre_casero, calle, ciudad, codigo_postal) VALUES
