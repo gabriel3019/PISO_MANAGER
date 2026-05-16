@@ -14,6 +14,7 @@
     </script>
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="../css/tareasUser.css">
     <link rel="stylesheet" href="../css/dark-mode.css">
     <link rel="stylesheet" href="../css/companerosAdmin.css">
@@ -25,8 +26,10 @@
 
         <!-- SIDEBAR -->
         <aside class="sidebar-admin">
+
             <div class="admin-info">
                 <div class="avatar">AD</div>
+
                 <div>
                     <h3 id="nombreUsuario">Admin Piso</h3>
                     <p>ADMINISTRADOR</p>
@@ -34,22 +37,37 @@
             </div>
 
             <nav>
-                <a href="../html/homeAdmin.html"><img src="../css/icons/settings.svg" class="icon">
-                    <strong>Home</strong></a>
-                <a href="../html/incidenciasAdmin.html"><img src="../css/icons/circle-alert.svg"
-                        class="icon"><strong>Incidencias</strong></a>
-                <a class="active" href="../html/companerosAdmin.html"><img src="../css/icons/users.svg"
-                        class="icon"><strong>Compañeros</strong></a>
+                <a href="../html/homeAdmin.html">
+                    <img src="../css/icons/settings.svg" class="icon">
+                    <strong>Home</strong>
+                </a>
+
+                <a href="../html/incidenciasAdmin.html">
+                    <img src="../css/icons/circle-alert.svg" class="icon">
+                    <strong>Incidencias</strong>
+                </a>
+
+                <a class="active" href="../html/companerosAdmin.html">
+                    <img src="../css/icons/users.svg" class="icon">
+                    <strong>Compañeros</strong>
+                </a>
             </nav>
 
             <button class="logout">Cerrar sesión</button>
+
         </aside>
 
         <!-- MAIN -->
         <main class="main">
 
             <div class="topbar">
+
                 <h1>Compañeros de piso</h1>
+
+                <button id="btnAbrirModal" class="btn-add">
+                    + Añadir miembro
+                </button>
+
             </div>
 
             <!-- CONTENEDOR -->
@@ -59,9 +77,57 @@
 
     </div>
 
+    <!-- MODAL -->
+    <div class="modal-overlay" id="modalMiembro">
+
+        <div class="modal">
+
+            <div class="modal-header">
+
+                <h2>Añadir nuevo miembro</h2>
+
+                <button id="cerrarModal" class="close-btn">
+                    ✕
+                </button>
+
+            </div>
+
+            <form id="formMiembro">
+
+                <div class="input-group">
+                    <label>Nombre</label>
+                    <input type="text" name="nombre" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Apellidos</label>
+                    <input type="text" name="apellidos" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Email</label>
+                    <input type="email" name="email" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Contraseña</label>
+                    <input type="password" name="password" required>
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    Crear miembro
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
     <!-- JS -->
     <script src="../js/dark-mode.js"></script>
     <script src="../js/companerosUser.js"></script>
+    <script src="../js/companerosAdmin.js"></script>
     <script src="../js/cerrarSesion.js"></script>
 
 </body>
