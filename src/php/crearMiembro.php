@@ -6,6 +6,10 @@ require_once __DIR__ . "/BBDD/conecta.php";
 
 header("Content-Type: application/json");
 
+/* =========================================
+   COMPROBAR SESION
+========================================= */
+
 if (!isset($_SESSION['id_usuario'])) {
 
     echo json_encode([
@@ -16,10 +20,18 @@ if (!isset($_SESSION['id_usuario'])) {
     exit;
 }
 
-$nombre = trim($_POST['nombre']);
-$apellidos = trim($_POST['apellidos']);
-$email = trim($_POST['email']);
-$password = $_POST['password'];
+/* =========================================
+   RECIBIR DATOS
+========================================= */
+
+$nombre = trim($_POST['nombre'] ?? '');
+$apellidos = trim($_POST['apellidos'] ?? '');
+$email = trim($_POST['email'] ?? '');
+$password = $_POST['password'] ?? '';
+
+/* =========================================
+   VALIDAR CAMPOS
+========================================= */
 
 if (
     empty($nombre) ||
@@ -36,7 +48,24 @@ if (
     exit;
 }
 
-// COMPROBAR EMAIL
+/* =========================================
+   VALIDAR EMAIL
+========================================= */
+
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+
+    echo json_encode([
+        "success" => false,
+        "message" => "Email no válido"
+    ]);
+
+    exit;
+}
+
+/* =========================================
+   COMPROBAR EMAIL EXISTENTE
+========================================= */
+
 $check = $conn->prepare("
     SELECT id_usuario
     FROM usuarios
@@ -59,16 +88,28 @@ if ($result->num_rows > 0) {
     exit;
 }
 
-// ENCRIPTAR PASSWORD
-$passwordHash = password_hash($password, PASSWORD_DEFAULT);
+/* =========================================
+   ENCRIPTAR PASSWORD
+========================================= */
 
-// DATOS VACIOS
+$passwordHash = password_hash(
+    $password,
+    PASSWORD_DEFAULT
+);
+
+/* =========================================
+   DATOS POR DEFECTO
+========================================= */
+
 $telefono = "";
 $direccion = "";
 $foto = null;
 $modo_oscuro = 0;
 
-// INSERTAR USUARIO
+/* =========================================
+   INSERTAR USUARIO
+========================================= */
+
 $stmt = $conn->prepare("
     INSERT INTO usuarios
     (
@@ -79,9 +120,10 @@ $stmt = $conn->prepare("
         telefono,
         direccion,
         foto,
-        modo_oscuro
+        modo_oscuro,
+        debe_cambiar_password
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
 ");
 
 $stmt->bind_param(
@@ -96,6 +138,10 @@ $stmt->bind_param(
     $modo_oscuro
 );
 
+/* =========================================
+   ERROR CREAR USUARIO
+========================================= */
+
 if (!$stmt->execute()) {
 
     echo json_encode([
@@ -106,13 +152,22 @@ if (!$stmt->execute()) {
     exit;
 }
 
-// ID USUARIO NUEVO
+/* =========================================
+   ID USUARIO NUEVO
+========================================= */
+
 $id_usuario_nuevo = $conn->insert_id;
 
-// ID PISO DEL ADMIN
+/* =========================================
+   ID PISO ADMIN
+========================================= */
+
 $id_piso = $_SESSION['piso_id'];
 
-// INSERTAR RELACION
+/* =========================================
+   INSERTAR RELACION USUARIO-PISO
+========================================= */
+
 $stmtRelacion = $conn->prepare("
     INSERT INTO usuarios_pisos
     (
@@ -128,6 +183,10 @@ $stmtRelacion->bind_param(
     $id_usuario_nuevo,
     $id_piso
 );
+
+/* =========================================
+   RESPUESTA FINAL
+========================================= */
 
 if ($stmtRelacion->execute()) {
 

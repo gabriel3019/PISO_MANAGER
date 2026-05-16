@@ -21,8 +21,7 @@ $conn->select_db("piso_manager");
 /* ================= TABLAS ================= */
 $sql = "
 
-/* ===== USUARIOS  ===== */
-    CREATE TABLE IF NOT EXISTS usuarios (
+CREATE TABLE IF NOT EXISTS usuarios (
     id_usuario INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100),
     apellidos VARCHAR(150),
@@ -33,7 +32,8 @@ $sql = "
     direccion VARCHAR(255),
     foto VARCHAR(255),
 
-    modo_oscuro BOOLEAN DEFAULT FALSE
+    modo_oscuro BOOLEAN DEFAULT FALSE,
+    debe_cambiar_password BOOLEAN DEFAULT TRUE
 );
 
 
@@ -214,11 +214,11 @@ if ($row['total'] == 0) {
     $sqlDatos = "
 
     /* ===== USUARIOS ===== */
-    INSERT INTO usuarios (nombre, apellidos, email, password, telefono, direccion) VALUES
-    ('Admin','Principal','admin@mail.com','$passAdmin','600000001','Calle Mayor 12 - Piso 1A'),
-    ('Carlos','Gomez','carlos@mail.com','$passUser','600000002','Calle Mayor 12 - Habitación 1'),
-    ('Celia','Lopez','celia@mail.com','$passUser','600000003','Calle Mayor 12 - Habitación 2'),
-    ('Gabriel','Gimenes','gabriel@mail.com','$passUser','600000004','Calle Mayor 12 - Habitación 3');
+    INSERT INTO usuarios (nombre, apellidos, email, password, telefono, direccion, debe_cambiar_password) VALUES
+    ('Admin','Principal','admin@mail.com','$passAdmin','600000001','Calle Mayor 12 - Piso 1A', 0),
+    ('Carlos','Gomez','carlos@mail.com','$passUser','600000002','Calle Mayor 12 - Habitación 1', 0),
+    ('Celia','Lopez','celia@mail.com','$passUser','600000003','Calle Mayor 12 - Habitación 2', 0),
+    ('Gabriel','Gimenes','gabriel@mail.com','$passUser','600000004','Calle Mayor 12 - Habitación 3', 0);
 
     /* ===== PISO ===== */
     INSERT INTO pisos (nombre_casero, calle, ciudad, codigo_postal) VALUES
