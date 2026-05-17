@@ -33,13 +33,18 @@ $usuario = $res->fetch_assoc();
 /* ================= TODOS LOS PISOS DEL USUARIO ================= */
 $sql = "
     SELECT 
-        id_piso,
-        nombre_casero,
-        calle,
-        ciudad,
-        codigo_postal
-    FROM pisos
-    WHERE id_admin = ?
+        p.id_piso,
+        p.nombre_casero,
+        p.calle,
+        p.ciudad,
+        p.codigo_postal,
+        up.rol
+    FROM pisos p
+
+    INNER JOIN usuarios_pisos up
+        ON p.id_piso = up.id_piso
+
+    WHERE up.id_usuario = ?
 ";
 
 $stmt = $conexion->prepare($sql);
