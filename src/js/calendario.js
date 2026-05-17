@@ -79,6 +79,20 @@ const cancelDeleteConfirmBtn = document.getElementById("cancel-delete-confirm");
 const confirmDeleteEventBtn = document.getElementById("confirm-delete-event");
 const deleteConfirmText = document.getElementById("delete-confirm-text");
 
+const usuarioActual =
+    JSON.parse(
+        sessionStorage.getItem("usuario")
+    );
+
+function cargarUsuario() {
+
+    document.getElementById(
+        "nombreUsuario"
+    ).textContent =
+        usuarioActual?.nombre || "";
+
+}
+
 nextRepeatBtn.addEventListener("click", () => {
     generalFields.classList.add("hidden");
     peopleFields.classList.add("hidden");
@@ -1358,6 +1372,14 @@ if (closeDayModalBtn) {
         closeModal(modalDay);
     });
 }
+
+document.addEventListener("DOMContentLoaded", async () => {
+
+    cargarUsuario();
+
+    await cargarEventos();
+
+});
 
 updateFormByType();
 setMinDates();
