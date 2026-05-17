@@ -7,15 +7,14 @@
 
 body {
     min-height: 100vh;
-    background: #f4f4f3;
-    color: #1f2937;
     display: flex;
+    align-items: stretch;
 }
 
 /* SIDEBAR */
 .sidebar-admin {
     width: 250px;
-    height: 100vh;
+    min-height: 100%;
     background: #ffffff;
     border-right: 1px solid #e5e7eb;
     padding: 28px 20px;

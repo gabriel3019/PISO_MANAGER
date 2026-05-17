@@ -66,10 +66,9 @@ nav {
 nav a {
     height: 52px;
     display: grid;
-    grid-template-columns: 32px 1fr auto;
+    grid-template-columns: 32px 1fr auto auto;
     align-items: center;
     gap: 12px;
-
     padding: 0 14px;
     border-radius: 2px;
     font-size: 14px;
