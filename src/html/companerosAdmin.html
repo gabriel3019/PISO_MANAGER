@@ -96,29 +96,147 @@
 
             <form id="formMiembro">
 
-                <div class="input-group">
-                    <label>Nombre</label>
-                    <input type="text" name="nombre" required>
+                <!-- ================= STEPS ================= -->
+
+                <div class="steps">
+
+                    <div class="step active" data-step="1">
+                        1
+                    </div>
+
+                    <div class="line"></div>
+
+                    <div class="step" data-step="2">
+                        2
+                    </div>
+
+                    <div class="line"></div>
+
+                    <div class="step" data-step="3">
+                        3
+                    </div>
+
                 </div>
 
-                <div class="input-group">
-                    <label>Apellidos</label>
-                    <input type="text" name="apellidos" required>
+                <!-- ================= PASO 1 ================= -->
+
+                <div id="step1" class="form-step">
+
+                    <div class="input-group">
+                        <label>Nombre</label>
+                        <input type="text" name="nombre" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Apellidos</label>
+                        <input type="text" name="apellidos" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Email</label>
+                        <input type="email" name="email" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Contraseña</label>
+                        <input type="password" name="password" required>
+                    </div>
+
+                    <button type="button" id="btnPaso1" class="btn-submit">
+                        Continuar
+                    </button>
+
                 </div>
 
-                <div class="input-group">
-                    <label>Email</label>
-                    <input type="email" name="email" required>
+                <!-- ================= PASO 2 ================= -->
+
+                <div id="step2" class="form-step hidden">
+
+                    <div class="input-group">
+                        <label>DNI</label>
+                        <input type="text" name="dni">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Fecha nacimiento</label>
+                        <input type="date" name="fecha_nacimiento">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Nacionalidad</label>
+                        <input type="text" name="nacionalidad">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Teléfono</label>
+                        <input type="text" name="telefono">
+                    </div>
+
+                    <div class="step-actions">
+
+                        <button type="button" id="volver1" class="btn-secondary">
+                            Volver
+                        </button>
+
+                        <button type="button" id="btnPaso2" class="btn-submit">
+                            Continuar
+                        </button>
+
+                    </div>
+
                 </div>
 
-                <div class="input-group">
-                    <label>Contraseña</label>
-                    <input type="password" name="password" required>
-                </div>
+                <!-- ================= PASO 3 ================= -->
 
-                <button type="submit" class="btn-submit">
-                    Crear miembro
-                </button>
+                <div id="step3" class="form-step hidden">
+
+                    <div class="input-group">
+                        <label>Dirección</label>
+                        <input type="text" name="direccion">
+                    </div>
+
+                    <div class="row-2">
+
+                        <div class="input-group">
+                            <label>Ciudad</label>
+                            <input type="text" name="ciudad">
+                        </div>
+
+                        <div class="input-group">
+                            <label>Código postal</label>
+                            <input type="text" name="codigo_postal">
+                        </div>
+
+                    </div>
+
+                    <div class="input-group">
+                        <label>Fecha entrada</label>
+                        <input type="date" name="fecha_entrada">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Contacto emergencia</label>
+                        <input type="text" name="contacto_emergencia">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Teléfono emergencia</label>
+                        <input type="text" name="telefono_emergencia">
+                    </div>
+
+                    <div class="step-actions">
+
+                        <button type="button" id="volver2" class="btn-secondary">
+                            Volver
+                        </button>
+
+                        <button type="submit" class="btn-submit">
+                            Crear miembro
+                        </button>
+
+                    </div>
+
+                </div>
 
             </form>
 
