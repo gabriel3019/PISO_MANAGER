@@ -58,16 +58,18 @@ CREATE TABLE IF NOT EXISTS usuarios (
 /* ===== PISOS ===== */
 CREATE TABLE IF NOT EXISTS pisos (
     id_piso INT AUTO_INCREMENT PRIMARY KEY,
+    id_admin INT NOT NULL,
     nombre_casero VARCHAR(100),
     calle VARCHAR(150),
     ciudad VARCHAR(100),
-    codigo_postal VARCHAR(10)
+    codigo_postal VARCHAR(10),
+    FOREIGN KEY (id_admin) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS usuarios_pisos (
     id_usuario INT,
     id_piso INT,
-    rol ENUM('admin','miembro'),
+    rol ENUM('miembro') DEFAULT 'miembro',
     PRIMARY KEY (id_usuario, id_piso),
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
     FOREIGN KEY (id_piso) REFERENCES pisos(id_piso) ON DELETE CASCADE
@@ -239,12 +241,14 @@ if ($row['total'] == 0) {
 ('Gabriel','Gimenes','44444444D','2004-03-12','Española','gabriel@mail.com','$passUser','600000004','ES7721000418450200051335','Calle Mayor 12 - Habitación 3','Madrid','28001','2026-01-15','Pedro Gimenes','644444444',0);
 
     /* ===== PISO ===== */
-    INSERT INTO pisos (nombre_casero, calle, ciudad, codigo_postal) VALUES
-    ('Juan Gonzalez', 'Calle Mayor 12', 'Madrid', '28001'),
-    ('Maria Lopez',   'Calle Mayor 14', 'Madrid', '28001');
+    INSERT INTO pisos (id_admin, nombre_casero, calle, ciudad, codigo_postal) VALUES
+    (1, 'Juan Gonzalez', 'Calle Mayor 12', 'Madrid', '28001'),
+    (1, 'Maria Lopez',   'Calle Mayor 14', 'Madrid', '28001');
 
     INSERT INTO usuarios_pisos VALUES
-    (1,1,'admin'),(2,1,'miembro'),(3,1,'miembro'),(4,1,'miembro');
+    (2,1,'miembro'),
+    (3,1,'miembro'),
+    (4,1,'miembro');
 
     /* ===== GASTO ===== */
     INSERT INTO gastos (id_piso,id_pagador,descripcion,monto_total)
