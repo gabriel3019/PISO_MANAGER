@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS pisos (
 CREATE TABLE IF NOT EXISTS usuarios_pisos (
     id_usuario INT,
     id_piso INT,
-    rol ENUM('miembro') DEFAULT 'miembro',
+    rol ENUM('admin','miembro') DEFAULT 'miembro',
     PRIMARY KEY (id_usuario, id_piso),
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
     FOREIGN KEY (id_piso) REFERENCES pisos(id_piso) ON DELETE CASCADE
@@ -246,6 +246,7 @@ if ($row['total'] == 0) {
     (1, 'Maria Lopez',   'Calle Mayor 14', 'Madrid', '28001');
 
     INSERT INTO usuarios_pisos VALUES
+    (1,1,'admin'),
     (2,1,'miembro'),
     (3,1,'miembro'),
     (4,1,'miembro');
