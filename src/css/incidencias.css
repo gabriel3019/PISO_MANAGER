@@ -671,7 +671,7 @@ body {
   padding: 10px 36px 10px 12px;
   font-family: var(--font-main);
   font-size: .88rem;
-  color: var(--text-secondary);
+  color: var(--text-primary);
   background: var(--bg-card);
   cursor: pointer;
   outline: none;
