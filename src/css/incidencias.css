@@ -2,11 +2,11 @@
    incidencias.css — Estilos para la pantalla de Incidencias
    ============================================================ */
 
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:"Inter", sans-serif;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", sans-serif;
 }
 
 /* ── Layout principal (con sidebar) ── */
@@ -29,91 +29,91 @@ body {
 /* ══════════════════════════════════════════════════════════════
    SIDEBAR
    ══════════════════════════════════════════════════════════════ */
-.sidebar{
-  width:240px;
-  background:#ffffff;
-  border-right:1px solid #e5e7eb;
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-  padding:20px;
+.sidebar {
+  width: 240px;
+  background: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
 }
 
-.sidebar-top{
-  flex:1;
+.sidebar-top {
+  flex: 1;
 }
 
-.sidebar h3{
-  font-size:18px;
-  font-weight:600;
+.sidebar h3 {
+  font-size: 18px;
+  font-weight: 600;
 }
 
-.subtitle{
-  font-size:13px;
-  color:#6b7280;
+.subtitle {
+  font-size: 13px;
+  color: #6b7280;
 }
 
-.section-title{
-  margin-top:20px;
-  font-size:11px;
-  color:#9ca3af;
-  letter-spacing:1px;
+.section-title {
+  margin-top: 20px;
+  font-size: 11px;
+  color: #9ca3af;
+  letter-spacing: 1px;
 }
 
-.sidebar ul{
-  list-style:none;
-  margin-top:10px;
+.sidebar ul {
+  list-style: none;
+  margin-top: 10px;
 }
 
-.sidebar li{
-  margin-bottom:6px;
+.sidebar li {
+  margin-bottom: 6px;
 }
 
-.sidebar li a{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:9px 10px;
-  border-radius:8px;
-  text-decoration:none;
-  color:#374151;
-  font-size:14px;
-  transition:0.2s;
+.sidebar li a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #374151;
+  font-size: 14px;
+  transition: 0.2s;
 }
 
-.sidebar li:hover a{
-  background:#f3f4f6;
+.sidebar li:hover a {
+  background: #f3f4f6;
 }
 
-.sidebar li.active a{
-  background:#e0e7ff;
-  color:#4338ca;
-  font-weight:500;
+.sidebar li.active a {
+  background: #e0e7ff;
+  color: #4338ca;
+  font-weight: 500;
 }
 
-.icon{
-  width:18px;
+.icon {
+  width: 18px;
 }
 
-.badge{
-  margin-left:auto;
-  background:#4f46e5;
-  color:white;
-  font-size:11px;
-  padding:2px 7px;
-  border-radius:999px;
+.badge {
+  margin-left: auto;
+  background: #4f46e5;
+  color: white;
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 999px;
 }
 
-.badge.gray{
-  background:#e5e7eb;
-  color:#374151;
+.badge.gray {
+  background: #e5e7eb;
+  color: #374151;
 }
 
-.logout{
-  color:#ef4444;
-  cursor:pointer;
-  font-size:14px;
-  margin-top:20px;
+.logout {
+  color: #ef4444;
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 20px;
 }
 
 /* ── Cabecera ── */
@@ -714,6 +714,15 @@ body {
   color: var(--text-muted);
 }
 
+/* ── Input fecha: texto en gris como el resto del formulario ── */
+input[type="date"].modal__input {
+  color: var(--text-muted);
+}
+
+input[type="date"].modal__input:focus {
+  color: var(--text-primary);
+}
+
 .modal__char-count {
   display: block;
   text-align: right;
@@ -811,6 +820,21 @@ body {
 
 .modal__urgencia-dot--high {
   background: var(--prio-high);
+}
+
+/* ── Hint de campos (ej: "Déjalo vacío si no sabes cuándo terminará") ── */
+.modal__hint {
+  display: block;
+  font-size: .75rem;
+  color: var(--text-muted);
+  margin-top: 5px;
+  line-height: 1.4;
+}
+
+/* Error de fecha — oculto por defecto, JS lo muestra cuando hay error */
+.modal__hint--error {
+  color: #dc2626;
+  display: none;
 }
 
 /* ── Checkbox notificar admin ── */
@@ -944,9 +968,9 @@ body {
   box-shadow: 0 4px 14px rgba(220, 38, 38, 0.45);
 }
 
-/* 🔔 NUEVO: Botón de conversación con admin */
+/* 🔔 Botón de conversación con admin */
 .modal__btn--chat {
-  background: #1e293b; 
+  background: #1e293b;
   color: #ffffff;
   border: none;
   padding: 9px 18px;
@@ -960,9 +984,8 @@ body {
   gap: 6px;
 }
 
-/* Efecto al pasar el mouse: se aclara un poco */
 .modal__btn--chat:hover {
-  background: #334155; /* Slate 700 */
+  background: #334155;
   box-shadow: 0 4px 12px rgba(30, 41, 59, 0.3);
   transform: translateY(-1px);
 }
@@ -978,7 +1001,7 @@ body {
   box-shadow: none;
 }
 
-/* 🔔 NUEVO: Alineación específica para footer del modal detalle */
+/* Alineación específica para footer del modal detalle */
 .modal--detalle .modal__footer {
   display: flex;
   justify-content: flex-start;
@@ -987,7 +1010,7 @@ body {
 }
 
 .modal--detalle .modal__btn--cancel {
-  margin-left: auto; /* Empuja el botón "Cerrar" a la derecha */
+  margin-left: auto;
 }
 
 .modal__confirm-text {
@@ -1011,7 +1034,6 @@ body {
   gap: 12px;
 }
 
-/* notify-item — posición relativa necesaria para el punto rojo */
 .notify-item {
   position: relative;
   background: var(--bg-soft, #f8fafc);
@@ -1036,7 +1058,6 @@ body {
   border-left-color: #3b82f6;
 }
 
-/* Punto rojo "nuevo" */
 .notify-item::before {
   content: '';
   position: absolute;
@@ -1088,7 +1109,6 @@ body {
   font-size: 0.95rem;
 }
 
-/* Botones de acción dentro de notificación */
 .notify-actions {
   display: flex;
   gap: 8px;
@@ -1128,7 +1148,6 @@ body {
   transform: translateY(-1px);
 }
 
-/* Badge de notificaciones en sidebar */
 .badge {
   background: var(--primary, #ef4444);
   color: white;
@@ -1240,7 +1259,6 @@ body {
   text-align: right;
 }
 
-/* Sin mensajes */
 .chat-sin-mensajes {
   text-align: center;
   padding: 40px 20px;
@@ -1262,7 +1280,6 @@ body {
   margin: 4px 0;
 }
 
-/* Área de input del chat */
 .chat-input-area {
   display: flex;
   gap: 12px;
@@ -1324,7 +1341,6 @@ body {
   transform: none;
 }
 
-/* Scrollbar personalizada para chat */
 .chat-container::-webkit-scrollbar {
   width: 8px;
 }
