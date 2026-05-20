@@ -119,10 +119,11 @@ backRepeatBtn.addEventListener("click", () => {
 });
 
 let repeatDayInputs = document.querySelectorAll('input[name="repeat-days"]');
-let currentDate = new Date(2026, 4, 1);
+let currentDate = new Date();
 let selectedEvent = null;
 let eventos = [];
 let currentView = "month";
+calendarViewSelect.value = "month";
 
 const monthNames = [
     "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -422,7 +423,9 @@ function renderCalendar(date) {
     calendarGrid.innerHTML = "";
     calendarGrid.className = "calendar-grid";
 
-    if (currentView === "week") {
+    if (currentView === "day") {
+        renderDayCalendar(date);
+    } else if (currentView === "week") {
         renderWeekCalendar(date);
     } else if (currentView === "year") {
         renderYearCalendar(date);
@@ -437,8 +440,14 @@ function renderMonthCalendar(date) {
     const year = date.getFullYear();
     const month = date.getMonth();
 
-    monthTitle.textContent = `${monthNames[month]} de ${year}`;
-    pageTitle.textContent = monthTitle.textContent;
+    const tituloActual = `${monthNames[month]} de ${year}`;
+
+    if (monthTitle) {
+        monthTitle.textContent = tituloActual;
+    }
+
+    pageTitle.textContent = tituloActual;
+
     calendarGrid.classList.add("month-view");
 
     const firstDay = new Date(year, month, 1);
@@ -482,44 +491,185 @@ function renderMonthCalendar(date) {
 }
 
 function renderWeekCalendar(date) {
+    document.querySelector(".calendar-weekdays")?.classList.add("hidden");
+
+    calendarGrid.innerHTML = "";
+    calendarGrid.className = "calendar-grid week-view";
+
     const baseDate = new Date(date);
     const weekDay = baseDate.getDay() === 0 ? 6 : baseDate.getDay() - 1;
+
     const monday = new Date(baseDate);
     monday.setDate(baseDate.getDate() - weekDay);
 
     const sunday = new Date(monday);
     sunday.setDate(monday.getDate() + 6);
 
-    monthTitle.textContent = `Semana del ${monday.getDate()} de ${monthNames[monday.getMonth()]} al ${sunday.getDate()} de ${monthNames[sunday.getMonth()]} de ${sunday.getFullYear()}`;
-    pageTitle.textContent = monthTitle.textContent;
-    calendarGrid.classList.add("week-view");
+    pageTitle.textContent =
+        `Semana del ${monday.getDate()} de ${monthNames[monday.getMonth()]} al ${sunday.getDate()} de ${monthNames[sunday.getMonth()]} de ${sunday.getFullYear()}`;
+
+    const diasSemana = ["LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB", "DOM"];
+
+    const weekHeader = document.createElement("div");
+    weekHeader.className = "week-header-row";
+
+    weekHeader.appendChild(document.createElement("div"));
 
     for (let i = 0; i < 7; i++) {
         const dayDate = new Date(monday);
         dayDate.setDate(monday.getDate() + i);
 
-        const year = dayDate.getFullYear();
-        const month = String(dayDate.getMonth() + 1).padStart(2, "0");
-        const day = String(dayDate.getDate()).padStart(2, "0");
-        const fullDate = `${year}-${month}-${day}`;
-
-        const dayBox = document.createElement("div");
-        dayBox.className = "calendar-day week-day";
-        dayBox.innerHTML = `
-            <div class="calendar-day-number">${dayDate.getDate()}</div>
-            <div class="week-day-month">${monthNames[dayDate.getMonth()]}</div>
+        const dayHeader = document.createElement("div");
+        dayHeader.className = "week-day-header";
+        dayHeader.innerHTML = `
+            <span>${diasSemana[i]}</span>
+            <strong>${dayDate.getDate()}</strong>
         `;
 
-        paintEventsInDay(dayBox, fullDate, 4);
-        calendarGrid.appendChild(dayBox);
+        weekHeader.appendChild(dayHeader);
+    }
+
+    calendarGrid.appendChild(weekHeader);
+
+    for (let hour = 0; hour < 24; hour++) {
+        const row = document.createElement("div");
+        row.className = "week-hour-row";
+
+        const hourLabel = document.createElement("div");
+        hourLabel.className = "week-hour-label";
+        hourLabel.textContent = `${String(hour).padStart(2, "0")}:00`;
+
+        row.appendChild(hourLabel);
+
+        for (let i = 0; i < 7; i++) {
+            const dayDate = new Date(monday);
+            dayDate.setDate(monday.getDate() + i);
+
+            const fullDate = formatearFecha(dayDate);
+
+            const cell = document.createElement("div");
+            cell.className = "week-hour-cell";
+
+            getVisibleEventsForDate(fullDate)
+                .filter(evento =>
+                    evento.hora &&
+                    evento.hora.startsWith(String(hour).padStart(2, "0"))
+                )
+                .forEach(evento => {
+                    const eventDiv = document.createElement("div");
+                    eventDiv.className = `week-hour-event ${evento.tipo}`;
+                    eventDiv.textContent = evento.titulo;
+
+                    eventDiv.addEventListener("click", () => {
+                        selectedEvent = evento;
+                        showEventDetails(evento);
+                    });
+
+                    cell.appendChild(eventDiv);
+                });
+
+            row.appendChild(cell);
+        }
+
+        calendarGrid.appendChild(row);
     }
 }
+
+function renderDayCalendar(date) {
+    calendarGrid.innerHTML = "";
+    calendarGrid.className = "calendar-grid day-view";
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const fullDate = `${year}-${month}-${day}`;
+
+    const tituloActual = `Hoy · ${day} de ${monthNames[date.getMonth()]} de ${year}`;
+
+    const diaSemanaActual = date.getDay() === 0 ? 6 : date.getDay() - 1;
+
+    const diasSemana = ["LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB", "DOM"];
+
+    pageTitle.textContent = tituloActual;
+
+    const eventosDelDia = getVisibleEventsForDate(fullDate);
+
+    /* ===== AÑADIR ESTO ===== */
+
+    const weekdaysRow = document.createElement("div");
+    weekdaysRow.className = "day-weekdays-row";
+
+    diasSemana.forEach((dia, index) => {
+
+        const diaEl = document.createElement("div");
+        diaEl.className = "day-weekday";
+
+        if (index === diaSemanaActual) {
+            diaEl.classList.add("active-day");
+        }
+
+        diaEl.textContent = dia;
+
+        weekdaysRow.appendChild(diaEl);
+    });
+
+    calendarGrid.appendChild(weekdaysRow);
+
+    /* ===== FIN ===== */
+
+    for (let hour = 0; hour < 24; hour++) {
+
+        const hourText = `${String(hour).padStart(2, "0")}:00`;
+
+        const hourRow = document.createElement("div");
+        hourRow.className = "day-hour-row";
+
+        const hourLabel = document.createElement("div");
+        hourLabel.className = "day-hour-label";
+        hourLabel.textContent = hourText;
+
+        const hourContent = document.createElement("div");
+        hourContent.className = "day-hour-content";
+
+        eventosDelDia
+            .filter(evento =>
+                evento.hora &&
+                evento.hora.startsWith(String(hour).padStart(2, "0"))
+            )
+            .forEach(evento => {
+
+                const eventDiv = document.createElement("div");
+                eventDiv.className = `day-hour-event ${evento.tipo}`;
+
+                eventDiv.textContent =
+                    `${evento.hora} · ${evento.titulo}`;
+
+                eventDiv.addEventListener("click", () => {
+                    selectedEvent = evento;
+                    showEventDetails(evento);
+                });
+
+                hourContent.appendChild(eventDiv);
+            });
+
+        hourRow.appendChild(hourLabel);
+        hourRow.appendChild(hourContent);
+
+        calendarGrid.appendChild(hourRow);
+    }
+}
+
 function renderYearCalendar() {
 
     calendarGrid.innerHTML = "";
 
-    monthTitle.textContent = `Año ${currentDate.getFullYear()}`;
-    pageTitle.textContent = monthTitle.textContent;
+    const tituloActual = `Año ${currentDate.getFullYear()}`;
+
+    if (monthTitle) {
+        monthTitle.textContent = tituloActual;
+    }
+
+    pageTitle.textContent = tituloActual;
     const yearContainer = document.createElement("div");
     yearContainer.className = "year-view";
 
@@ -1006,6 +1156,12 @@ document.getElementById("btn-next").addEventListener("click", () => {
 
 btnToday.addEventListener("click", () => {
     currentDate = new Date();
+    currentView = "day";
+
+    if (calendarViewSelect) {
+        calendarViewSelect.value = "day";
+    }
+
     renderCalendar(currentDate);
 });
 
@@ -1118,6 +1274,11 @@ searchInput.addEventListener("input", () => {
 
 calendarViewSelect.addEventListener("change", () => {
     currentView = calendarViewSelect.value;
+
+    if (currentView === "day" || currentView === "week") {
+        currentDate = new Date();
+    }
+
     renderCalendar(currentDate);
 });
 
