@@ -217,7 +217,7 @@
       </div>
     </div>
 
-    <!-- ══════════════ MODAL NUEVA INCIDENCIA ══════════════ -->
+    <!-- ══════════════ MODAL NUEVA INCIDENCIA (2 PASOS) ══════════════ -->
     <div class="modal-overlay modal--hidden" id="modal-nueva-incidencia" role="dialog" aria-modal="true"
       aria-labelledby="modal-nueva-title">
       <div class="modal">
@@ -228,10 +228,26 @@
           </div>
           <button class="modal__close" aria-label="Cerrar" data-modal-close="modal-nueva-incidencia">✕</button>
         </div>
-        <div class="modal__body">
+
+        <!-- Stepper -->
+        <div class="modal__stepper">
+          <div class="stepper__step stepper__step--active" id="step-indicator-1">
+            <div class="stepper__circle">1</div>
+            <span class="stepper__label">Información básica</span>
+          </div>
+          <div class="stepper__line"></div>
+          <div class="stepper__step" id="step-indicator-2">
+            <div class="stepper__circle">2</div>
+            <span class="stepper__label">Detalles y fechas</span>
+          </div>
+        </div>
+
+        <hr class="modal__divider" />
+
+        <!-- PASO 1: Tipo, título, descripción, urgencia -->
+        <div class="modal__body" id="nueva-paso-1">
           <div class="modal__field">
-            <label class="modal__label" for="nueva-tipo">TIPO DE INCIDENCIA<span
-                class="modal__required">*</span></label>
+            <label class="modal__label" for="nueva-tipo">TIPO DE INCIDENCIA<span class="modal__required">*</span></label>
             <div class="modal__select-wrapper">
               <select class="modal__select" id="nueva-tipo" name="tipo">
                 <option value="">Selecciona un tipo...</option>
@@ -265,18 +281,18 @@
               </button>
             </div>
           </div>
+        </div>
 
+        <!-- PASO 2: Fechas, notificar admin, imagen -->
+        <div class="modal__body modal--hidden" id="nueva-paso-2">
           <div class="modal__field">
-            <label class="modal__label" for="nueva-fecha-inicio">FECHA DE INICIO<span
-                class="modal__required">*</span></label>
+            <label class="modal__label" for="nueva-fecha-inicio">FECHA DE INICIO<span class="modal__required">*</span></label>
             <input class="modal__input" id="nueva-fecha-inicio" name="fecha_inicio" type="date" required />
-            <span class="modal__hint modal__hint--error" id="nueva-fecha-inicio-error">La fecha no puede ser anterior a
-              hoy</span>
+            <span class="modal__hint modal__hint--error" id="nueva-fecha-inicio-error">La fecha no puede ser anterior a hoy</span>
           </div>
 
           <div class="modal__field">
-            <label class="modal__label" for="nueva-fecha-fin">FECHA DE FIN <span
-                class="modal__optional">(opcional)</span></label>
+            <label class="modal__label" for="nueva-fecha-fin">FECHA DE FIN <span class="modal__optional">(opcional)</span></label>
             <input class="modal__input" id="nueva-fecha-fin" name="fecha_fin" type="date" />
             <span class="modal__hint">(Déjalo vacío si no sabes cuándo terminará)</span>
           </div>
@@ -294,6 +310,7 @@
             </label>
             <p class="modal__checkbox-hint">El administrador podrá ver esta incidencia marcada en su panel.</p>
           </div>
+
           <div class="modal__field">
             <label class="modal__label">IMAGEN <span class="modal__optional">(opcional)</span></label>
             <label class="modal__dropzone" for="nueva-imagen">
@@ -303,12 +320,16 @@
             </label>
           </div>
         </div>
-        <div class="modal__footer">
-          <button type="button" class="modal__btn modal__btn--cancel"
+
+        <!-- ── Footer unificado (un solo footer para ambos pasos) ── -->
+        <div class="modal__footer" id="nueva-footer-unificado">
+          <button type="button" class="modal__btn modal__btn--cancel" id="btn-nueva-izquierda"
             data-modal-close="modal-nueva-incidencia">Cancelar</button>
-          <button type="button" class="modal__btn modal__btn--primary" id="btn-enviar-incidencia">Enviar
-            incidencia</button>
+          <button type="button" class="modal__btn modal__btn--primary" id="btn-nueva-derecha">
+            Siguiente →
+          </button>
         </div>
+
       </div>
     </div>
 
@@ -371,16 +392,13 @@
           </div>
 
           <div class="modal__field">
-            <label class="modal__label" for="editar-fecha-inicio">FECHA DE INICIO<span
-                class="modal__required">*</span></label>
+            <label class="modal__label" for="editar-fecha-inicio">FECHA DE INICIO<span class="modal__required">*</span></label>
             <input class="modal__input" id="editar-fecha-inicio" name="fecha_inicio" type="date" required />
-            <span class="modal__hint modal__hint--error" id="editar-fecha-inicio-error">La fecha no puede ser anterior a
-              hoy</span>
+            <span class="modal__hint modal__hint--error" id="editar-fecha-inicio-error">La fecha no puede ser anterior a hoy</span>
           </div>
 
           <div class="modal__field">
-            <label class="modal__label" for="editar-fecha-fin">FECHA DE FIN <span
-                class="modal__optional">(opcional)</span></label>
+            <label class="modal__label" for="editar-fecha-fin">FECHA DE FIN <span class="modal__optional">(opcional)</span></label>
             <input class="modal__input" id="editar-fecha-fin" name="fecha_fin" type="date" />
             <span class="modal__hint">(Déjalo vacío si no sabes cuándo terminará)</span>
           </div>
@@ -408,30 +426,35 @@
         <div class="modal__footer">
           <button type="button" class="modal__btn modal__btn--cancel"
             data-modal-close="modal-editar-incidencia">Cancelar</button>
-          <button type="button" class="modal__btn modal__btn--primary" id="btn-confirmar-editar">Guardar
-            cambios</button>
+          <button type="button" class="modal__btn modal__btn--primary" id="btn-confirmar-editar">Guardar cambios</button>
         </div>
       </div>
     </div>
 
-    <!-- ══════════════ MODAL ELIMINAR ══════════════ -->
+    <!-- ══════════════ MODAL ELIMINAR — CONFIRMACIÓN ══════════════ -->
     <div class="modal-overlay modal--hidden" id="modal-eliminar-incidencia" role="dialog" aria-modal="true"
       aria-labelledby="modal-eliminar-title">
       <div class="modal modal--sm">
         <div class="modal__header">
-          <h2 class="modal__title" id="modal-eliminar-title">Eliminar incidencia</h2>
+          <div class="modal__header-left">
+            <span class="modal__icon" aria-hidden="true">🗑️</span>
+            <h2 class="modal__title" id="modal-eliminar-title">Eliminar incidencia</h2>
+          </div>
           <button class="modal__close" aria-label="Cerrar" data-modal-close="modal-eliminar-incidencia">✕</button>
         </div>
         <hr class="modal__divider" />
         <div class="modal__body modal__body--center">
-          <p class="modal__confirm-text">¿ESTAS SEGURO DE ELIMINAR ESTA INCIDENCIA?</p>
+          <div class="modal__confirm-block">
+            <div class="modal__confirm-icon">⚠️</div>
+            <p class="modal__confirm-title">¿Seguro que la quieres eliminar?</p>
+            <p class="modal__confirm-text">Esta acción no se puede deshacer. La incidencia y toda su información desaparecerán permanentemente.</p>
+          </div>
         </div>
         <hr class="modal__divider" />
         <div class="modal__footer">
           <button type="button" class="modal__btn modal__btn--cancel"
             data-modal-close="modal-eliminar-incidencia">Cancelar</button>
-          <button type="button" class="modal__btn modal__btn--danger" id="btn-confirmar-eliminar">Eliminar
-            incidencia</button>
+          <button type="button" class="modal__btn modal__btn--danger" id="btn-confirmar-eliminar">Sí, eliminar</button>
         </div>
       </div>
     </div>
@@ -506,6 +529,9 @@
         </div>
       </div>
     </div>
+
+    <!-- ══════════════ TOAST CONTAINER ══════════════ -->
+    <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
 
     <script src="../js/dark-mode.js"></script>
   </div>

@@ -1,5 +1,27 @@
 const nombreUsuario = document.getElementById("nombreUsuario");
 
+/* ─────────────────────────────────────────────────────────────
+   TOAST HELPER
+   ───────────────────────────────────────────────────────────── */
+function mostrarToast(mensaje, tipo = "success", duracion = 3200) {
+    const container = document.getElementById("toast-container");
+    if (!container) return;
+
+    const icono = tipo === "success" ? "✅" : "❌";
+    const toast = document.createElement("div");
+    toast.className = `toast toast--${tipo}`;
+    toast.innerHTML = `
+        <span class="toast__icon">${icono}</span>
+        <span class="toast__msg">${mensaje}</span>
+    `;
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.classList.add("toast--exit");
+        toast.addEventListener("animationend", () => toast.remove(), { once: true });
+    }, duracion);
+}
+
 /* ================= USUARIO ================= */
 function cargarUsuario() {
     const usuario = JSON.parse(sessionStorage.getItem("usuario"));
@@ -122,7 +144,6 @@ async function initIncidencias() {
                 row.querySelectorAll(".modal__urgencia-btn")
                     .forEach(b => b.classList.remove("modal__urgencia-btn--active"));
                 btn.classList.add("modal__urgencia-btn--active");
-                validarFormularioNueva();
             });
         });
     });
@@ -153,25 +174,6 @@ async function initIncidencias() {
         preview.src = URL.createObjectURL(file);
     }
 
-    // ─── VALIDACIÓN FORMULARIO NUEVA ─────────────────────────────────
-    const btnEnviar = document.getElementById("btn-enviar-incidencia");
-
-    function validarFormularioNueva() {
-        const titulo = document.getElementById("nueva-titulo")?.value.trim();
-        const descripcion = document.getElementById("nueva-desc")?.value.trim();
-        const tipo = document.getElementById("nueva-tipo")?.value;
-        const urgenciaBtn = document.querySelector(
-            "#modal-nueva-incidencia .modal__urgencia-btn--active"
-        );
-        const valido = !!(titulo && descripcion && tipo && urgenciaBtn);
-        if (btnEnviar) btnEnviar.disabled = !valido;
-    }
-
-    ["nueva-titulo", "nueva-desc", "nueva-tipo"].forEach(id => {
-        document.getElementById(id)?.addEventListener("input", validarFormularioNueva);
-        document.getElementById(id)?.addEventListener("change", validarFormularioNueva);
-    });
-
     // ─── Contadores de caracteres ─────────────────────────────────────
     document.getElementById("nueva-titulo")?.addEventListener("input", (e) => {
         const count = document.getElementById("nueva-titulo-count");
@@ -181,6 +183,83 @@ async function initIncidencias() {
     document.getElementById("editar-titulo")?.addEventListener("input", (e) => {
         const count = document.getElementById("editar-titulo-count");
         if (count) count.textContent = e.target.value.length;
+    });
+
+    // ══════════════════════════════════════════════════════════════
+    // LÓGICA DE 2 PASOS — MODAL NUEVA INCIDENCIA
+    // Footer unificado: un solo div con dos botones que cambian según el paso
+    // ══════════════════════════════════════════════════════════════
+
+    let pasoActual = 1;
+
+    function irAPaso(paso) {
+        pasoActual = paso;
+
+        const paso1  = document.getElementById("nueva-paso-1");
+        const paso2  = document.getElementById("nueva-paso-2");
+        const ind1   = document.getElementById("step-indicator-1");
+        const ind2   = document.getElementById("step-indicator-2");
+        const btnIzq = document.getElementById("btn-nueva-izquierda");
+        const btnDer = document.getElementById("btn-nueva-derecha");
+
+        if (paso === 1) {
+            // ── Mostrar paso 1, ocultar paso 2
+            paso1.classList.remove("modal--hidden");
+            paso2.classList.add("modal--hidden");
+
+            // ── Stepper
+            ind1.classList.add("stepper__step--active");
+            ind1.classList.remove("stepper__step--done");
+            ind2.classList.remove("stepper__step--active", "stepper__step--done");
+
+            // ── Botón izquierdo → Cancelar (cierra el modal)
+            btnIzq.textContent = "Cancelar";
+            btnIzq.setAttribute("data-modal-close", "modal-nueva-incidencia");
+            delete btnIzq.dataset.accion;
+
+            // ── Botón derecho → Siguiente
+            btnDer.textContent = "Siguiente →";
+            btnDer.dataset.accion = "siguiente";
+
+        } else {
+            // ── Mostrar paso 2, ocultar paso 1
+            paso1.classList.add("modal--hidden");
+            paso2.classList.remove("modal--hidden");
+
+            // ── Stepper
+            ind1.classList.remove("stepper__step--active");
+            ind1.classList.add("stepper__step--done");
+            ind2.classList.add("stepper__step--active");
+            ind2.classList.remove("stepper__step--done");
+
+            // ── Botón izquierdo → Volver (no cierra el modal)
+            btnIzq.textContent = "← Volver";
+            btnIzq.removeAttribute("data-modal-close");
+            btnIzq.dataset.accion = "volver";
+
+            // ── Botón derecho → Enviar incidencia
+            btnDer.textContent = "Enviar incidencia";
+            btnDer.dataset.accion = "enviar";
+        }
+    }
+
+    // ─── Listener del botón izquierdo del footer unificado ──────────
+    document.getElementById("btn-nueva-izquierda")?.addEventListener("click", () => {
+        const btnIzq = document.getElementById("btn-nueva-izquierda");
+        if (btnIzq.dataset.accion === "volver") {
+            irAPaso(1);
+        }
+        // Si tiene data-modal-close, el listener global de data-modal-close ya lo gestiona
+    });
+
+    // ─── Listener del botón derecho del footer unificado ────────────
+    document.getElementById("btn-nueva-derecha")?.addEventListener("click", () => {
+        const btnDer = document.getElementById("btn-nueva-derecha");
+        if (btnDer.dataset.accion === "siguiente") {
+            irAPaso(2);
+        } else if (btnDer.dataset.accion === "enviar") {
+            enviarNuevaIncidencia();
+        }
     });
 
     // ─── CARGAR INCIDENCIAS ──────────────────────────────────────────
@@ -242,7 +321,6 @@ async function initIncidencias() {
                     ? `<span style="font-size:.7rem;background:#dbeafe;color:#1d4ed8;padding:2px 7px;border-radius:999px;font-weight:600;margin-left:6px;">Admin</span>`
                     : '';
 
-                // 🔔 NUEVO: Añadimos data-id-usuario para validación de ownership en frontend
                 const html = `
                     <li class="incident-item"
                         data-id="${inc.id}"
@@ -387,7 +465,7 @@ async function initIncidencias() {
     document.querySelectorAll(".btn-abrir-nueva").forEach(btn => {
         btn.addEventListener("click", () => {
             limpiarFormulario("modal-nueva-incidencia");
-            if (btnEnviar) btnEnviar.disabled = true;
+            irAPaso(1);
             initToggleComentario();
             setMinDateToday('nueva-fecha-inicio');
             abrirModal("modal-nueva-incidencia");
@@ -446,8 +524,8 @@ async function initIncidencias() {
         }
     });
 
-    // ─── CREAR ───────────────────────────────────────────────────────
-    btnEnviar?.addEventListener("click", async () => {
+    // ─── CREAR (función extraída para llamarla desde el footer unificado) ──
+    async function enviarNuevaIncidencia() {
 
         const titulo = document.getElementById("nueva-titulo").value.trim();
         const descripcion = document.getElementById("nueva-desc").value.trim();
@@ -459,8 +537,14 @@ async function initIncidencias() {
         );
         const notificar = document.getElementById("nueva-notificar-admin").checked ? 1 : 0;
 
-        if (!titulo || !descripcion || !tipo || !fechaInicio) {
-            alert("Rellena todos los campos obligatorios.");
+        if (!titulo || !descripcion || !tipo) {
+            mostrarToast("Rellena los campos de información básica.", "error");
+            irAPaso(1);
+            return;
+        }
+
+        if (!fechaInicio) {
+            mostrarToast("La fecha de inicio es obligatoria.", "error");
             return;
         }
 
@@ -492,22 +576,24 @@ async function initIncidencias() {
             }
         }
 
-        console.log("ID USUARIO:", idUsuario);
-        console.log("DATOS:", Object.fromEntries(formData));
-
         const imagenFile = document.getElementById("nueva-imagen").files[0];
         if (imagenFile) formData.append("imagen", imagenFile);
 
-        const res = await fetch("../php/incidencias.php", { method: "POST", body: formData });
-        const result = await res.json();
+        try {
+            const res = await fetch("../php/incidencias.php", { method: "POST", body: formData });
+            const result = await res.json();
 
-        if (result.success) {
-            cerrarModal("modal-nueva-incidencia");
-            cargarIncidencias();
-        } else {
-            alert("Error al crear la incidencia: " + (result.error || ""));
+            if (result.success) {
+                cerrarModal("modal-nueva-incidencia");
+                cargarIncidencias();
+                mostrarToast("Incidencia creada correctamente 🎉", "success");
+            } else {
+                mostrarToast("Error al crear la incidencia: " + (result.error || ""), "error");
+            }
+        } catch (err) {
+            mostrarToast("Error de conexión al crear la incidencia.", "error");
         }
-    });
+    }
 
     // ─── EDITAR ──────────────────────────────────────────────────────
     document.getElementById("btn-confirmar-editar")?.addEventListener("click", async (e) => {
@@ -525,7 +611,7 @@ async function initIncidencias() {
         const notificar = document.getElementById("editar-notificar-admin").checked ? 1 : 0;
 
         if (!titulo || !descripcion || !fechaInicio) {
-            alert("Rellena título, descripción y fecha de inicio.");
+            mostrarToast("Rellena título, descripción y fecha de inicio.", "error");
             return;
         }
 
@@ -558,8 +644,43 @@ async function initIncidencias() {
         const imagenFile = document.getElementById("editar-imagen").files[0];
         if (imagenFile) formData.append("imagen", imagenFile);
 
-        console.log("📤 Enviando accion:", formData.get("accion"));
-        console.log("📋 Todos los datos:", Object.fromEntries(formData));
+        try {
+            const res = await fetch("../php/incidencias.php", {
+                method: "POST",
+                body: formData
+            });
+
+            const text = await res.text();
+            const result = JSON.parse(text);
+
+            if (result.success) {
+                cerrarModal("modal-editar-incidencia");
+                cargarIncidencias();
+                mostrarToast("Incidencia editada correctamente ✏️", "success");
+            } else {
+                mostrarToast("Error al editar: " + (result.error || ""), "error");
+            }
+        } catch (error) {
+            console.error("❌ Error en fetch:", error);
+            mostrarToast("Error de conexión al editar.", "error");
+        }
+    });
+
+    // ─── ELIMINAR ────────────────────────────────────────────────────
+    document.getElementById("btn-confirmar-eliminar")?.addEventListener("click", async () => {
+        const modal = document.getElementById("modal-eliminar-incidencia");
+        const id = modal?.dataset.incidenciaId;
+
+        if (!id || id === "undefined" || id === "null" || id.trim() === "") {
+            console.error("❌ ID no válido para eliminar");
+            mostrarToast("Error: No se pudo identificar la incidencia.", "error");
+            cerrarModal("modal-eliminar-incidencia");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("accion", "eliminar");
+        formData.append("id", id.toString().trim());
 
         try {
             const res = await fetch("../php/incidencias.php", {
@@ -568,70 +689,25 @@ async function initIncidencias() {
             });
 
             const text = await res.text();
-            console.log("📥 Respuesta raw:", text);
+
+            if (!text.trim()) {
+                throw new Error("Servidor devolvió respuesta vacía (HTTP " + res.status + ")");
+            }
 
             const result = JSON.parse(text);
 
             if (result.success) {
-                cerrarModal("modal-editar-incidencia");
+                cerrarModal("modal-eliminar-incidencia");
                 cargarIncidencias();
+                mostrarToast("Incidencia eliminada correctamente 🗑️", "success");
             } else {
-                alert("Error al editar: " + (result.error || ""));
+                mostrarToast("Error: " + (result.error || "Desconocido"), "error");
             }
         } catch (error) {
-            console.error("❌ Error en fetch:", error);
-            alert("Error de conexión al editar");
+            console.error("💥 Error fatal en eliminar:", error);
+            mostrarToast("Error de conexión. Revisa la consola.", "error");
         }
     });
-
-   // ─── ELIMINAR ────────────────────────────────────────────────────
-document.getElementById("btn-confirmar-eliminar")?.addEventListener("click", async () => {
-    const modal = document.getElementById("modal-eliminar-incidencia");
-    const id = modal?.dataset.incidenciaId;
-    
-    console.log("🗑️ Intentando eliminar ID:", id, "tipo:", typeof id);
-    
-    if (!id || id === "undefined" || id === "null" || id.trim() === "") {
-        console.error("❌ ID no válido para eliminar");
-        alert("Error: No se pudo identificar la incidencia");
-        cerrarModal("modal-eliminar-incidencia");
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append("accion", "eliminar");
-    formData.append("id", id.toString().trim());
-
-    console.log("📤 Enviando FormData:", Object.fromEntries(formData));
-
-    try {
-        const res = await fetch("../php/incidencias.php", { 
-            method: "POST", 
-            body: formData
-        });
-
-        console.log("📡 Status:", res.status, "OK:", res.ok);
-        
-        const text = await res.text();
-        console.log("📥 Respuesta raw:", text);
-        
-        if (!text.trim()) {
-            throw new Error("Servidor devolvió respuesta vacía (HTTP " + res.status + ")");
-        }
-        
-        const result = JSON.parse(text);
-
-        if (result.success) {
-            cerrarModal("modal-eliminar-incidencia");
-            cargarIncidencias();
-        } else {
-            alert("Error: " + (result.error || "Desconocido"));
-        }
-    } catch (error) {
-        console.error("💥 Error fatal en eliminar:", error);
-        alert("Error de conexión. Revisa la consola para más detalles.");
-    }
-});
 
     // ─── Util ────────────────────────────────────────────────────────
     function limpiarFormulario(modalId) {
@@ -718,7 +794,7 @@ document.getElementById("btn-confirmar-eliminar")?.addEventListener("click", asy
                     <button class="btn-ver-conversacion" 
                             data-id-notif="${n.id_notificacion}"
                             data-id-inc="${n.id_incidencia}"
-                            style="flex:1;padding:8px 12px;background:#3b82f6;color:white;border:none;border-radius:6px;cursor:pointer;font-size:0.85rem;font-weight:600;">
+                            style="flex:1;padding:8px 12px;background:#4f46e5;color:white;border:none;border-radius:6px;cursor:pointer;font-size:0.85rem;font-weight:600;">
                         💬 Ver conversación
                     </button>
                     <button class="btn-ver-detalle-notif"
@@ -889,7 +965,6 @@ document.getElementById("btn-confirmar-eliminar")?.addEventListener("click", asy
         const fecha = new Date(fechaStr);
         const ahora = new Date();
         const esHoy = fecha.toDateString() === ahora.toDateString();
-
         const hora = fecha.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
 
         if (esHoy) {
@@ -927,11 +1002,11 @@ document.getElementById("btn-confirmar-eliminar")?.addEventListener("click", asy
                 await cargarMensajesChat(idIncidenciaChatActual);
                 scrollToBottomChat();
             } else {
-                alert("Error al enviar el mensaje: " + (data.error || ""));
+                mostrarToast("Error al enviar el mensaje: " + (data.error || ""), "error");
             }
         } catch (error) {
             console.error("Error enviando mensaje:", error);
-            alert("Error de conexión al enviar el mensaje");
+            mostrarToast("Error de conexión al enviar el mensaje.", "error");
         }
     });
 
@@ -953,19 +1028,17 @@ document.getElementById("btn-confirmar-eliminar")?.addEventListener("click", asy
     });
 
     // ═══════════════════════════════════════════════════════════════
-    // 🔔 NUEVO: FUNCIONES PARA CONVERSACIÓN SEGURA DESDE DETALLE
+    // 🔔 FUNCIONES PARA CONVERSACIÓN SEGURA DESDE DETALLE
     // ═══════════════════════════════════════════════════════════════
 
-    // 🔔 NUEVO: Mostrar/ocultar botón conversación según condiciones
     function actualizarBotonConversacion(incidenciaData) {
         const btn = document.getElementById('btn-ver-conversacion');
         if (!btn) return;
-        
+
         const idUsuarioLogueado = obtenerIdUsuario();
         const idCreador = parseInt(incidenciaData.id_usuario || 0);
         const requiereAdmin = parseInt(incidenciaData.notificar_admin || 0) === 1;
-        
-        // ✅ Solo mostrar si: es el creador Y necesita revisión admin
+
         if (idUsuarioLogueado && idCreador === idUsuarioLogueado && requiereAdmin) {
             btn.style.display = 'inline-block';
             btn.dataset.incidenciaId = incidenciaData.id_incidencia;
@@ -975,7 +1048,6 @@ document.getElementById("btn-confirmar-eliminar")?.addEventListener("click", asy
         }
     }
 
-    // 🔔 NUEVO: Cargar conversación con validación de seguridad en backend
     async function cargarConversacionSegura(idIncidencia) {
         try {
             const resp = await fetch(
@@ -983,35 +1055,34 @@ document.getElementById("btn-confirmar-eliminar")?.addEventListener("click", asy
                 { credentials: 'same-origin' }
             );
             const data = await resp.json();
-            
+
             if (!data.success) {
                 console.warn('Acceso denegado a conversación:', data.error);
-                alert('No tienes permiso para ver esta conversación');
+                mostrarToast('No tienes permiso para ver esta conversación.', 'error');
                 return null;
             }
             return data.mensajes;
         } catch (error) {
             console.error('Error cargando conversación:', error);
-            alert('Error de conexión al cargar la conversación');
+            mostrarToast('Error de conexión al cargar la conversación.', 'error');
             return null;
         }
     }
 
-    // 🔔 NUEVO: Abrir modal de conversación desde el detalle de incidencia
     async function abrirModalConversacionDesdeDetalle(idIncidencia) {
         const mensajes = await cargarConversacionSegura(idIncidencia);
-        if (!mensajes) return; // Acceso denegado o error
-        
+        if (!mensajes) return;
+
         const lista = document.getElementById('chat-mensajes-lista');
         if (lista) {
-            lista.innerHTML = mensajes.length > 0 
+            lista.innerHTML = mensajes.length > 0
                 ? mensajes.map(msg => {
                     const idUsuarioLogueado = obtenerIdUsuario();
                     const esUsuario = msg.origen === 'usuario' || msg.id_usuario == idUsuarioLogueado;
                     const clase = esUsuario ? 'mensaje-chat--usuario' : 'mensaje-chat--admin';
                     const autor = esUsuario ? 'Tú' : (msg.nombre || 'Administrador');
                     const fecha = msg.fecha_envio ? formatearFechaHora(msg.fecha_envio) : 'Ahora';
-                    
+
                     return `
                         <div class="mensaje-chat ${clase}">
                             <div class="mensaje-chat__autor">${autor}</div>
@@ -1022,7 +1093,7 @@ document.getElementById("btn-confirmar-eliminar")?.addEventListener("click", asy
                 }).join('')
                 : `<div class="chat-sin-mensajes"><p>Aún no hay mensajes en esta conversación</p></div>`;
         }
-        
+
         const modal = document.getElementById('modal-conversacion-admin');
         if (modal) {
             modal.classList.remove('modal--hidden');
@@ -1031,7 +1102,6 @@ document.getElementById("btn-confirmar-eliminar")?.addEventListener("click", asy
         }
     }
 
-    // 🔔 NUEVO: Event listener para el botón de conversación en el detalle
     document.getElementById('btn-ver-conversacion')?.addEventListener('click', (e) => {
         const idIncidencia = e.currentTarget.dataset.incidenciaId;
         if (idIncidencia) {
@@ -1045,7 +1115,6 @@ document.getElementById("btn-confirmar-eliminar")?.addEventListener("click", asy
 
     iniciarPollingNotificaciones();
 
-    // Click en notificaciones (con botones)
     document.getElementById("lista-notificaciones-usuario")?.addEventListener("click", async (e) => {
         const btnConversacion = e.target.closest(".btn-ver-conversacion");
         const btnDetalle = e.target.closest(".btn-ver-detalle-notif");
