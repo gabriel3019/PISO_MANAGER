@@ -499,6 +499,7 @@ body{
   transform:translateY(-1px);
 }
 
+
 /* ================================================= */
 /* ================= ANIMACION ===================== */
 /* ================================================= */
@@ -531,12 +532,107 @@ body{
     grid-column:span 1;
   }
 
-  .sidebar{
-    display:none;
-  }
-
   .main{
     padding:20px;
+  }
+
+}
+
+
+/* ================================================= */
+/* ================= MENU HAMBURGUESA ============== */
+/* ================================================= */
+
+.menu-toggle{
+
+  display:none;
+
+  background:none;
+  border:none;
+
+  font-size:34px;
+
+  cursor:pointer;
+
+  margin-right:15px;
+
+  z-index:100000;
+}
+
+/* ================================================= */
+/* ================= RESPONSIVE ==================== */
+/* ================================================= */
+
+@media (max-width:1000px){
+
+  .app{
+    position:relative;
+  }
+
+  /* ================= SIDEBAR ================= */
+
+  .sidebar{
+
+    position:fixed;
+
+    top:0;
+    left:-260px;
+
+    width:250px;
+    height:100vh;
+
+    background:#ffffff;
+
+    z-index:99999;
+
+    transition:left 0.3s ease;
+
+    padding:20px;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+
+    box-shadow:
+      0 0 20px rgba(0,0,0,0.15);
+  }
+
+  .sidebar.active{
+    left:0;
+  }
+
+  /* ================= BOTON ================= */
+
+  .menu-toggle{
+    display:block;
+  }
+
+  /* ================= TOPBAR ================= */
+
+  .topbar{
+    display:flex;
+    align-items:center;
+  }
+
+  /* ================= MAIN ================= */
+
+  .main{
+
+    width:100%;
+
+    margin-left:0;
+
+    padding:20px;
+  }
+
+  /* ================= GRID ================= */
+
+  .dashboard{
+    grid-template-columns:1fr !important;
+  }
+
+  .card.full{
+    grid-column:span 1;
   }
 
 }
