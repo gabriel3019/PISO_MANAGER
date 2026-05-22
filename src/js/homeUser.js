@@ -85,6 +85,19 @@ window.onload = () => {
 
                 sidebar.classList.toggle("active");
 
+                menuToggle.classList.toggle("active");
+
+                // CAMBIAR ICONO
+                if (sidebar.classList.contains("active")) {
+
+                    menuToggle.innerHTML = "✕";
+
+                } else {
+
+                    menuToggle.innerHTML = "☰";
+
+                }
+
             }
         );
 
