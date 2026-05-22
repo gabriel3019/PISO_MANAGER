@@ -94,6 +94,9 @@ function cargarUsuario() {
 }
 
 nextRepeatBtn.addEventListener("click", () => {
+
+    if (!validarPrimerPaso()) return;
+
     generalFields.classList.add("hidden");
     peopleFields.classList.add("hidden");
     repeatFields.classList.add("hidden");
@@ -148,6 +151,148 @@ function clearWarning() {
     eventWarning.textContent = "";
     eventWarning.classList.remove("show");
 }
+
+function mostrarError(input, mensaje) {
+    limpiarError(input);
+
+    const error = document.createElement("small");
+    error.className = "field-error";
+    error.textContent = mensaje;
+
+    input.insertAdjacentElement("afterend", error);
+}
+
+function limpiarError(input) {
+    const siguiente = input.nextElementSibling;
+
+    if (siguiente && siguiente.classList.contains("field-error")) {
+        siguiente.remove();
+    }
+}
+
+function validarPrimerPaso() {
+    let valido = true;
+
+    if (!eventTitleInput.value.trim()) {
+        mostrarError(eventTitleInput, "Es obligatorio escribir el título.");
+        valido = false;
+    }
+
+    if (!eventTypeInput.value) {
+        mostrarError(eventTypeInput, "Es obligatorio seleccionar el tipo.");
+        valido = false;
+    }
+
+    if (eventTypeInput.value === "tarea" || eventTypeInput.value === "evento") {
+        if (!eventDateInput.value) {
+            mostrarError(eventDateInput, "Es obligatorio elegir la fecha.");
+            valido = false;
+        }
+
+        const personasSeleccionadas = Array.from(eventPeopleInputs)
+            .some(input => input.checked);
+
+        if (!personasSeleccionadas) {
+
+            let errorPersonas = peopleFields.querySelector(".field-error");
+
+            if (!errorPersonas) {
+                errorPersonas = document.createElement("small");
+                errorPersonas.className = "field-error";
+                errorPersonas.textContent = "Hay que elegir una persona como mínimo.";
+
+                peopleFields.appendChild(errorPersonas);
+            }
+
+            valido = false;
+
+        } else {
+
+            const errorPersonas = peopleFields.querySelector(".field-error");
+
+            if (errorPersonas) {
+                errorPersonas.remove();
+            }
+        }
+    }
+
+    if (eventTypeInput.value === "evento" && !eventTimeInput.value) {
+        mostrarError(eventTimeInput, "Es obligatorio elegir una hora.");
+        valido = false;
+    }
+
+    return valido;
+}
+
+eventTitleInput.addEventListener("blur", () => {
+    if (!eventTitleInput.value.trim()) {
+        mostrarError(eventTitleInput, "Es obligatorio escribir el título.");
+    } else {
+        limpiarError(eventTitleInput);
+    }
+});
+
+eventTypeInput.addEventListener("blur", () => {
+    if (!eventTypeInput.value) {
+        mostrarError(eventTypeInput, "Es obligatorio seleccionar el tipo.");
+    } else {
+        limpiarError(eventTypeInput);
+    }
+});
+
+eventDateInput.addEventListener("blur", () => {
+    if (!eventDateInput.value) {
+        mostrarError(eventDateInput, "Es obligatorio elegir la fecha.");
+    } else {
+        limpiarError(eventDateInput);
+    }
+});
+
+eventTimeInput.addEventListener("blur", () => {
+    if (eventTypeInput.value === "evento" && !eventTimeInput.value) {
+        mostrarError(eventTimeInput, "Es obligatorio elegir una hora.");
+    } else {
+        limpiarError(eventTimeInput);
+    }
+});
+
+eventTitleInput.addEventListener("input", () => {
+    if (eventTitleInput.value.trim()) {
+        limpiarError(eventTitleInput);
+    }
+});
+
+eventTypeInput.addEventListener("change", () => {
+    if (eventTypeInput.value) {
+        limpiarError(eventTypeInput);
+    }
+});
+
+eventDateInput.addEventListener("change", () => {
+    if (eventDateInput.value) {
+        limpiarError(eventDateInput);
+    }
+});
+
+eventTimeInput.addEventListener("change", () => {
+    if (eventTimeInput.value) {
+        limpiarError(eventTimeInput);
+    }
+});
+
+eventPeopleInputs.forEach(input => {
+    input.addEventListener("change", () => {
+
+        const personasSeleccionadas = Array.from(eventPeopleInputs)
+            .some(i => i.checked);
+
+        const errorPersonas = peopleFields.querySelector(".field-error");
+
+        if (personasSeleccionadas && errorPersonas) {
+            errorPersonas.remove();
+        }
+    });
+});
 
 function formatDateText(fecha) {
     const [anio, mes, dia] = fecha.split("-");
@@ -437,6 +582,9 @@ function renderCalendar(date) {
 }
 
 function renderMonthCalendar(date) {
+
+    document.querySelector(".calendar-weekdays")?.classList.remove("hidden");
+
     const year = date.getFullYear();
     const month = date.getMonth();
 
@@ -661,31 +809,38 @@ function renderDayCalendar(date) {
 
 function renderYearCalendar() {
 
-    calendarGrid.innerHTML = "";
+    document.querySelector(".calendar-weekdays")?.classList.add("hidden");
 
-    const tituloActual = `Año ${currentDate.getFullYear()}`;
+    calendarGrid.innerHTML = "";
+    calendarGrid.className = "calendar-grid year-mode";
+
+    const currentYear = currentDate.getFullYear();
+
+    const tituloActual = `Año ${currentYear}`;
 
     if (monthTitle) {
         monthTitle.textContent = tituloActual;
     }
 
     pageTitle.textContent = tituloActual;
+
     const yearContainer = document.createElement("div");
-    yearContainer.className = "year-view";
+    yearContainer.className = "year-container";
 
-    const meses = [
-        "Enero", "Febrero", "Marzo", "Abril",
-        "Mayo", "Junio", "Julio", "Agosto",
-        "Septiembre", "Octubre", "Noviembre", "Diciembre"
-    ];
-
-    meses.forEach((mes, index) => {
+    for (let month = 0; month < 12; month++) {
 
         const monthCard = document.createElement("div");
-        monthCard.className = "year-month-card";
+        const hoy = new Date();
 
-        const firstDay = new Date(currentDate.getFullYear(), index, 1);
-        const lastDay = new Date(currentDate.getFullYear(), index + 1, 0);
+        monthCard.className =
+            month === hoy.getMonth() && currentYear === hoy.getFullYear()
+                ? "year-month-card current-month"
+                : "year-month-card";
+
+        const monthName = monthNames[month];
+
+        const firstDay = new Date(currentYear, month, 1);
+        const lastDay = new Date(currentYear, month + 1, 0);
 
         let startDay = firstDay.getDay();
         startDay = startDay === 0 ? 6 : startDay - 1;
@@ -694,49 +849,47 @@ function renderYearCalendar() {
 
         let daysHTML = "";
 
-        // Espacios vacíos antes del día 1
+        // huecos antes del día 1
         for (let i = 0; i < startDay; i++) {
             daysHTML += `<div class="year-day empty"></div>`;
         }
 
-        // Días del mes
+        // días
         for (let day = 1; day <= totalDays; day++) {
 
             const fechaCompleta =
-                `${currentDate.getFullYear()}-${String(index + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+                `${currentYear}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 
-            const tieneEvento = eventos.some(evento => {
+            const hoy = new Date();
 
-                if (evento.tipo === "incidencia") {
-
-                    if (evento.estado === "resuelta") return false;
-
-                    const fechaFin = evento.fechaFin || evento.fechaInicio;
-
-                    return fechaCompleta >= evento.fechaInicio &&
-                        fechaCompleta <= fechaFin;
-                }
-
-                return evento.fecha === fechaCompleta;
-            });
+            const esHoy =
+                day === hoy.getDate() &&
+                month === hoy.getMonth() &&
+                currentYear === hoy.getFullYear();
 
             daysHTML += `
-                <div class="year-day ${tieneEvento ? "has-event" : ""}">
+                <div class="year-day ${esHoy ? "today-year" : ""}">
                     ${day}
-                </div>
-            `;
+                 </div>
+                `;
         }
 
-        monthCard.innerHTML = `
-            <h3>${mes}</h3>
+        const esMesActual =
+            month === hoy.getMonth() &&
+            currentYear === hoy.getFullYear();
 
-            <div class="year-days-grid">
-                ${daysHTML}
-            </div>
-        `;
+        monthCard.innerHTML = `
+    <div class="year-month-title ${esMesActual ? "current-month-title" : ""}">
+        ${monthName}
+    </div>
+
+    <div class="year-days-grid">
+        ${daysHTML}
+    </div>
+`;
 
         yearContainer.appendChild(monthCard);
-    });
+    }
 
     calendarGrid.appendChild(yearContainer);
 }
@@ -1128,7 +1281,10 @@ function setMinDates() {
     eventDateInput.min = todayString;
 }
 
-eventTypeInput.addEventListener("change", updateFormByType);
+eventTypeInput.addEventListener("change", () => {
+    limpiarError(eventTypeInput);
+    updateFormByType();
+});
 
 document.getElementById("btn-prev").addEventListener("click", () => {
     if (currentView === "week") {
@@ -1283,13 +1439,8 @@ calendarViewSelect.addEventListener("change", () => {
 });
 
 document.getElementById("btn-add").addEventListener("click", () => {
+    resetAddForm();
     setMinDates();
-
-    // Si ya había algo escrito, lo mantiene tal cual
-    if (!eventTitleInput.value.trim()) {
-        updateFormByType();
-    }
-
     openModal(modalAdd);
 });
 
@@ -1321,7 +1472,7 @@ addEventForm.addEventListener("submit", async (e) => {
 
     clearWarning();
 
-    if (!titulo || !tipo) {
+    if (!validarPrimerPaso()) {
         return;
     }
 
@@ -1429,6 +1580,7 @@ addEventForm.addEventListener("submit", async (e) => {
 });
 
 document.getElementById("close-add-modal").addEventListener("click", () => {
+    resetAddForm();
     clearWarning();
     closeModal(modalAdd);
 });
@@ -1445,7 +1597,8 @@ document.getElementById("close-details-modal").addEventListener("click", () => {
 
 window.addEventListener("click", (e) => {
     if (e.target === modalAdd) {
-        // Solo se cierra, pero NO limpia ni cambia el formulario, para evitar perder datos si se cierra por error
+        resetAddForm();
+        clearWarning();
         closeModal(modalAdd);
     }
 
