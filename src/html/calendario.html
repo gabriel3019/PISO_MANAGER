@@ -86,8 +86,9 @@
                     <button id="btn-prev" class="icon-btn" type="button">◀</button>
 
                     <select id="calendar-view" class="view-select">
-                        <option value="month">Mes</option>
+                        <option value="day">Día</option>
                         <option value="week">Semana</option>
+                        <option value="month" selected>Mes</option>
                         <option value="year">Año</option>
                     </select>
 
@@ -105,10 +106,6 @@
 
                 <!-- CALENDARIO -->
                 <div class="calendar-main">
-                    <div class="calendar-month-bar">
-                        <h2 id="month-title">Mayo de 2026</h2>
-                    </div>
-
                     <div class="legend">
                         <div class="legend-item">
                             <span class="legend-color incidencia"></span>
@@ -150,16 +147,16 @@
         <div id="modal-add" class="modal hidden">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3>Nuevo evento</h3>
+                    <h3>Nueva actividad</h3>
                     <button id="close-add-modal" class="modal-close">&times;</button>
                 </div>
 
                 <form id="add-event-form" class="modal-form">
                     <label for="event-title">Título</label>
-                    <input type="text" id="event-title" placeholder="Ej: Cena del piso" required>
+                    <input type="text" id="event-title" placeholder="Ej: Cena del piso">
 
                     <label for="event-type">Tipo</label>
-                    <select id="event-type" required>
+                    <select id="event-type">
                         <option value="">Selecciona una opción</option>
                         <option value="tarea">Tarea</option>
                         <option value="evento">Evento</option>
@@ -251,13 +248,13 @@
                                     </div>
                                 </div>
 
-                                <div class="repeat-select-row">
+                                <div class="repeat-select-row repeat-end-container">
                                     <label for="repeat-end">Finaliza</label>
                                     <select id="repeat-end">
-                                        <option value="4">Después de 1 mes</option>
-                                        <option value="12">Después de 3 meses</option>
-                                        <option value="24">Después de 6 meses</option>
-                                        <option value="52">Después de 1 año</option>
+                                        <option value="4">1 mes</option>
+                                        <option value="12">3 meses</option>
+                                        <option value="24">6 meses</option>
+                                        <option value="52">1 año</option>
                                         <option value="custom">Personalizado</option>
                                     </select>
                                 </div>
