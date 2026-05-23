@@ -49,6 +49,23 @@ async function initIncidencias() {
         }
     });
 
+    // ─── MENÚ HAMBURGUESA ────────────────────────────────────────────
+    const menuToggle = document.getElementById("menuToggle");
+    const sidebar = document.getElementById("sidebar");
+
+    if (menuToggle && sidebar) {
+        menuToggle.addEventListener("click", () => {
+            sidebar.classList.toggle("active");
+            menuToggle.classList.toggle("active");
+
+            if (sidebar.classList.contains("active")) {
+                menuToggle.innerHTML = "✕";
+            } else {
+                menuToggle.innerHTML = "☰";
+            }
+        });
+    }
+
     // ─── Helpers modales ─────────────────────────────────────────────
     function abrirModal(id) {
         const modal = document.getElementById(id);
@@ -195,10 +212,10 @@ async function initIncidencias() {
     function irAPaso(paso) {
         pasoActual = paso;
 
-        const paso1  = document.getElementById("nueva-paso-1");
-        const paso2  = document.getElementById("nueva-paso-2");
-        const ind1   = document.getElementById("step-indicator-1");
-        const ind2   = document.getElementById("step-indicator-2");
+        const paso1 = document.getElementById("nueva-paso-1");
+        const paso2 = document.getElementById("nueva-paso-2");
+        const ind1 = document.getElementById("step-indicator-1");
+        const ind2 = document.getElementById("step-indicator-2");
         const btnIzq = document.getElementById("btn-nueva-izquierda");
         const btnDer = document.getElementById("btn-nueva-derecha");
 
