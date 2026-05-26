@@ -1,6 +1,8 @@
 const API_URL = "../php/homeUser.php";
 
-/* ================= DOM ================= */
+/* ================================================= */
+/* ================= DOM =========================== */
+/* ================================================= */
 
 const nombreUsuario =
     document.getElementById("nombreUsuario");
@@ -49,7 +51,17 @@ const cancelarBtn =
 const modalText =
     document.getElementById("modalText");
 
-/* ================= ESTADO ================= */
+/* ================= MENU ================= */
+
+const menuToggle =
+    document.getElementById("menuToggle");
+
+const sidebar =
+    document.getElementById("sidebar");
+
+/* ================================================= */
+/* ================= ESTADO ======================== */
+/* ================================================= */
 
 let tareaSeleccionada = null;
 
@@ -57,16 +69,41 @@ let tareaSeleccionada = null;
 /* ================= INIT ========================== */
 /* ================================================= */
 
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
+window.onload = () => {
 
-        cargarUsuario();
+    cargarUsuario();
 
-        cargarDashboard();
+    cargarDashboard();
+
+    /* ================= MENU HAMBURGUESA ================= */
+
+    if (menuToggle && sidebar) {
+
+        menuToggle.addEventListener(
+            "click",
+            () => {
+
+                sidebar.classList.toggle("active");
+
+                menuToggle.classList.toggle("active");
+
+                // CAMBIAR ICONO
+                if (sidebar.classList.contains("active")) {
+
+                    menuToggle.innerHTML = "✕";
+
+                } else {
+
+                    menuToggle.innerHTML = "☰";
+
+                }
+
+            }
+        );
 
     }
-);
+
+};
 
 /* ================================================= */
 /* ================= USUARIO ======================= */
@@ -286,8 +323,6 @@ function renderTareas(tareas) {
         const checkbox =
             li.querySelector("input");
 
-        /* ================= CLICK ================= */
-
         checkbox.addEventListener(
             "click",
             (e) => {
@@ -311,8 +346,6 @@ function renderTareas(tareas) {
 
     });
 
-    /* ================= PROGRESO ================= */
-
     if (
         barraProgreso &&
         tareas.length > 0
@@ -334,8 +367,6 @@ function renderTareas(tareas) {
 
     }
 
-    /* ================= CONTADOR ================= */
-
     contadorTareas.textContent =
 
         `${completadas} / ${tareas.length} completadas`;
@@ -345,8 +376,6 @@ function renderTareas(tareas) {
 /* ================================================= */
 /* ================= MODAL ========================= */
 /* ================================================= */
-
-/* ================= CANCELAR ================= */
 
 cancelarBtn.addEventListener(
     "click",
@@ -358,8 +387,6 @@ cancelarBtn.addEventListener(
 
     }
 );
-
-/* ================= CONFIRMAR ================= */
 
 confirmarBtn.addEventListener(
     "click",
@@ -421,15 +448,9 @@ confirmarBtn.addEventListener(
 
             }
 
-            /* ================= CERRAR ================= */
-
             modal.classList.add("hidden");
 
-            /* ================= LIMPIAR ================= */
-
             tareaSeleccionada = null;
-
-            /* ================= REFRESH ================= */
 
             await cargarDashboard();
 
@@ -561,9 +582,9 @@ function renderReparto(reparto) {
 
             <span class="
                 ${cantidad >= 0
-                    ? "red"
-                    : "green"
-                }
+                ? "red"
+                : "green"
+            }
             ">
 
                 ${cantidad.toFixed(2)} €

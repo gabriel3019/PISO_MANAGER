@@ -18,7 +18,7 @@
 </head>
 
 <body>
-  <aside class="sidebar">
+  <aside class="sidebar" id="sidebar">
     <div>
       <h3 id="nombreUsuario"></h3>
       <span class="subtitle">Panel de inicio</span>
@@ -80,6 +80,8 @@
   <div class="page-wrapper" id="page-body">
 
     <header class="page-header">
+      <!-- BOTÓN HAMBURGUESA -->
+      <button class="menu-toggle" id="menuToggle">☰</button>
       <div class="page-header__info">
         <h1>Incidencias</h1>
         <p class="address">Piso Calle Mayor, 12 &middot; 3 compañeros</p>
@@ -247,7 +249,8 @@
         <!-- PASO 1: Tipo, título, descripción, urgencia -->
         <div class="modal__body" id="nueva-paso-1">
           <div class="modal__field">
-            <label class="modal__label" for="nueva-tipo">TIPO DE INCIDENCIA<span class="modal__required">*</span></label>
+            <label class="modal__label" for="nueva-tipo">TIPO DE INCIDENCIA<span
+                class="modal__required">*</span></label>
             <div class="modal__select-wrapper">
               <select class="modal__select" id="nueva-tipo" name="tipo">
                 <option value="">Selecciona un tipo...</option>
@@ -286,13 +289,16 @@
         <!-- PASO 2: Fechas, notificar admin, imagen -->
         <div class="modal__body modal--hidden" id="nueva-paso-2">
           <div class="modal__field">
-            <label class="modal__label" for="nueva-fecha-inicio">FECHA DE INICIO<span class="modal__required">*</span></label>
+            <label class="modal__label" for="nueva-fecha-inicio">FECHA DE INICIO<span
+                class="modal__required">*</span></label>
             <input class="modal__input" id="nueva-fecha-inicio" name="fecha_inicio" type="date" required />
-            <span class="modal__hint modal__hint--error" id="nueva-fecha-inicio-error">La fecha no puede ser anterior a hoy</span>
+            <span class="modal__hint modal__hint--error" id="nueva-fecha-inicio-error">La fecha no puede ser anterior a
+              hoy</span>
           </div>
 
           <div class="modal__field">
-            <label class="modal__label" for="nueva-fecha-fin">FECHA DE FIN <span class="modal__optional">(opcional)</span></label>
+            <label class="modal__label" for="nueva-fecha-fin">FECHA DE FIN <span
+                class="modal__optional">(opcional)</span></label>
             <input class="modal__input" id="nueva-fecha-fin" name="fecha_fin" type="date" />
             <span class="modal__hint">(Déjalo vacío si no sabes cuándo terminará)</span>
           </div>
@@ -392,13 +398,16 @@
           </div>
 
           <div class="modal__field">
-            <label class="modal__label" for="editar-fecha-inicio">FECHA DE INICIO<span class="modal__required">*</span></label>
+            <label class="modal__label" for="editar-fecha-inicio">FECHA DE INICIO<span
+                class="modal__required">*</span></label>
             <input class="modal__input" id="editar-fecha-inicio" name="fecha_inicio" type="date" required />
-            <span class="modal__hint modal__hint--error" id="editar-fecha-inicio-error">La fecha no puede ser anterior a hoy</span>
+            <span class="modal__hint modal__hint--error" id="editar-fecha-inicio-error">La fecha no puede ser anterior a
+              hoy</span>
           </div>
 
           <div class="modal__field">
-            <label class="modal__label" for="editar-fecha-fin">FECHA DE FIN <span class="modal__optional">(opcional)</span></label>
+            <label class="modal__label" for="editar-fecha-fin">FECHA DE FIN <span
+                class="modal__optional">(opcional)</span></label>
             <input class="modal__input" id="editar-fecha-fin" name="fecha_fin" type="date" />
             <span class="modal__hint">(Déjalo vacío si no sabes cuándo terminará)</span>
           </div>
@@ -426,7 +435,8 @@
         <div class="modal__footer">
           <button type="button" class="modal__btn modal__btn--cancel"
             data-modal-close="modal-editar-incidencia">Cancelar</button>
-          <button type="button" class="modal__btn modal__btn--primary" id="btn-confirmar-editar">Guardar cambios</button>
+          <button type="button" class="modal__btn modal__btn--primary" id="btn-confirmar-editar">Guardar
+            cambios</button>
         </div>
       </div>
     </div>
@@ -447,7 +457,8 @@
           <div class="modal__confirm-block">
             <div class="modal__confirm-icon">⚠️</div>
             <p class="modal__confirm-title">¿Seguro que la quieres eliminar?</p>
-            <p class="modal__confirm-text">Esta acción no se puede deshacer. La incidencia y toda su información desaparecerán permanentemente.</p>
+            <p class="modal__confirm-text">Esta acción no se puede deshacer. La incidencia y toda su información
+              desaparecerán permanentemente.</p>
           </div>
         </div>
         <hr class="modal__divider" />
