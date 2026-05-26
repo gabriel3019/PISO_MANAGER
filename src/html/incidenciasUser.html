@@ -13,6 +13,7 @@
   </script>
 
   <link rel="stylesheet" href="../css/incidencias.css" />
+  <link rel="stylesheet" href="../css/incidenciasAdmin.css" />
   <link rel="stylesheet" href="../css/general.css">
   <link rel="stylesheet" href="../css/dark-mode.css">
 </head>
@@ -82,9 +83,21 @@
     <header class="page-header">
       <!-- BOTÓN HAMBURGUESA -->
       <button class="menu-toggle" id="menuToggle">☰</button>
+
       <div class="page-header__info">
         <h1>Incidencias</h1>
         <p class="address">Piso Calle Mayor, 12 &middot; 3 compañeros</p>
+      </div>
+
+      <!-- CAMPANITA -->
+      <div class="notifications-container">
+        <button id="btnNotificacionesUser" class="notification-btn">
+          🔔
+
+          <span id="contadorNotificacionesUser" class="notification-badge hidden">
+            0
+          </span>
+        </button>
       </div>
     </header>
 
@@ -541,13 +554,61 @@
       </div>
     </div>
 
-    <!-- ══════════════ TOAST CONTAINER ══════════════ -->
-    <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+    <div id="modal-notificaciones-user" class="notif-overlay hidden">
 
+      <div class="notif-drawer">
+
+        <div class="notif-drawer__header">
+
+          <button class="notif-drawer__close" id="cerrarPanelNotificacionesUser" title="Cerrar">
+            ✕
+          </button>
+
+          <div class="notif-drawer__header-info">
+
+            <span class="notif-drawer__icon">🔔</span>
+
+            <div>
+              <h2 class="notif-drawer__title">
+                Notificaciones
+              </h2>
+
+              <p class="notif-drawer__subtitle">
+                Incidencias pendientes de revisar
+              </p>
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="notif-drawer__body">
+
+          <ul id="listaNotificacionesUser" class="notif-drawer__list"></ul>
+
+          <div id="notify-empty-user" class="notif-drawer__empty" style="display:none;">
+            <span class="notif-drawer__empty-icon">✅</span>
+
+            <p>Sin notificaciones nuevas</p>
+          </div>
+
+        </div>
+
+        <div class="notif-drawer__footer">
+
+          <button id="marcarLeidasUser" class="notif-drawer__btn-leidas">
+            Marcar todas como leídas
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <script src="../js/incidencias.js"></script>
     <script src="../js/dark-mode.js"></script>
-  </div>
-  <script src="../js/incidencias.js"></script>
-  <script src="../js/cerrarSesion.js"></script>
+    <script src="../js/cerrarSesion.js"></script>
 </body>
 
 </html>

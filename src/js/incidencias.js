@@ -1184,4 +1184,48 @@ async function initIncidencias() {
     window.addEventListener("beforeunload", detenerPollingNotificaciones);
 }
 
+async function abrirPanelNotificacionesUser() {
+    if (!panelNotificacionesUser || !overlayNotificacionesUser) {
+        console.log("Falta el panel o el overlay de notificaciones user");
+        return;
+    }
+
+    panelNotificacionesUser.classList.remove("hidden");
+    overlayNotificacionesUser.classList.remove("hidden");
+
+    await cargarNotificacionesUser();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const btn = document.getElementById("btnNotificacionesUser");
+
+    const modal = document.getElementById("modal-notificaciones-user");
+
+    const cerrar = document.getElementById("cerrarPanelNotificacionesUser");
+
+    if (!btn || !modal) {
+        console.log("Faltan elementos de notificaciones user");
+        return;
+    }
+
+    btn.addEventListener("click", () => {
+        modal.classList.remove("hidden");
+    });
+
+    cerrar?.addEventListener("click", () => {
+        modal.classList.add("hidden");
+    });
+
+    modal.addEventListener("click", (e) => {
+
+        if (e.target === modal) {
+            modal.classList.add("hidden");
+        }
+
+    });
+
+});
+
 document.addEventListener("DOMContentLoaded", initIncidencias);
+

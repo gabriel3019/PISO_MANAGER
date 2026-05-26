@@ -4,7 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Admin - Incidencias</title>
+    <link rel="stylesheet" href="../css/general.css">
+    <link rel="stylesheet" href="../css/incidencias.css">
     <link rel="stylesheet" href="../css/incidenciasAdmin.css">
+    <link rel="stylesheet" href="../css/dark-mode.css">
 </head>
 
 <body>
@@ -40,30 +43,54 @@
                     <h1>Incidencias</h1>
                     <p>Gestión de problemas y avisos del piso</p>
                 </div>
+                <button class="btn-notif-bell" id="btn-abrir-notificaciones" title="Notificaciones">
+                    🔔
+                    <span class="badge-notif" id="badge-notificaciones-admin" style="display:none;">0</span>
+                </button>
             </header>
 
-            <section class="stats">
-                <div class="card">
-                    <h2 id="count-abiertas">0</h2>
-                    <p>Abiertas</p>
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-card__icon stat-card__icon--blue">🔵</div>
+                    <div>
+                        <div class="stat-card__value" id="stat-abiertas">0</div>
+                        <div class="stat-card__label">Abiertas</div>
+                    </div>
                 </div>
-
-                <div class="card">
-                    <h2 id="count-en-curso">0</h2>
-                    <p>En proceso</p>
+                <div class="stat-card">
+                    <div class="stat-card__icon stat-card__icon--orange">🔧</div>
+                    <div>
+                        <div class="stat-card__value" id="stat-curso">0</div>
+                        <div class="stat-card__label">En curso</div>
+                    </div>
                 </div>
-
-                <div class="card">
-                    <h2 id="count-resueltas">0</h2>
-                    <p>Resueltas</p>
+                <div class="stat-card">
+                    <div class="stat-card__icon stat-card__icon--green">✅</div>
+                    <div>
+                        <div class="stat-card__value" id="stat-resueltas">0</div>
+                        <div class="stat-card__label">Resueltas</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card__icon stat-card__icon--slate">📋</div>
+                    <div>
+                        <div class="stat-card__value" id="stat-total">0</div>
+                        <div class="stat-card__label">Total</div>
+                    </div>
                 </div>
             </section>
 
             <section class="content">
-                <div class="top-content">
-                    <h3>Todas las incidencias</h3>
+                <div class="section__header admin-incidencias-header">
+                    <h2 class="section__title">Todas las incidencias</h2>
 
-                    <input type="text" id="searchInput" placeholder="Buscar incidencia...">
+                    <div class="admin-incidencias-actions">
+                        <input type="text" id="searchInput" placeholder="Buscar incidencia...">
+
+                        <button type="button" class="btn-new btn-abrir-nueva">
+                            + Nueva Incidencia
+                        </button>
+                    </div>
                 </div>
 
                 <div class="filters">
@@ -73,70 +100,275 @@
                     <button class="filter" data-filter="resuelta">Resueltas</button>
                 </div>
 
-                <div id="incidenciasList" class="incidencias-list"></div>
+                <ul id="incidenciasList" class="incident-list"></ul>
             </section>
         </main>
 
     </div>
 
-    <div id="modalDetalleIncidencia" class="modal hidden">
+    <!-- ══════════════ DRAWER NOTIFICACIONES ADMIN ══════════════ -->
+    <div id="modal-notificaciones-admin" class="notif-overlay hidden">
+        <div class="notif-drawer">
 
-        <div class="modal-content incidencia-modal">
-
-            <button id="cerrarModalDetalle" class="modal-close">
-                &times;
-            </button>
-
-            <h2 id="detalleTitulo"></h2>
-
-            <p id="detalleDescripcion" class="detalle-desc"></p>
-
-            <div class="detalle-info">
-                <p>
-                    <strong>Usuario:</strong>
-                    <span id="detalleUsuario"></span>
-                </p>
-
-                <p>
-                    <strong>Estado:</strong>
-                    <span id="detalleEstado"></span>
-                </p>
+            <div class="notif-drawer__header">
+                <button class="notif-drawer__close" data-modal-close="modal-notificaciones-admin"
+                    title="Cerrar">✕</button>
+                <div class="notif-drawer__header-info">
+                    <span class="notif-drawer__icon">🔔</span>
+                    <div>
+                        <h2 class="notif-drawer__title">Notificaciones</h2>
+                        <p class="notif-drawer__subtitle">Incidencias pendientes de revisar</p>
+                    </div>
+                </div>
             </div>
 
-            <h3 class="chat-title">Conversación</h3>
+            <div class="notif-drawer__body">
+                <ul id="lista-notificaciones" class="notif-drawer__list"></ul>
+                <div id="notify-empty" class="notif-drawer__empty" style="display:none;">
+                    <span class="notif-drawer__empty-icon">✅</span>
+                    <p>Sin notificaciones nuevas</p>
+                </div>
+            </div>
 
-            <div id="listaMensajes" class="chat-box"></div>
-
-            <textarea id="mensajeAdmin" class="chat-textarea" placeholder="Escribe una respuesta..."></textarea>
-
-            <div class="modal-actions">
-                <button id="btnEnviarRespuesta" class="btn-primary">
-                    Enviar respuesta
-                </button>
-
-                <button id="btnMarcarResuelta" class="btn-danger">
-                    Marcar como resuelta
+            <div class="notif-drawer__footer">
+                <button id="btn-marcar-todas-leidas" class="notif-drawer__btn-leidas">
+                    Marcar todas como leídas
                 </button>
             </div>
 
         </div>
-
     </div>
 
-    <div id="modal-notificaciones-admin" class="modal hidden">
-        <div class="modal-content incidencia-modal">
-            <button class="modal-close" data-modal-close="modal-notificaciones-admin">&times;</button>
 
-            <h2>Nueva incidencia</h2>
-            <p>Se ha creado una nueva incidencia en el piso.</p>
+    <div class="modal-overlay modal--hidden" id="modal-detalle-incidencia" role="dialog" aria-modal="true"
+        aria-labelledby="modal-detalle-title">
+        <div class="modal modal--detalle">
+            <div class="modal__header">
+                <div class="modal__header-left">
+                    <span class="modal__icon" id="detalle-icono" aria-hidden="true"></span>
+                    <h2 class="modal__title" id="modal-detalle-title">Detalle de Incidencia</h2>
+                </div>
+                <button class="modal__close" aria-label="Cerrar" data-modal-close="modal-detalle-incidencia">✕</button>
+            </div>
+            <hr class="modal__divider" />
+            <div class="modal__body modal__body--detalle">
 
-            <ul id="lista-notificaciones"></ul>
+                <div id="detalle-imagen-wrap" class="detalle__imagen-wrap" style="display:none;">
+                    <img id="detalle-imagen" src="" alt="Imagen incidencia" class="detalle__imagen" />
+                </div>
 
-            <p id="notify-empty">No hay notificaciones nuevas.</p>
+                <div class="detalle__badges">
+                    <span class="status-badge" id="detalle-estado-badge"></span>
+                    <span class="priority-dot" id="detalle-prioridad-dot"></span>
+                </div>
 
-            <div class="modal-actions">
-                <button id="btn-marcar-todas-leidas" class="btn-primary">
-                    Marcar como leídas
+                <div class="detalle__grid">
+                    <div class="detalle__campo">
+                        <span class="detalle__label">TIPO</span>
+                        <span class="detalle__valor" id="detalle-tipo"></span>
+                    </div>
+                    <div class="detalle__campo">
+                        <span class="detalle__label">FECHA</span>
+                        <span class="detalle__valor" id="detalle-fecha"></span>
+                    </div>
+                </div>
+
+                <div class="detalle__campo detalle__campo--full">
+                    <span class="detalle__label">TÍTULO</span>
+                    <span class="detalle__valor detalle__valor--titulo" id="detalle-titulo"></span>
+                </div>
+
+                <div class="detalle__campo detalle__campo--full">
+                    <span class="detalle__label">DESCRIPCIÓN</span>
+                    <p class="detalle__valor detalle__valor--desc" id="detalle-desc"></p>
+                </div>
+
+                <div class="detalle__campo detalle__campo--full">
+                    <span class="detalle__label">NOTIFICAR ADMINISTRADOR</span>
+                    <span class="detalle__valor" id="detalle-notificar"></span>
+                </div>
+
+                <div class="detalle__campo detalle__campo--full" id="detalle-comentario-wrap" style="display:none;">
+                    <span class="detalle__label">COMENTARIO AL ADMINISTRADOR</span>
+                    <p class="detalle__valor detalle__valor--desc" id="detalle-comentario"></p>
+                </div>
+
+                <div class="detalle__grid">
+                    <div class="detalle__campo">
+                        <span class="detalle__label">FECHA INICIO</span>
+                        <span class="detalle__valor" id="detalle-fecha-inicio"></span>
+                    </div>
+                    <div class="detalle__campo">
+                        <span class="detalle__label">FECHA FIN</span>
+                        <span class="detalle__valor" id="detalle-fecha-fin"></span>
+                    </div>
+                </div>
+
+                <div class="detalle__campo detalle__campo--full">
+                    <button type="button" id="btnVerConversacionAdmin" class="modal__btn modal__btn--chat">
+                        💬 Ver conversación
+                    </button>
+                </div>
+
+            </div>
+            <hr class="modal__divider" />
+
+            <div class="modal__footer">
+                <button type="button" class="modal__btn modal__btn--cancel" data-modal-close="modal-detalle-incidencia"
+                    style="margin-left: auto;">
+                    Cerrar
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ══════════════ MODAL NUEVA INCIDENCIA (2 PASOS) ══════════════ -->
+    <div class="modal-overlay modal--hidden" id="modal-nueva-incidencia" role="dialog" aria-modal="true"
+        aria-labelledby="modal-nueva-title">
+        <div class="modal">
+            <div class="modal__header">
+                <div class="modal__header-left">
+                    <span class="modal__icon modal__icon--warn" aria-hidden="true">⚠</span>
+                    <h2 class="modal__title" id="modal-nueva-title">Nueva Incidencia</h2>
+                </div>
+                <button class="modal__close" aria-label="Cerrar" data-modal-close="modal-nueva-incidencia">✕</button>
+            </div>
+
+            <!-- Stepper -->
+            <div class="modal__stepper">
+                <div class="stepper__step stepper__step--active" id="step-indicator-1">
+                    <div class="stepper__circle">1</div>
+                    <span class="stepper__label">Información básica</span>
+                </div>
+                <div class="stepper__line"></div>
+                <div class="stepper__step" id="step-indicator-2">
+                    <div class="stepper__circle">2</div>
+                    <span class="stepper__label">Detalles y fechas</span>
+                </div>
+            </div>
+
+            <hr class="modal__divider" />
+
+            <!-- PASO 1: Tipo, título, descripción, urgencia -->
+            <div class="modal__body" id="nueva-paso-1">
+                <div class="modal__field">
+                    <label class="modal__label" for="nueva-tipo">TIPO DE INCIDENCIA<span
+                            class="modal__required">*</span></label>
+                    <div class="modal__select-wrapper">
+                        <select class="modal__select" id="nueva-tipo" name="tipo">
+                            <option value="">Selecciona un tipo...</option>
+                            <option value="fontaneria">Fontanería</option>
+                            <option value="electricidad">Electricidad</option>
+                            <option value="climatizacion">Climatización</option>
+                            <option value="carpinteria">Carpintería</option>
+                            <option value="otros">Otros</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal__field">
+                    <label class="modal__label" for="nueva-titulo">TÍTULO<span class="modal__required">*</span></label>
+                    <input class="modal__input" id="nueva-titulo" name="titulo" type="text"
+                        placeholder="Ej: Grifo roto en el baño principal" maxlength="100" />
+                    <span class="modal__char-count"><span id="nueva-titulo-count">0</span>/100</span>
+                </div>
+                <div class="modal__field">
+                    <label class="modal__label" for="nueva-desc">DESCRIPCIÓN<span
+                            class="modal__required">*</span></label>
+                    <textarea class="modal__textarea" id="nueva-desc" name="descripcion"
+                        placeholder="Describe el problema con detalle..."></textarea>
+                </div>
+                <div class="modal__field">
+                    <label class="modal__label">NIVEL DE URGENCIA<span class="modal__required">*</span></label>
+                    <div class="modal__urgencia-row" role="group" aria-label="Nivel de urgencia">
+                        <button type="button" class="modal__urgencia-btn" data-urgencia="baja">
+                            <span class="modal__urgencia-dot modal__urgencia-dot--low"></span>Bajo
+                        </button>
+                        <button type="button" class="modal__urgencia-btn" data-urgencia="alta">
+                            <span class="modal__urgencia-dot modal__urgencia-dot--high"></span>Alto
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PASO 2: Fechas, notificar admin, imagen -->
+            <div class="modal__body modal--hidden" id="nueva-paso-2">
+                <div class="modal__field">
+                    <label class="modal__label" for="nueva-fecha-inicio">FECHA DE INICIO<span
+                            class="modal__required">*</span></label>
+                    <input class="modal__input" id="nueva-fecha-inicio" name="fecha_inicio" type="date" required />
+                    <span class="modal__hint modal__hint--error" id="nueva-fecha-inicio-error">La fecha no puede ser
+                        anterior a
+                        hoy</span>
+                </div>
+
+                <div class="modal__field">
+                    <label class="modal__label" for="nueva-fecha-fin">FECHA DE FIN <span
+                            class="modal__optional">(opcional)</span></label>
+                    <input class="modal__input" id="nueva-fecha-fin" name="fecha_fin" type="date" />
+                    <span class="modal__hint">(Déjalo vacío si no sabes cuándo terminará)</span>
+                </div>
+
+                <div class="modal__field admin-only" id="nueva-comentario-admin-wrap" style="display:none;">
+                    <label class="modal__label" for="nueva-comentario-admin">COMENTARIO PARA EL ADMINISTRADOR</label>
+                    <textarea class="modal__textarea" id="nueva-comentario-admin" name="comentario_admin"
+                        placeholder="Añade una nota interna para el administrador..."></textarea>
+                </div>
+
+                <div class="modal__field">
+                    <label class="modal__checkbox-label">
+                        <input type="checkbox" id="nueva-notificar-inquilino" name="notificar_inquilino"
+                            class="modal__checkbox" />
+                        <span>Notificar al inquilino</span>
+                    </label>
+                    <p class="modal__checkbox-hint">El inquilino recibirá una notificación sobre esta incidencia.</p>
+                </div>
+
+                <div class="modal__field">
+                    <label class="modal__label">IMAGEN <span class="modal__optional">(opcional)</span></label>
+                    <label class="modal__dropzone" for="nueva-imagen">
+                        <span class="modal__dropzone-icon" aria-hidden="true">📷</span>
+                        <span><span class="modal__dropzone-link">Haz clic para subir</span> o arrastra una imagen</span>
+                        <input type="file" id="nueva-imagen" name="imagen" accept=".png,.jpg,.jpeg,.webp" hidden />
+                    </label>
+                </div>
+            </div>
+
+            <!-- ── Footer unificado (un solo footer para ambos pasos) ── -->
+            <div class="modal__footer" id="nueva-footer-unificado">
+                <button type="button" class="modal__btn modal__btn--cancel" id="btn-nueva-izquierda"
+                    data-modal-close="modal-nueva-incidencia">Cancelar</button>
+                <button type="button" class="modal__btn modal__btn--primary" id="btn-nueva-derecha">
+                    Siguiente →
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal-overlay modal--hidden" id="modal-chat-admin">
+        <div class="modal modal--chat">
+            <div class="modal__header">
+                <div>
+                    <h2 class="modal__title" id="chat-admin-titulo">Conversación</h2>
+                    <p class="modal__subtitle" id="chat-admin-estado"></p>
+                </div>
+                <button class="modal__close" data-modal-close="modal-chat-admin">✕</button>
+            </div>
+
+            <div id="listaMensajes" class="chat-container"></div>
+
+            <div class="chat-input-area">
+                <textarea id="mensajeAdmin" class="chat-input"
+                    placeholder="Escribe una respuesta al usuario..."></textarea>
+                <button type="button" id="btnEnviarRespuesta" class="btn-enviar">Enviar</button>
+            </div>
+
+            <div class="modal__footer">
+                <button type="button" class="modal__btn modal__btn--cancel"
+                    data-modal-close="modal-chat-admin">Cerrar</button>
+                <button type="button" id="btnMarcarResuelta" class="modal__btn modal__btn--primary">
+                    Marcar como resuelta
                 </button>
             </div>
         </div>

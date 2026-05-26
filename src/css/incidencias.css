@@ -453,6 +453,166 @@ body {
   font-size: 1.2rem;
 }
 
+
+#lista-notificaciones {
+    list-style: none;
+    padding: 0;
+    margin-top: 18px;
+}
+
+.notify-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #fff7f7;
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 12px;
+}
+
+.notify-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: #fee2e2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notify-info {
+    flex: 1;
+}
+
+.notify-info h4 {
+    margin: 0;
+    font-size: 14px;
+}
+
+.notify-info p {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.notify-priority {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 5px 10px;
+    border-radius: 999px;
+}
+
+.notify-priority.alta {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.notify-priority.baja {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+/* ── Admin: select de estado dentro de incident-item ── */
+.admin-estado-select {
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    font-size: .78rem;
+    font-weight: 600;
+    background: white;
+    cursor: pointer;
+    color: #374151;
+    min-width: 100px;
+}
+
+.admin-estado-select:focus {
+    outline: 2px solid #4f46e5;
+    outline-offset: 1px;
+}
+
+/* ── Admin: incident-list ajustes de columna (4 col: icon, body, status, actions) ── */
+#incidenciasList.incident-list .incident-item {
+    grid-template-columns: 40px 1fr auto auto;
+}
+
+/* ── Admin: section header con buscador ── */
+.section .section__header.admin-incidencias-header {
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+/* ── Botón campana notificaciones ── */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.btn-notif-bell {
+    position: relative;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    width: 42px;
+    height: 42px;
+    font-size: 1.15rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .15s;
+    flex-shrink: 0;
+}
+
+.btn-notif-bell:hover {
+    background: #f3f4f6;
+}
+
+.badge-notif {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: #ef4444;
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    pointer-events: none;
+}
+
+/* ══════════════════════════════════════════
+   DRAWER NOTIFICACIONES ADMIN
+══════════════════════════════════════════ */
+.notif-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.35);
+    z-index: 9998;
+    display: flex;
+    justify-content: flex-end;
+    backdrop-filter: blur(2px);
+}
+
+.notif-overlay.hidden {
+    display: none;
+}
+
+.notif-drawer {
+    width: 380px;
+    height: 100vh;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -8px 0 32px rgba(0,0,0,.12);
+    animation: slideInRight .22s ease;
+}
+
+
 /* ══════════════════════════════════════════════════════════════
    MODALES — Base
    ══════════════════════════════════════════════════════════════ */
@@ -1710,6 +1870,140 @@ body.dark .chat-container::-webkit-scrollbar-thumb {
 .menu-toggle:hover {
   transform: scale(1.03);
 }
+
+/* =========================
+   PANEL NOTIFICACIONES USER
+========================= */
+
+.notifications-panel{
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 380px;
+    max-width: 100%;
+    height: 100vh;
+    background: #fff;
+    z-index: 9999;
+    box-shadow: -10px 0 30px rgba(0,0,0,.12);
+
+    display: flex;
+    flex-direction: column;
+}
+
+.notifications-overlay{
+    position: fixed;
+    inset: 0;
+    background: rgba(15,23,42,.45);
+    z-index: 9998;
+}
+
+.notifications-header{
+    padding: 24px;
+    border-bottom: 1px solid #eee;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.notifications-header h3{
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.notifications-header button{
+    border: none;
+    background: transparent;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.notifications-list{
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.notification-item{
+    padding: 16px;
+    border-radius: 16px;
+    background: #f8fafc;
+    margin-bottom: 14px;
+    border: 1px solid #edf2f7;
+}
+
+.notification-item strong{
+    display: block;
+    margin-bottom: 6px;
+    color: #111827;
+}
+
+.notification-item span{
+    color: #64748b;
+    font-size: .9rem;
+}
+
+.notifications-footer{
+    padding: 20px;
+    border-top: 1px solid #eee;
+}
+
+.notifications-footer button{
+    width: 100%;
+    height: 48px;
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.notification-btn{
+    position: relative;
+
+    width: 52px;
+    height: 52px;
+
+    border-radius: 16px;
+    border: 1px solid #eee;
+
+    background: white;
+
+    cursor: pointer;
+    font-size: 22px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notification-badge{
+    position: absolute;
+
+    top: -6px;
+    right: -6px;
+
+    width: 22px;
+    height: 22px;
+
+    border-radius: 999px;
+
+    background: #ef4444;
+    color: white;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.hidden{
+    display: none !important;
+}
+
 
 /* ══════════════════════════════════════════════════════════════
    RESPONSIVE
