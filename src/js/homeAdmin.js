@@ -14,6 +14,7 @@ function inicializar() {
   inicializarGuardar();
   inicializarRotacion();
   inicializarEliminarPiso();
+  inicializarDescargarContrato();
 }
 
 
@@ -410,5 +411,23 @@ function inicializarEliminarPiso() {
       modalCrearPiso.classList.add("hidden");
     }
 
+  });
+}
+
+function inicializarDescargarContrato() {
+  const btn = document.getElementById("btnDescargarContrato");
+
+  if (!btn) return;
+
+  btn.addEventListener("click", (event) => {
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!pisoSeleccionado) {
+      mostrarToast("Selecciona un piso primero");
+      return;
+    }
+    window.location.href = `../php/descargarContrato.php?id_piso=${pisoSeleccionado.id_piso}`;
   });
 }
