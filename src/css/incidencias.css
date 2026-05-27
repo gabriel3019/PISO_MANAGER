@@ -1345,7 +1345,7 @@ input[type="date"].modal__input:focus {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   NOTIFICACIONES
+   NOTIFICACIONES (modal antiguo — mantenido por compatibilidad)
    ══════════════════════════════════════════════════════════════ */
 
 .notify-list {
@@ -1698,6 +1698,17 @@ input[type="date"].modal__input:focus {
   }
 }
 
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
 /* ══════════════════════════════════════════════════════════════
    DARK MODE
    ══════════════════════════════════════════════════════════════ */
@@ -2004,6 +2015,130 @@ body.dark .chat-container::-webkit-scrollbar-thumb {
     display: none !important;
 }
 
+/* ══════════════════════════════════════════════════════════════
+   ITEMS DEL DRAWER DE NOTIFICACIONES DE MENSAJES (NUEVOS)
+   ══════════════════════════════════════════════════════════════ */
+
+.notif-drawer__item {
+    list-style: none;
+    margin-bottom: 12px;
+}
+
+.notif-drawer__item-inner {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: #fff;
+    border: 1px solid #edf2f7;
+    border-radius: 16px;
+    padding: 16px;
+    border-left: 4px solid #ef4444;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.15s;
+}
+
+.notif-drawer__item-inner:hover {
+    background: #f8fafc;
+    transform: translateX(2px);
+}
+
+.notif-drawer__item-icon {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    border-radius: 12px;
+    background: #fef9ec;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+}
+
+.notif-drawer__item-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.notif-drawer__item-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.notif-drawer__item-sub {
+    font-size: 0.78rem;
+    color: #64748b;
+    margin: 0 0 6px;
+}
+
+.notif-drawer__item-msg {
+    font-size: 0.85rem;
+    color: #374151;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.notif-drawer__item-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+    align-self: flex-start;
+    flex-shrink: 0;
+}
+
+.notif-drawer__item-badge.alta {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.notif-drawer__item-badge.baja {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.notif-drawer__item-dot {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 9px;
+    height: 9px;
+    background: #ef4444;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+/* Dark mode para items del drawer */
+body.dark .notif-drawer__item-inner {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+body.dark .notif-drawer__item-inner:hover {
+    background: #334155;
+}
+
+body.dark .notif-drawer__item-title {
+    color: #f1f5f9;
+}
+
+body.dark .notif-drawer__item-sub {
+    color: #94a3b8;
+}
+
+body.dark .notif-drawer__item-msg {
+    color: #cbd5e1;
+}
+
+body.dark .notif-drawer__item-icon {
+    background: #0f172a;
+}
 
 /* ══════════════════════════════════════════════════════════════
    RESPONSIVE
@@ -2093,6 +2228,10 @@ body.dark .chat-container::-webkit-scrollbar-thumb {
 
   .toast {
     max-width: 100%;
+  }
+
+  .notif-drawer {
+    width: 100%;
   }
 }
 
