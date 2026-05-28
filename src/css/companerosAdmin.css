@@ -194,30 +194,29 @@ nav a.active{
     gap:14px;
 }
 
-/* ================================================= */
-/* ================= CARD ========================== */
-/* ================================================= */
+/* ================= CARD USER STYLE ================= */
 
 .companero{
     display:flex;
     justify-content:space-between;
     align-items:center;
 
-    padding:18px;
+    padding:16px 20px;
+
+    min-height:82px;
 
     border-radius:18px;
 
     background:white;
 
-    border:1px solid #e5e7eb;
+    border:1px solid #eef2f7;
 
     transition:.2s;
 }
 
 .companero:hover{
     transform:translateY(-2px);
-
-    box-shadow:0 10px 24px rgba(0,0,0,.05);
+    box-shadow:0 8px 20px rgba(0,0,0,.05);
 }
 
 .companero .left{
@@ -226,26 +225,39 @@ nav a.active{
     gap:14px;
 }
 
-.avatar-mini{
+.mini-avatar{
     width:46px;
     height:46px;
 
+    min-width:46px;
+
     border-radius:50%;
 
-    background:#e5e7eb;
+    object-fit:cover;
 
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    font-weight:700;
-
-    color:#374151;
+    border:2px solid #f1f5f9;
 }
 
 .companero p{
-    font-size:14px;
+    margin:0;
+    font-size:15px;
     font-weight:600;
+    color:#111827;
+}
+
+.meta{
+    margin-top:3px;
+}
+
+.date{
+    font-size:13px;
+    color:#94a3b8;
+}
+
+.right span{
+    font-size:14px;
+    font-weight:500;
+    color:#374151;
 }
 
 .email{
@@ -545,6 +557,222 @@ nav a.active{
     to{
         opacity:1;
         transform:translateY(0);
+    }
+
+}
+
+/* ================================================= */
+/* ================= MODAL INFO ==================== */
+/* ================================================= */
+
+.modal-companero{
+    width:100%;
+    max-width:520px;
+
+    background:white;
+
+    border-radius:24px;
+
+    padding:24px;
+
+    position:relative;
+
+    animation:fadeIn .2s ease;
+
+    box-shadow:0 20px 40px rgba(0,0,0,.18);
+}
+
+/* ================= CERRAR ================= */
+
+.cerrar-modal{
+    position:absolute;
+
+    top:14px;
+    right:14px;
+
+    width:38px;
+    height:38px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:transparent;
+
+    font-size:28px;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.cerrar-modal:hover{
+    background:#f3f4f6;
+}
+
+/* ================= HEADER ================= */
+
+.modal-top{
+    display:flex;
+    align-items:center;
+    gap:16px;
+
+    margin-bottom:22px;
+}
+
+/* ================= FOTO ================= */
+
+.modal-avatar{
+    width:74px;
+    height:74px;
+
+    min-width:74px;
+
+    border-radius:50%;
+
+    object-fit:cover;
+
+    border:2px solid #f1f5f9;
+}
+
+/* ================= TEXTOS ================= */
+
+.modal-top h2{
+    margin:0;
+
+    font-size:30px;
+
+    line-height:1;
+
+    color:#0f172a;
+}
+
+.modal-top p{
+    margin:6px 0;
+
+    font-size:15px;
+
+    color:#64748b;
+}
+
+/* ================= ROL ================= */
+
+.modal-rol{
+    display:inline-flex;
+
+    align-items:center;
+    justify-content:center;
+
+    padding:5px 12px;
+
+    border-radius:999px;
+
+    font-size:12px;
+    font-weight:600;
+
+    background:#dbeafe;
+    color:#2563eb;
+}
+
+/* ================= GRID ================= */
+
+.modal-grid{
+    display:grid;
+    gap:12px;
+}
+
+/* ================= CARDS ================= */
+
+.info-card{
+    background:#f8fafc;
+
+    border:1px solid #eef2f7;
+
+    border-radius:16px;
+
+    padding:16px 18px;
+}
+
+.info-card span{
+    display:block;
+
+    font-size:13px;
+
+    color:#94a3b8;
+
+    margin-bottom:6px;
+}
+
+.info-card p{
+    margin:0;
+
+    font-size:20px;
+
+    font-weight:600;
+
+    color:#0f172a;
+}
+
+/* ================================================= */
+/* ================= DARK ========================== */
+/* ================================================= */
+
+.dark .modal-companero{
+    background:#1f1f1f;
+}
+
+.dark .cerrar-modal{
+    color:white;
+}
+
+.dark .cerrar-modal:hover{
+    background:#2b2b2b;
+}
+
+.dark .modal-avatar{
+    border-color:#333;
+}
+
+.dark .modal-top h2{
+    color:white;
+}
+
+.dark .modal-top p{
+    color:#b4b4b4;
+}
+
+.dark .info-card{
+    background:#2a2a2a;
+
+    border-color:#333;
+}
+
+.dark .info-card p{
+    color:white;
+}
+
+.dark .info-card span{
+    color:#9ca3af;
+}
+
+/* ================================================= */
+/* ================= RESPONSIVE ==================== */
+/* ================================================= */
+
+@media(max-width:700px){
+
+    .modal-companero{
+        padding:22px;
+    }
+
+    .modal-top{
+        flex-direction:column;
+
+        text-align:center;
+    }
+
+    .modal-top h2{
+        font-size:26px;
     }
 
 }

@@ -1,3 +1,9 @@
+const API_URL = "../php/companeros.php";
+
+/* ================================================= */
+/* ================= ELEMENTOS ===================== */
+/* ================================================= */
+
 const modal =
     document.getElementById("modalMiembro");
 
@@ -9,6 +15,9 @@ const cerrar =
 
 const form =
     document.getElementById("formMiembro");
+
+const container =
+    document.getElementById("companerosContainer");
 
 /* ================================================= */
 /* ================= PASOS ========================= */
@@ -33,6 +42,19 @@ const volver1 =
 
 const volver2 =
     document.getElementById("volver2");
+
+/* ================================================= */
+/* ================= INIT ========================== */
+/* ================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        cargarCompaneros();
+
+    }
+);
 
 /* ================================================= */
 /* ================= MODAL ========================= */
@@ -73,7 +95,7 @@ function cerrarModal() {
 }
 
 /* ================================================= */
-/* ================= CAMBIO PASOS ================== */
+/* ================= PASOS ========================= */
 /* ================================================= */
 
 function mostrarPaso(numero) {
@@ -190,11 +212,7 @@ form.addEventListener("submit", async (e) => {
 
             cerrarModal();
 
-            setTimeout(() => {
-
-                location.reload();
-
-            }, 1000);
+            cargarCompaneros();
 
         } else {
 
@@ -216,6 +234,113 @@ form.addEventListener("submit", async (e) => {
     }
 
 });
+
+/* ================================================= */
+/* ================= CARGAR ======================== */
+/* ================================================= */
+
+async function cargarCompaneros() {
+
+    try {
+
+        const res =
+            await fetch(API_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+                body: JSON.stringify({
+                    action: "listar"
+                })
+            });
+
+        const data =
+            await res.json();
+
+        if (data.success) {
+
+            renderCompaneros(
+                data.usuarios
+            );
+
+        }
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
+
+}
+
+/* ================================================= */
+/* ================= RENDER ======================== */
+/* ================================================= */
+
+function renderCompaneros(lista) {
+
+    container.innerHTML = "";
+
+    lista.forEach(u => {
+
+        const div =
+            document.createElement("div");
+
+        div.className =
+            "companero";
+
+        div.innerHTML = `
+
+            <div class="left">
+
+                <img
+                    src="../${u.foto}"
+                    class="mini-avatar"
+                >
+
+                <div>
+
+                    <p>${u.nombre}</p>
+
+                    <div class="meta">
+
+                        <span class="date">
+                            ${u.email}
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="right">
+
+                <span class="rol ${u.rol}">
+                    ${u.rol}
+                </span>
+
+            </div>
+
+        `;
+
+        /* ================= CLICK MODAL ================= */
+
+        div.addEventListener(
+            "click",
+            () => {
+
+                abrirInfo(u);
+
+            }
+        );
+
+        container.appendChild(div);
+
+    });
+
+}
 
 /* ================================================= */
 /* ================= TOAST ========================= */
@@ -256,3 +381,84 @@ function mostrarToast(
     }, 3000);
 
 }
+
+/* ================================================= */
+/* ================= MODAL INFO ==================== */
+/* ================================================= */
+
+const modalCompanero =
+    document.getElementById(
+        "modalCompanero"
+    );
+
+function abrirInfo(u){
+
+    document.getElementById(
+        "modalNombre"
+    ).textContent =
+        u.nombre || "-";
+
+    document.getElementById(
+        "modalEmail"
+    ).textContent =
+        u.email || "-";
+
+    document.getElementById(
+        "modalRol"
+    ).textContent =
+        u.rol || "-";
+
+    document.getElementById(
+        "modalDni"
+    ).textContent =
+        u.dni || "-";
+
+    document.getElementById(
+        "modalTelefono"
+    ).textContent =
+        u.telefono || "-";
+
+    document.getElementById(
+        "modalFoto"
+    ).src =
+        "../" + u.foto;
+
+    modalCompanero.classList.add(
+        "active"
+    );
+
+}
+
+/* ================= CERRAR ================= */
+
+document
+    .getElementById(
+        "cerrarInfoModal"
+    )
+    .addEventListener(
+        "click",
+        () => {
+
+            modalCompanero.classList.remove(
+                "active"
+            );
+
+        }
+    );
+
+modalCompanero.addEventListener(
+    "click",
+    (e) => {
+
+        if(
+            e.target === modalCompanero
+        ){
+
+            modalCompanero.classList.remove(
+                "active"
+            );
+
+        }
+
+    }
+);
