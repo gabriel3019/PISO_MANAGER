@@ -108,16 +108,32 @@
       <!-- FILTROS (los puedes dejar o quitar si quieres más simple aún) -->
       <div class="filters-bar">
         <div class="filters">
-          <button type="button" class="active">Todas</button>
-          <button type="button">Hoy</button>
-          <button type="button">Esta semana</button>
-          <button type="button">Atrasadas</button>
-          <button type="button">Alta prioridad</button>
+
+          <button type="button" class="active filter-btn" data-filter="todas">
+            Todas
+          </button>
+
+          <button type="button" class="filter-btn" data-filter="hoy">
+            Hoy
+          </button>
+
+          <button type="button" class="filter-btn" data-filter="semana">
+            Esta semana
+          </button>
+
+          <button type="button" class="filter-btn" data-filter="atrasadas">
+            Atrasadas
+          </button>
+
+          <button type="button" class="filter-btn" data-filter="alta">
+            Alta prioridad
+          </button>
+
         </div>
 
         <div class="search-box">
           <img src="../css/icons/search.svg" class="icon">
-          <input type="text" placeholder="Buscar tarea...">
+          <input type="text" id="searchTask" placeholder="Buscar tarea...">
         </div>
       </div>
 

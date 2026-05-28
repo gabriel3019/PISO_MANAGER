@@ -80,6 +80,10 @@ let deleteId = null;
 
 let tareaEditando = null;
 
+let filtroActual = "todas";
+
+let busquedaActual = "";
+
 /* ================================================= */
 /* ================= INIT ========================== */
 /* ================================================= */
@@ -124,6 +128,10 @@ document.addEventListener(
     activarPrioridad();
 
     initModal();
+
+    initFiltros();
+
+    initBusqueda();
 
   }
 );
@@ -174,6 +182,69 @@ function activarPrioridad() {
       );
 
     });
+
+}
+
+/* ================================================= */
+/* ================= FILTROS ======================= */
+/* ================================================= */
+
+function initFiltros() {
+
+  document
+    .querySelectorAll(".filter-btn")
+    .forEach(btn => {
+
+      btn.addEventListener(
+        "click",
+        () => {
+
+          document
+            .querySelectorAll(".filter-btn")
+            .forEach(b =>
+              b.classList.remove("active")
+            );
+
+          btn.classList.add("active");
+
+          filtroActual =
+            btn.dataset.filter;
+
+          renderTareas();
+
+        }
+      );
+
+    });
+
+}
+
+/* ================================================= */
+/* ================= BUSQUEDA ====================== */
+/* ================================================= */
+
+function initBusqueda() {
+
+  const input =
+    document.getElementById(
+      "searchTask"
+    );
+
+  if (!input) return;
+
+  input.addEventListener(
+    "input",
+    (e) => {
+
+      busquedaActual =
+        e.target.value
+          .trim()
+          .toLowerCase();
+
+      renderTareas();
+
+    }
+  );
 
 }
 
@@ -532,7 +603,6 @@ async function cargarUsuarios() {
 /* ================================================= */
 /* ================= RENDER ======================== */
 /* ================================================= */
-
 function renderTareas() {
 
   const container =
@@ -564,7 +634,247 @@ function renderTareas() {
   const completadasDiv =
     document.getElementById("completadas");
 
-  tareas.forEach(t => {
+  /* ================================================= */
+  /* ================= FECHA HOY ===================== */
+  /* ================================================= */
+
+  const hoy = new Date();
+
+  hoy.setHours(0, 0, 0, 0);
+
+  /* ================================================= */
+  /* ================= FILTRAR ======================= */
+  /* ================================================= */
+
+  const tareasFiltradas =
+    tareas.filter(t => {
+
+      /* ================= BUSQUEDA ================= */
+
+      const coincideBusqueda =
+
+        t.titulo
+          .toLowerCase()
+          .includes(busquedaActual)
+
+        ||
+
+        (
+          t.descripcion &&
+          t.descripcion
+            .toLowerCase()
+            .includes(busquedaActual)
+        )
+
+        ||
+
+        (
+          t.nombre &&
+          t.nombre
+            .toLowerCase()
+            .includes(busquedaActual)
+        );
+
+      if (!coincideBusqueda) {
+
+        return false;
+
+      }
+
+      /* ================= TODAS ================= */
+
+      if (filtroActual === "todas") {
+
+        return true;
+
+      }
+
+      const fechaTarea =
+        t.fecha
+          ? new Date(t.fecha)
+          : null;
+
+      /* ================= HOY ================= */
+
+      if (filtroActual === "hoy") {
+
+        if (!fechaTarea) return false;
+
+        fechaTarea.setHours(0,0,0,0);
+
+        return (
+          fechaTarea.getTime()
+          === hoy.getTime()
+        );
+
+      }
+
+      /* ================= SEMANA ================= */
+
+      if (filtroActual === "semana") {
+
+        if (!fechaTarea) return false;
+
+        const diff =
+          (
+            fechaTarea - hoy
+          ) / (1000 * 60 * 60 * 24);
+
+        return diff >= 0 && diff <= 7;
+
+      }
+
+      /* ================= ATRASADAS ================= */
+
+      if (filtroActual === "atrasadas") {
+
+        if (!fechaTarea) return false;
+
+        fechaTarea.setHours(0,0,0,0);
+
+        return (
+          fechaTarea < hoy &&
+          t.estado !== "completada"
+        );
+
+      }
+
+      /* ================= ALTA ================= */
+
+      if (filtroActual === "alta") {
+
+        return (
+          t.prioridad === "alta"
+        );
+
+      }
+
+      return true;
+
+    });
+
+  /* ================================================= */
+  /* ================= RENDER ======================== */
+  /* ================================================= */
+
+  tareasFiltradas.forEach(t => {
+
+    const completada =
+      t.estado === "completada";
+
+    const html = `
+
+      <div class="task ${completada ? "completed" : ""}">
+
+        <div class="left">
+
+          <input
+            type="checkbox"
+            data-id="${t.id_tarea}"
+            ${completada ? "checked" : ""}
+          >
+
+          <div class="task-content">
+
+            <p class="task-title">
+              ${t.titulo}
+            </p>
+
+            <div class="meta">
+
+              <span class="tag ${t.prioridad}">
+                ${t.prioridad}
+              </span>
+
+              <span class="date">
+                ${t.fecha || ""}
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="right">
+
+          <span>
+            ${t.nombre}
+          </span>
+
+          <button
+            class="btn-detail"
+            data-id="${t.id_tarea}"
+          >
+            Ver detalles
+          </button>
+
+          <button
+            class="edit-btn"
+            data-id="${t.id_tarea}"
+          >
+            ✏️
+          </button>
+
+          <button
+            class="delete-btn"
+            data-id="${t.id_tarea}"
+          >
+            🗑️
+          </button>
+
+        </div>
+
+      </div>
+
+    `;
+
+    if (completada) {
+
+      completadasDiv.innerHTML += html;
+
+    } else {
+
+      pendientesDiv.innerHTML += html;
+
+    }
+
+  });
+
+  /* ================================================= */
+  /* ================= VACIO ========================= */
+  /* ================================================= */
+
+  if (!tareasFiltradas.length) {
+
+    pendientesDiv.innerHTML = `
+
+      <div class="empty">
+        No se encontraron tareas
+      </div>
+
+    `;
+
+  }
+
+  /* ================================================= */
+  /* ================= EVENTS ======================== */
+  /* ================================================= */
+
+  activarChecks();
+
+  activarEditar();
+
+  activarEliminar();
+
+  activarDetalle();
+
+}
+  /* ================================================= */
+  /* ================= RENDER ======================== */
+  /* ================================================= */
+
+  tareasFiltradas.forEach(t => {
 
     const completada =
       t.estado === "completada";
@@ -656,7 +966,6 @@ function renderTareas() {
 
   activarDetalle();
 
-}
 
 /* ================================================= */
 /* ================= DETALLE ======================= */
