@@ -18,6 +18,12 @@ let gastoDetalleActual = null;
 let filtroActivo = "todos";
 let paginaActual = 1;
 
+const menuToggle =
+  document.getElementById("menuToggle");
+
+const sidebar =
+  document.getElementById("sidebar");
+
 const usuarioActual =
   JSON.parse(
     sessionStorage.getItem("usuario")
@@ -46,6 +52,35 @@ let textoConfirmarPago;
 /* ================================================= */
 /* ================= INIT ========================== */
 /* ================================================= */
+
+/* ================= MENU ================= */
+
+if (menuToggle && sidebar) {
+
+  menuToggle.addEventListener(
+    "click",
+    () => {
+
+      sidebar.classList.toggle("active");
+
+      menuToggle.classList.toggle("active");
+
+      if (
+        sidebar.classList.contains("active")
+      ) {
+
+        menuToggle.innerHTML = "✕";
+
+      } else {
+
+        menuToggle.innerHTML = "☰";
+
+      }
+
+    }
+  );
+
+}
 
 document.addEventListener(
   "DOMContentLoaded",

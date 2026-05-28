@@ -5,35 +5,23 @@
 
   <meta charset="UTF-8">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Gastos Comunes</title>
 
   <script>
 
-    if(localStorage.getItem("darkMode") === "true"){
+    if (localStorage.getItem("darkMode") === "true") {
       document.documentElement.classList.add("dark");
     }
 
   </script>
 
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-    rel="stylesheet"
-  >
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <link
-    rel="stylesheet"
-    href="../css/gastosComunesUser.css"
-  >
+  <link rel="stylesheet" href="../css/gastosComunesUser.css">
 
-  <link
-    rel="stylesheet"
-    href="../css/dark-mode.css"
-  >
+  <link rel="stylesheet" href="../css/dark-mode.css">
 
 </head>
 
@@ -45,7 +33,7 @@
     <!-- ================= SIDEBAR ======================= -->
     <!-- ================================================= -->
 
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
 
       <div>
 
@@ -67,10 +55,7 @@
 
             <a href="../html/homeUser.html">
 
-              <img
-                src="../css/icons/house.svg"
-                class="icon"
-              >
+              <img src="../css/icons/house.svg" class="icon">
 
               Inicio
 
@@ -82,10 +67,7 @@
 
             <a href="../html/gastosComunesUser.html">
 
-              <img
-                src="../css/icons/euro.svg"
-                class="icon"
-              >
+              <img src="../css/icons/euro.svg" class="icon">
 
               Gastos Comunes
 
@@ -97,10 +79,7 @@
 
             <a href="../html/tareasUser.html">
 
-              <img
-                src="../css/icons/square-check-big.svg"
-                class="icon"
-              >
+              <img src="../css/icons/square-check-big.svg" class="icon">
 
               Tareas
 
@@ -112,10 +91,7 @@
 
             <a href="../html/calendario.html">
 
-              <img
-                src="../css/icons/calendar.svg"
-                class="icon"
-              >
+              <img src="../css/icons/calendar.svg" class="icon">
 
               Calendario
 
@@ -137,10 +113,7 @@
 
             <a href="../html/companerosUser.html">
 
-              <img
-                src="../css/icons/users.svg"
-                class="icon"
-              >
+              <img src="../css/icons/users.svg" class="icon">
 
               Compañeros
 
@@ -152,10 +125,7 @@
 
             <a href="../html/incidenciasUser.html">
 
-              <img
-                src="../css/icons/circle-alert.svg"
-                class="icon"
-              >
+              <img src="../css/icons/circle-alert.svg" class="icon">
 
               Incidencias
 
@@ -177,10 +147,7 @@
 
             <a href="../html/ajustes.html">
 
-              <img
-                src="../css/icons/settings.svg"
-                class="icon"
-              >
+              <img src="../css/icons/settings.svg" class="icon">
 
               Ajustes
 
@@ -194,10 +161,7 @@
 
       <!-- LOGOUT -->
 
-      <div
-        class="logout"
-        id="btn-cerrar-sesion"
-      >
+      <div class="logout" id="btn-cerrar-sesion">
 
         Cerrar sesión
 
@@ -212,13 +176,19 @@
 
     <main class="main">
 
-      <!-- TOPBAR -->
-
       <div class="topbar">
 
-        <h1>
-          Gastos Comunes
-        </h1>
+        <button class="menu-toggle" id="menuToggle">
+          ☰
+        </button>
+
+        <div>
+
+          <h1>
+            Gastos Comunes
+          </h1>
+
+        </div>
 
       </div>
 
@@ -242,10 +212,7 @@
                 Tu Balance
               </h3>
 
-              <div
-                class="amount"
-                id="balance"
-              >
+              <div class="amount" id="balance">
                 0 €
               </div>
 
@@ -301,10 +268,7 @@
 
             </button>
 
-            <button
-              class="btn-light"
-              id="btnPagar"
-            >
+            <button class="btn-light" id="btnPagar">
 
               💸 Pagar
 
@@ -325,19 +289,13 @@
               Deudas
             </h3>
 
-            <span
-              class="debts-count"
-              id="deudasCount"
-            >
+            <span class="debts-count" id="deudasCount">
               0
             </span>
 
           </div>
 
-          <div
-            id="resumenDeudas"
-            class="resumen"
-          >
+          <div id="resumenDeudas" class="resumen">
 
             <div class="empty-debts">
 
@@ -372,10 +330,7 @@
 
             <div class="filters">
 
-              <button
-                id="filterTodos"
-                class="active"
-              >
+              <button id="filterTodos" class="active">
                 Todos
               </button>
 
@@ -396,11 +351,7 @@
 
             <!-- SEARCH -->
 
-            <input
-              id="searchInput"
-              type="text"
-              placeholder="Buscar gasto..."
-            >
+            <input id="searchInput" type="text" placeholder="Buscar gasto...">
 
           </div>
 
@@ -418,190 +369,154 @@
   </div>
 
 
-<!-- ================================================= -->
-<!-- ================= MODAL GASTO =================== -->
-<!-- ================================================= -->
+  <!-- ================================================= -->
+  <!-- ================= MODAL GASTO =================== -->
+  <!-- ================================================= -->
 
-<div
-  id="gastoModal"
-  class="modal-overlay hidden"
->
+  <div id="gastoModal" class="modal-overlay hidden">
 
-  <div class="modal splitwise">
+    <div class="modal splitwise">
 
-    <!-- HEADER -->
+      <!-- HEADER -->
 
-    <div class="modal-header">
+      <div class="modal-header">
 
-      <h2>
-        Añadir gasto
-      </h2>
+        <h2>
+          Añadir gasto
+        </h2>
 
-      <span
-        id="closeGastoModal"
-        class="close"
-      >
-        &times;
-      </span>
-
-    </div>
-
-
-    <!-- ================================================= -->
-    <!-- ================= PASO 1 ======================== -->
-    <!-- ================================================= -->
-
-    <div id="step1">
-
-      <div class="modal-body">
-
-        <!-- TITULO -->
-
-        <input
-          id="gastoTitulo"
-          type="text"
-          placeholder="¿En qué has gastado?"
-        >
-
-
-        <!-- IMPORTE -->
-
-        <div class="amount-input">
-
-          <span>€</span>
-
-          <input
-            id="gastoImporte"
-            type="number"
-            placeholder="0.00"
-          >
-
-        </div>
-
-
-        <!-- PAGADOR -->
-
-        <div class="split-row">
-
-          <span>
-            Pagado por
-          </span>
-
-          <!-- SOLO USUARIO LOGEADO -->
-
-          <select
-            id="gastoPagador"
-            disabled
-          ></select>
-
-        </div>
-
-
-        <!-- PARTICIPANTES -->
-
-        <div class="split-row">
-
-          <span>
-            Dividido entre
-          </span>
-
-        </div>
-
-        <div id="usuariosCheckbox"></div>
+        <span id="closeGastoModal" class="close">
+          &times;
+        </span>
 
       </div>
 
 
-      <!-- FOOTER -->
+      <!-- ================================================= -->
+      <!-- ================= PASO 1 ======================== -->
+      <!-- ================================================= -->
 
-      <div class="modal-footer">
+      <div id="step1">
 
-        <button
-          id="cancelGasto"
-          class="btn-light"
-        >
-          Cancelar
-        </button>
+        <div class="modal-body">
 
-        <button
-          id="btnContinuar"
-          class="btn-primary"
-        >
-          Continuar
-        </button>
+          <!-- TITULO -->
 
-      </div>
-
-    </div>
+          <input id="gastoTitulo" type="text" placeholder="¿En qué has gastado?">
 
 
-    <!-- ================================================= -->
-    <!-- ================= PASO 2 ======================== -->
-    <!-- ================================================= -->
+          <!-- IMPORTE -->
 
-    <div
-      id="step2"
-      class="hidden"
-    >
+          <div class="amount-input">
 
-      <div class="modal-body">
+            <span>€</span>
 
-        <!-- DIVISION -->
+            <input id="gastoImporte" type="number" placeholder="0.00">
 
-        <div class="split-row">
+          </div>
 
-          <span>
-            ¿Cómo quieres dividirlo?
-          </span>
+
+          <!-- PAGADOR -->
+
+          <div class="split-row">
+
+            <span>
+              Pagado por
+            </span>
+
+            <!-- SOLO USUARIO LOGEADO -->
+
+            <select id="gastoPagador" disabled></select>
+
+          </div>
+
+
+          <!-- PARTICIPANTES -->
+
+          <div class="split-row">
+
+            <span>
+              Dividido entre
+            </span>
+
+          </div>
+
+          <div id="usuariosCheckbox"></div>
 
         </div>
 
 
-        <!-- BOTONES -->
+        <!-- FOOTER -->
 
-        <div class="extra-options">
+        <div class="modal-footer">
 
-          <button
-            class="btn-light"
-            id="btnIgual"
-          >
-            Dividir igualmente
+          <button id="cancelGasto" class="btn-light">
+            Cancelar
           </button>
 
-          <button
-            class="btn-light"
-            id="btnManual"
-          >
-            Ajustar importes
+          <button id="btnContinuar" class="btn-primary">
+            Continuar
           </button>
 
         </div>
 
-
-        <!-- DIVISION CONTAINER -->
-
-        <div id="divisionContainer"></div>
-
       </div>
 
 
-      <!-- FOOTER -->
+      <!-- ================================================= -->
+      <!-- ================= PASO 2 ======================== -->
+      <!-- ================================================= -->
 
-      <div class="modal-footer">
+      <div id="step2" class="hidden">
 
-        <button
-          id="btnVolver"
-          class="btn-light"
-        >
-          Volver
-        </button>
+        <div class="modal-body">
 
-        <button
-          id="guardarGasto"
-          class="btn-primary"
-        >
-          Guardar gasto
-        </button>
+          <!-- DIVISION -->
+
+          <div class="split-row">
+
+            <span>
+              ¿Cómo quieres dividirlo?
+            </span>
+
+          </div>
+
+
+          <!-- BOTONES -->
+
+          <div class="extra-options">
+
+            <button class="btn-light" id="btnIgual">
+              Dividir igualmente
+            </button>
+
+            <button class="btn-light" id="btnManual">
+              Ajustar importes
+            </button>
+
+          </div>
+
+
+          <!-- DIVISION CONTAINER -->
+
+          <div id="divisionContainer"></div>
+
+        </div>
+
+
+        <!-- FOOTER -->
+
+        <div class="modal-footer">
+
+          <button id="btnVolver" class="btn-light">
+            Volver
+          </button>
+
+          <button id="guardarGasto" class="btn-primary">
+            Guardar gasto
+          </button>
+
+        </div>
 
       </div>
 
@@ -609,17 +524,12 @@
 
   </div>
 
-</div>
-
 
   <!-- ================================================= -->
   <!-- ================= MODAL DELETE ================== -->
   <!-- ================================================= -->
 
-  <div
-    id="deleteModal"
-    class="modal-overlay hidden"
-  >
+  <div id="deleteModal" class="modal-overlay hidden">
 
     <div class="modal delete-modal">
 
@@ -637,17 +547,11 @@
 
       <div class="modal-footer center">
 
-        <button
-          id="cancelDelete"
-          class="btn-light"
-        >
+        <button id="cancelDelete" class="btn-light">
           Cancelar
         </button>
 
-        <button
-          id="confirmDelete"
-          class="btn-danger"
-        >
+        <button id="confirmDelete" class="btn-danger">
           Eliminar
         </button>
 
@@ -662,10 +566,7 @@
   <!-- ================= MODAL PAGO ==================== -->
   <!-- ================================================= -->
 
-  <div
-    id="pagoModal"
-    class="modal-overlay hidden"
-  >
+  <div id="pagoModal" class="modal-overlay hidden">
 
     <div class="modal">
 
@@ -675,10 +576,7 @@
           Registrar pago
         </h2>
 
-        <span
-          id="closePagoModal"
-          class="close"
-        >
+        <span id="closePagoModal" class="close">
           &times;
         </span>
 
@@ -708,11 +606,7 @@
 
           <span>€</span>
 
-          <input
-            id="pagoImporte"
-            type="number"
-            placeholder="0.00"
-          >
+          <input id="pagoImporte" type="number" placeholder="0.00">
 
         </div>
 
@@ -723,17 +617,11 @@
 
       <div class="modal-footer">
 
-        <button
-          id="cancelPago"
-          class="btn-light"
-        >
+        <button id="cancelPago" class="btn-light">
           Cancelar
         </button>
 
-        <button
-          id="confirmPago"
-          class="btn-primary"
-        >
+        <button id="confirmPago" class="btn-primary">
           Guardar pago
         </button>
 
@@ -748,10 +636,7 @@
   <!-- ================= MODAL DETALLE ================= -->
   <!-- ================================================= -->
 
-  <div
-    id="detalleModal"
-    class="modal-overlay hidden"
-  >
+  <div id="detalleModal" class="modal-overlay hidden">
 
     <div class="modal detalle-modal">
 
@@ -761,10 +646,7 @@
           Detalle del gasto
         </h2>
 
-        <span
-          id="closeDetalleModal"
-          class="close"
-        >
+        <span id="closeDetalleModal" class="close">
           &times;
         </span>
 
@@ -819,10 +701,7 @@
 
         <!-- BOTON SALDAR -->
 
-        <button
-          id="btnSaldar"
-          class="btn-primary hidden"
-        >
+        <button id="btnSaldar" class="btn-primary hidden">
 
           💸 Saldar deuda
 
@@ -839,10 +718,7 @@
   <!-- ============== MODAL CONFIRMAR PAGO ============ -->
   <!-- ================================================= -->
 
-  <div
-    id="confirmarPagoModal"
-    class="modal-overlay hidden"
-  >
+  <div id="confirmarPagoModal" class="modal-overlay hidden">
 
     <div class="modal small-modal">
 
@@ -852,10 +728,7 @@
           Confirmar pago
         </h2>
 
-        <span
-          id="closeConfirmarPago"
-          class="close"
-        >
+        <span id="closeConfirmarPago" class="close">
           &times;
         </span>
 
@@ -879,19 +752,13 @@
 
       <div class="modal-footer">
 
-        <button
-          id="cancelarConfirmarPago"
-          class="btn-light"
-        >
+        <button id="cancelarConfirmarPago" class="btn-light">
 
           Cancelar
 
         </button>
 
-        <button
-          id="aceptarConfirmarPago"
-          class="btn-primary"
-        >
+        <button id="aceptarConfirmarPago" class="btn-primary">
 
           Confirmar pago
 

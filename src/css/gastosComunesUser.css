@@ -1128,77 +1128,196 @@ body{
 }
 
 /* ================================================= */
+/* ================= MENU HAMBURGUESA ============== */
+/* ================================================= */
+
+.menu-toggle {
+
+  display: none;
+
+  position: relative;
+  z-index: 100002;
+
+  width: 42px;
+  height: 42px;
+
+  min-width: 42px;
+
+  background: #ffffff;
+
+  border: none;
+
+  border-radius: 10px;
+
+  font-size: 24px;
+
+  cursor: pointer;
+
+  align-items: center;
+  justify-content: center;
+
+  box-shadow:
+    0 2px 8px rgba(0,0,0,0.10);
+
+  transition: 0.2s;
+}
+
+.menu-toggle:hover {
+
+  transform: scale(1.03);
+
+}
+
+
+/* ================================================= */
 /* ================= RESPONSIVE ==================== */
 /* ================================================= */
 
-@media (max-width:1100px){
+@media (max-width:1000px) {
 
-  .top-cards{
-    flex-direction:column;
+  .app {
+
+    position: relative;
+
   }
 
-  .debts-card{
-    min-width:100%;
+  /* ================= SIDEBAR ================= */
+
+  .sidebar {
+
+    position: fixed;
+
+    top: 0;
+    left: -260px;
+
+    width: 250px;
+    height: 100vh;
+
+    background: #ffffff;
+
+    z-index: 999;
+
+    transition: left 0.3s ease;
+
+    padding: 20px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    box-shadow:
+      0 0 20px rgba(0,0,0,0.15);
+
+    padding-top: 80px;
+
+  }
+
+  .sidebar.active {
+
+    left: 0;
+
+  }
+
+  /* ================= BOTON ================= */
+
+  .menu-toggle {
+
+    display: flex;
+
+  }
+
+  /* ================= TOPBAR ================= */
+
+  .topbar {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 14px;
+
+    margin-bottom: 25px;
+
+  }
+
+  .topbar h1 {
+
+    margin: 0;
+
+  }
+
+  /* ================= MAIN ================= */
+
+  .main {
+
+    width: 100%;
+
+    margin-left: 0;
+
+    padding: 20px;
+
+  }
+
+  /* ================= TOP CARDS ================= */
+
+  .top-cards {
+
+    flex-direction: column;
+
+  }
+
+  /* ================= LIST HEADER ================= */
+
+  .list-header {
+
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: 16px;
+
+  }
+
+  .list-actions {
+
+    width: 100%;
+
+    flex-direction: column;
+
+    align-items: stretch;
+
+  }
+
+  .filters {
+
+    flex-wrap: wrap;
+
+  }
+
+  .list-actions input {
+
+    width: 100%;
+
   }
 
 }
 
-@media (max-width:700px){
+@media (max-width:1000px) {
 
-  .sidebar{
-    display:none;
+  .topbar {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
   }
 
-  .main{
-    padding:20px;
-  }
+  .topbar h1 {
 
-  .list-header{
-    flex-direction:column;
-    align-items:flex-start;
-    gap:15px;
-  }
+    margin: 0;
 
-  .list-actions{
-    width:100%;
-    flex-direction:column;
-    align-items:stretch;
-  }
-
-  .filters{
-    overflow-x:auto;
-  }
-
-  .list-actions input{
-    width:100%;
-  }
-
-  .expense-main{
-    flex-direction:column;
-    align-items:flex-start;
-    gap:16px;
-  }
-
-  .right{
-    width:100%;
-    align-items:flex-start;
-  }
-
-  .expense-actions{
-    width:100%;
-    justify-content:space-between;
-  }
-
-  .modal.splitwise{
-    width:94%;
-  }
-
-  .modal-footer{
-    flex-direction:column;
-  }
-
-  .extra-options{
-    flex-direction:column;
   }
 
 }
