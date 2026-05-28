@@ -1,6 +1,42 @@
 const API_URL = "../php/companeros.php";
+/* ================= MENU ================= */
+
+const menuToggle =
+  document.getElementById("menuToggle");
+
+const sidebar =
+  document.getElementById("sidebar");
 
 /* INIT */
+/* ================= MENU HAMBURGUESA ================= */
+
+if (menuToggle && sidebar) {
+
+  menuToggle.addEventListener(
+    "click",
+    () => {
+
+      sidebar.classList.toggle("active");
+
+      menuToggle.classList.toggle("active");
+
+      if (
+        sidebar.classList.contains("active")
+      ) {
+
+        menuToggle.innerHTML = "✕";
+
+      } else {
+
+        menuToggle.innerHTML = "☰";
+
+      }
+
+    }
+  );
+
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   cargarUsuario();
   cargarCompaneros();
