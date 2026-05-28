@@ -903,6 +903,52 @@ body{
   background:#dc2626;
 }
 
+.expense-date {
+
+  font-size: 13px;
+
+  color: #8b8b8b;
+
+  margin-top: 4px;
+
+}
+
+.pagination {
+
+  display: flex;
+
+  justify-content: center;
+
+  gap: 10px;
+
+  margin-top: 25px;
+
+}
+
+.page-btn {
+
+  border: none;
+
+  background: #f1f1f1;
+
+  padding: 10px 15px;
+
+  border-radius: 10px;
+
+  cursor: pointer;
+
+  font-weight: 600;
+
+}
+
+.page-btn.active {
+
+  background: #4f46e5;
+
+  color: white;
+
+}
+
 /* ================================================= */
 /* ================= DARK MODE ===================== */
 /* ================================================= */
