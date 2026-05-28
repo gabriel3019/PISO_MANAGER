@@ -62,6 +62,14 @@ const crearTareaBtn =
 const currentStep =
   document.getElementById("currentStep");
 
+/* ================= MENU ================= */
+
+const menuToggle =
+  document.getElementById("menuToggle");
+
+const sidebar =
+  document.getElementById("sidebar");
+
 /* ================================================= */
 /* ================= ESTADO ======================== */
 /* ================================================= */
@@ -75,6 +83,33 @@ let tareaEditando = null;
 /* ================================================= */
 /* ================= INIT ========================== */
 /* ================================================= */
+
+/* ================= MENU HAMBURGUESA ================= */
+
+if (menuToggle && sidebar) {
+
+  menuToggle.addEventListener(
+    "click",
+    () => {
+
+      sidebar.classList.toggle("active");
+
+      menuToggle.classList.toggle("active");
+
+      if (sidebar.classList.contains("active")) {
+
+        menuToggle.innerHTML = "✕";
+
+      } else {
+
+        menuToggle.innerHTML = "☰";
+
+      }
+
+    }
+  );
+
+}
 
 document.addEventListener(
   "DOMContentLoaded",
