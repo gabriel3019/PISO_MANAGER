@@ -547,6 +547,38 @@ switch ($accion) {
         ]);
         break;
 
+    case 'obtener_notificaciones_usuario':
+        $id_usuario = $_GET['id_usuario'] ?? null;
+
+        if (!$id_usuario) {
+            echo json_encode(['success' => false, 'error' => 'Falta id_usuario']);
+            exit;
+        }
+
+        $stmt = $conn->prepare("
+        SELECT *
+        FROM notificaciones
+        WHERE id_usuario = ?
+        AND leida = 0
+        ORDER BY fecha_creacion DESC
+    ");
+
+        $stmt->bind_param("i", $id_usuario);
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+        $notificaciones = [];
+
+        while ($row = $result->fetch_assoc()) {
+            $notificaciones[] = $row;
+        }
+
+        echo json_encode([
+            'success' => true,
+            'notificaciones' => $notificaciones
+        ]);
+        break;
+
     default:
         error_log("ACCIÓN NO VÁLIDA RECIBIDA: $accion | POST: " . print_r($_POST, true));
         echo json_encode([

@@ -184,7 +184,7 @@ switch ($accion) {
     WHERE m.id_incidencia = ?
 
     ORDER BY fecha_envio ASC
-");
+    ");
 
         $stmt->bind_param("ii", $id_incidencia, $id_incidencia);
         $stmt->execute();
@@ -298,9 +298,85 @@ switch ($accion) {
         ]);
         break;
 
+    case 'crear':
+        $id_piso            = intval($_POST['id_piso']    ?? 1);
+        $id_usuario         = intval($_POST['id_usuario'] ?? 1);
+        $tipo               = trim($_POST['tipo']         ?? '');
+        $titulo             = trim($_POST['titulo']       ?? '');
+        $descripcion        = trim($_POST['descripcion']  ?? '');
+        $urgencia           = $_POST['urgencia']          ?? 'baja';
+        $fecha_inicio       = $_POST['fecha_inicio']      ?? date('Y-m-d');
+        $fecha_fin          = $_POST['fecha_fin']         ?? null;
+        $notificar_inquilino = 1;
+        $estado             = 'abierta';
 
-    default:
-        echo json_encode(['success' => false, 'error' => 'Acción no válida']);
+        // Cuando el admin crea la incidencia no necesita notificarse a sí mismo
+        $notificar_admin = 0;
+        $leido_admin     = 1;
+
+        if ($tipo === '' || $titulo === '' || $descripcion === '') {
+            echo json_encode([
+                'success' => false,
+                'error'   => 'Faltan campos obligatorios'
+            ]);
+            exit;
+        }
+
+        $stmt = $conn->prepare("
+            INSERT INTO incidencias
+                (id_piso, id_usuario, tipo, titulo, descripcion, urgencia, estado,
+                 notificar_admin, leido_admin, notificar_inquilino, fecha_inicio, fecha_fin, fecha_creacion)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+
+        $fecha_creacion = date('Y-m-d');
+
+        $stmt->bind_param(
+            "iisssssiiisss",
+            $id_piso,
+            $id_usuario,
+            $tipo,
+            $titulo,
+            $descripcion,
+            $urgencia,
+            $estado,
+            $notificar_admin,
+            $leido_admin,
+            $notificar_inquilino,
+            $fecha_inicio,
+            $fecha_fin,
+            $fecha_creacion
+        );
+
+        if (!$stmt->execute()) {
+            echo json_encode(['success' => false, 'error' => $stmt->error]);
+            $stmt->close();
+            exit;
+        }
+
+        $id_nueva_incidencia = $conn->insert_id;
+        $stmt->close();
+
+        // Si el admin marcó "Notificar al inquilino", crear notificación para ese usuario
+        if ($notificar_inquilino === 1 && $id_usuario > 0) {
+            $textoNotificacion = "El administrador ha creado una nueva incidencia: \"$titulo\".";
+
+            $stmt = $conn->prepare("
+                INSERT INTO notificaciones
+                    (id_usuario, id_incidencia, mensaje)
+                VALUES (?, ?, ?)
+            ");
+
+            $stmt->bind_param("iis", $id_usuario, $id_nueva_incidencia, $textoNotificacion);
+            $stmt->execute();
+            $stmt->close();
+        }
+
+        echo json_encode([
+            'success' => true,
+            'message' => 'Incidencia creada correctamente',
+            'id'      => $id_nueva_incidencia
+        ]);
         break;
 
     case 'marcar_todas_leidas':
@@ -318,6 +394,10 @@ switch ($accion) {
         $stmt->execute();
 
         echo json_encode(['success' => true]);
+        break;
+
+    default:
+        echo json_encode(['success' => false, 'error' => 'Acción no válida']);
         break;
 }
 

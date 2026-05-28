@@ -1,4 +1,3 @@
-
 <?php
 
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
@@ -152,6 +151,7 @@ CREATE TABLE IF NOT EXISTS incidencias (
     imagen VARCHAR(255) DEFAULT NULL,
     notificar_admin BOOLEAN DEFAULT FALSE,
     leido_admin BOOLEAN DEFAULT FALSE,
+    notificar_inquilino TINYINT(1) DEFAULT 0,
     urgencia ENUM('baja','media','alta') DEFAULT 'media',
     estado ENUM('abierta','en_curso','resuelta') DEFAULT 'abierta',
     fecha DATE NULL,
