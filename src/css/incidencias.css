@@ -1306,47 +1306,424 @@ input[type="date"].modal__input:focus { color: var(--text-primary); }
   from { transform: translateX(100%); opacity: 0; }
   to   { transform: translateX(0);    opacity: 1; }
 }
+/* ================================================= */
+/* ================= DARK VARIABLES ================= */
+/* ================================================= */
 
-/* ══════════════════════════════════════════════════════════════
-   DARK MODE
-   ══════════════════════════════════════════════════════════════ */
-body, .card, input, .slider { transition: all 0.3s ease; }
+.dark {
 
-body.dark .card                { background: #020617; border-color: #1e293b; }
-body.dark .form-group input    { background: #020617; color: #e5e7eb; border-color: #1e293b; }
-body.dark label                { color: #cbd5f5; }
-body.dark .avatar button       { background: #1e293b; color: #e5e7eb; }
-body.dark .slider              { background: #374151; }
-body.dark input:checked+.slider{ background: #4f46e5; }
+  --bg-page: #020617;
 
-body.dark .modal__stepper .stepper__circle  { background: #312e81; border-color: #4338ca; color: #a5b4fc; }
-body.dark .modal__stepper .stepper__label   { color: #94a3b8; }
-body.dark .modal__stepper .stepper__line    { background: #312e81; }
-body.dark .stepper__step--active .stepper__circle { background: #4f46e5; color: #fff; border-color: #4f46e5; }
-body.dark .stepper__step--active .stepper__label  { color: #a5b4fc; }
-body.dark .stepper__step--done .stepper__circle   { background: #166534; color: #fff; border-color: #166534; }
+  --bg-card: #0f172a;
 
-body.dark .toast--success { background: #14532d; }
-body.dark .toast--error   { background: #7f1d1d; }
+  --bg-soft: #111827;
 
-body.dark .notify-item        { background: #1e293b; border-color: #334155; color: #f1f5f9; }
-body.dark .notify-item:hover  { background: #334155; }
-body.dark .notify-title,
-body.dark .notify-mensaje     { color: #f1f5f9; }
-body.dark .notify-meta,
-body.dark .notify-fecha       { color: #94a3b8; }
+  --bg-hover: #1e293b;
 
-body.dark .chat-container                         { background: #0f172a; }
-body.dark .mensaje-chat--admin                    { background: #1e293b; border-color: #334155; color: #f1f5f9; }
-body.dark .mensaje-chat--usuario                  { background: #4f46e5; color: white; }
-body.dark .chat-input-area                        { background: #1e293b; border-color: #334155; }
-body.dark .chat-input                             { background: #0f172a; border-color: #334155; color: #f1f5f9; }
-body.dark .chat-input:focus                       { border-color: #4f46e5; }
-body.dark .chat-input::placeholder                { color: #64748b; }
-body.dark .chat-sin-mensajes                      { color: #94a3b8; }
-body.dark .chat-container::-webkit-scrollbar-track{ background: #1e293b; }
-body.dark .chat-container::-webkit-scrollbar-thumb{ background: #475569; }
+  --bg-tag: #1e293b;
 
+  --text-primary: #f8fafc;
+
+  --text-secondary: #cbd5e1;
+
+  --text-muted: #94a3b8;
+
+  --border: #334155;
+
+  --border-dashed: #475569;
+
+  --shadow-card: 0 4px 20px rgba(0,0,0,.35);
+
+  --status-progress-bg: #3b2f1b;
+  --status-progress-text: #fbbf24;
+
+  --status-done-bg: #16341f;
+  --status-done-text: #4ade80;
+
+  --prio-high: #ef4444;
+  --prio-medium: #f59e0b;
+  --prio-low: #22c55e;
+
+}
+
+/* ================================================= */
+/* ================= MAIN DARK ===================== */
+/* ================================================= */
+
+.dark {
+
+  background: var(--bg-page);
+
+  color: var(--text-primary);
+
+}
+
+.dark .section,
+.dark .stat-card,
+.dark .modal,
+.dark .notification-item,
+.dark .notif-drawer,
+.dark .notifications-panel {
+
+  background: var(--bg-card);
+
+  border-color: var(--border);
+
+}
+
+/* ================================================= */
+/* ================= TEXT DARK ===================== */
+/* ================================================= */
+
+.dark .section__title,
+.dark .incident-body__title,
+.dark .stat-card__value,
+.dark .page-header__info h1,
+.dark .modal__title,
+.dark .detalle__valor,
+.dark .notifications-header h3 {
+
+  color: var(--text-primary);
+
+}
+
+.dark .incident-body__desc,
+.dark .incident-body__meta,
+.dark .stat-card__label,
+.dark .address,
+.dark .detalle__label {
+
+  color: var(--text-secondary);
+
+}
+
+/* ================================================= */
+/* ================= INCIDENTS DARK ================ */
+/* ================================================= */
+
+.dark .incident-item {
+
+  border-color: var(--border);
+
+}
+
+.dark .incident-item:hover {
+
+  background: var(--bg-hover);
+
+}
+
+.dark .incident-icon {
+
+  background: #111827;
+
+  border-color: var(--border);
+
+}
+
+/* ================================================= */
+/* ================= STATUS DARK =================== */
+/* ================================================= */
+
+.dark .status-badge--open {
+
+  background: #1e3a5f;
+
+  color: #93c5fd;
+
+}
+
+.dark .status-badge--progress {
+
+  background: #3b2f1b;
+
+  color: #fbbf24;
+
+}
+
+.dark .status-badge--done {
+
+  background: #16341f;
+
+  color: #4ade80;
+
+}
+
+/* ================================================= */
+/* ================= BUTTONS DARK ================== */
+/* ================================================= */
+
+.dark .btn-notif-bell,
+.dark .notification-btn {
+
+  background: #111827;
+
+  border-color: var(--border);
+
+  color: white;
+
+}
+
+.dark .btn-notif-bell:hover,
+.dark .notification-btn:hover {
+
+  background: #1e293b;
+
+}
+
+/* ================================================= */
+/* ================= MODALS DARK =================== */
+/* ================================================= */
+
+.dark .modal {
+
+  background: #0f172a;
+
+}
+
+.dark .modal__divider {
+
+  border-color: var(--border);
+
+}
+
+.dark .modal__input,
+.dark .modal__textarea,
+.dark .modal__select {
+
+  background: #111827;
+
+  border-color: var(--border);
+
+  color: white;
+
+}
+
+.dark .modal__input::placeholder,
+.dark .modal__textarea::placeholder {
+
+  color: #64748b;
+
+}
+
+/* ================================================= */
+/* ================= DRAWER DARK =================== */
+/* ================================================= */
+
+.dark .notif-drawer {
+
+  background: #0f172a;
+
+}
+
+.dark .notif-drawer__item-inner {
+
+  background: #111827;
+
+  border-color: var(--border);
+
+}
+
+.dark .notif-drawer__item-inner:hover {
+
+  background: #1e293b;
+
+}
+/* ================================================= */
+/* ========== FORCE DARK NOTIFICATIONS ============= */
+/* ================================================= */
+
+.dark .notifications-panel {
+    background: #0f172a !important;
+}
+
+.dark .notifications-header {
+    background: #111827 !important;
+    border-bottom: 1px solid #334155 !important;
+}
+
+.dark .notifications-header h3 {
+    color: #f8fafc !important;
+}
+
+.dark .notifications-header span {
+    color: #94a3b8 !important;
+}
+
+.dark .notifications-header button {
+    color: #f8fafc !important;
+}
+
+.dark .notifications-list {
+    background: #0f172a !important;
+}
+
+.dark .notifications-footer {
+    background: #111827 !important;
+    border-top: 1px solid #334155 !important;
+}
+
+.dark .notifications-footer button {
+    background: #1e293b !important;
+    border: 1px solid #334155 !important;
+    color: #f8fafc !important;
+}
+
+.dark .notifications-footer button:hover {
+    background: #334155 !important;
+}
+
+.dark .notif-drawer__empty {
+    color: #e2e8f0 !important;
+}
+
+/* ================================================= */
+/* ============== DRAWER HEADER DARK =============== */
+/* ================================================= */
+
+.dark .notif-drawer {
+
+    background: #0f172a !important;
+
+}
+
+.dark .notif-drawer__header {
+
+    background: #111827 !important;
+
+    border-bottom: 1px solid #334155 !important;
+
+}
+
+.dark .notif-drawer__title {
+
+    color: #f8fafc !important;
+
+}
+
+.dark .notif-drawer__subtitle {
+
+    color: #94a3b8 !important;
+
+}
+
+.dark .notif-drawer__close {
+
+    color: #f8fafc !important;
+
+    background: #1e293b !important;
+
+}
+
+.dark .notif-drawer__close:hover {
+
+    background: #334155 !important;
+
+}
+
+.dark .notif-drawer__body {
+
+    background: #0f172a !important;
+
+}
+
+.dark .notif-drawer__footer {
+
+    background: #111827 !important;
+
+    border-top: 1px solid #334155 !important;
+
+}
+
+.dark .notif-drawer__btn-leidas {
+
+    background: #1e293b !important;
+
+    border: 1px solid #334155 !important;
+
+    color: #f8fafc !important;
+
+}
+
+.dark .notif-drawer__btn-leidas:hover {
+
+    background: #334155 !important;
+
+}
+
+/* ================================================= */
+/* ============ STATS CARDS DARK STRONG ============ */
+/* ================================================= */
+
+.dark .stat-card {
+
+    background: linear-gradient(
+        180deg,
+        #111827 0%,
+        #0f172a 100%
+    ) !important;
+
+    border: 1px solid #334155 !important;
+
+    box-shadow:
+        0 8px 24px rgba(0,0,0,.45),
+        inset 0 1px 0 rgba(255,255,255,.03);
+
+}
+
+.dark .stat-card:hover {
+
+    transform: translateY(-3px);
+
+    border-color: #475569 !important;
+
+    box-shadow:
+        0 12px 30px rgba(0,0,0,.55),
+        0 0 0 1px rgba(148,163,184,.08);
+
+}
+
+/* NUMEROS */
+
+.dark .stat-card__value {
+
+    color: #ffffff !important;
+
+}
+
+/* TEXTO */
+
+.dark .stat-card__label {
+
+    color: #cbd5e1 !important;
+
+}
+
+/* ICONOS */
+
+.dark .stat-card__icon--blue {
+
+    background: rgba(59,130,246,.18);
+
+}
+
+.dark .stat-card__icon--orange {
+
+    background: rgba(245,158,11,.18);
+
+}
+
+.dark .stat-card__icon--green {
+
+    background: rgba(34,197,94,.18);
+
+}
+
+.dark .stat-card__icon--slate {
+
+    background: rgba(148,163,184,.18);
+
+}
 /* ══════════════════════════════════════════════════════════════
    MENÚ HAMBURGUESA
    ══════════════════════════════════════════════════════════════ */
@@ -1399,6 +1776,21 @@ body.dark .chat-container::-webkit-scrollbar-thumb{ background: #475569; }
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.dark .notifications-header {
+
+  background: #111827 !important;
+
+}
+
+.dark .notifications-header h3,
+.dark .notifications-header p,
+.dark .notifications-header span,
+.dark .notifications-header button {
+
+  color: #f8fafc !important;
+
 }
 
 .notifications-header h3     { margin: 0; font-size: 1.25rem; font-weight: 700; }
@@ -1528,12 +1920,12 @@ body.dark .chat-container::-webkit-scrollbar-thumb{ background: #475569; }
 }
 
 /* Dark drawer items */
-body.dark .notif-drawer__item-inner       { background: #1e293b; border-color: #334155; }
-body.dark .notif-drawer__item-inner:hover { background: #334155; }
-body.dark .notif-drawer__item-title       { color: #f1f5f9; }
-body.dark .notif-drawer__item-sub         { color: #94a3b8; }
-body.dark .notif-drawer__item-msg         { color: #cbd5e1; }
-body.dark .notif-drawer__item-icon        { background: #0f172a; }
+.dark .notif-drawer__item-inner       { background: #1e293b; border-color: #334155; }
+.dark .notif-drawer__item-inner:hover { background: #334155; }
+.dark .notif-drawer__item-title       { color: #f1f5f9; }
+.dark .notif-drawer__item-sub         { color: #94a3b8; }
+.dark .notif-drawer__item-msg         { color: #cbd5e1; }
+.dark .notif-drawer__item-icon        { background: #0f172a; }
 
 /* ══════════════════════════════════════════════════════════════
    DRAWER VACÍO

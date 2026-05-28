@@ -1209,17 +1209,31 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     btn.addEventListener("click", () => {
+
         modal.classList.remove("hidden");
+
+        if (document.body.classList.contains("dark")) {
+            modal.classList.add("dark");
+        }
+
     });
 
     cerrar?.addEventListener("click", () => {
+
         modal.classList.add("hidden");
+        modal.classList.remove("dark");
+
     });
 
     modal.addEventListener("click", (e) => {
+
         if (e.target === modal) {
+
             modal.classList.add("hidden");
+            modal.classList.remove("dark");
+
         }
+
     });
 
     // ─── Marcar todas leídas desde el drawer y cerrarlo ──────────────
