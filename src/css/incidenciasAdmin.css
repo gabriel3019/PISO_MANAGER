@@ -43,6 +43,22 @@ body {
     border-bottom: 1px solid #eeeeee;
 }
 
+.admin-incidencias-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.admin-incidencias-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.admin-incidencias-actions input {
+    width: 260px;
+}
+
 .avatar {
     width: 34px;
     height: 34px;
@@ -203,6 +219,24 @@ nav a span {
     flex-direction: column;
 }
 
+.incidencias-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.incidencias-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.incidencias-actions input {
+  width: 260px;
+}
+
 .incidencia {
     display: grid;
     grid-template-columns: 45px 1fr auto;
@@ -275,48 +309,11 @@ select {
     padding: 30px;
 }
 
+/* Estilos de .modal, .modal-overlay, .modal__*, stepper, etc.
+   vienen de incidencias.css que ya está incluido */
+
 .hidden {
     display: none !important;
-}
-
-.modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(15, 23, 42, 0.45);
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    z-index: 9999;
-}
-
-.incidencia-modal {
-    width: 600px;
-    max-width: 92%;
-
-    background: white;
-    border-radius: 24px;
-
-    padding: 28px;
-
-    position: relative;
-
-    box-shadow: 0 20px 40px rgba(0, 0, 0, .12);
-}
-
-.modal-close {
-    position: absolute;
-    top: 18px;
-    right: 20px;
-
-    border: none;
-    background: transparent;
-
-    font-size: 28px;
-    cursor: pointer;
-
-    color: #64748b;
 }
 
 .detalle-desc {
@@ -363,12 +360,28 @@ select {
     font-family: inherit;
 }
 
+
 .modal-actions {
     display: flex;
     justify-content: flex-end;
     gap: 12px;
 
     margin-top: 18px;
+}
+
+.btn-new {
+  background: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 14px;
+  padding: 12px 18px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(79, 70, 229, 0.25);
+}
+
+.btn-new:hover {
+  transform: translateY(-1px);
 }
 
 .btn-primary {
@@ -450,4 +463,437 @@ select {
 .notify-priority.baja {
     background: #e0f2fe;
     color: #0369a1;
+}
+/* ── Admin: select de estado dentro de incident-item ── */
+.admin-estado-select {
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    font-size: .78rem;
+    font-weight: 600;
+    background: white;
+    cursor: pointer;
+    color: #374151;
+    min-width: 100px;
+}
+
+.admin-estado-select:focus {
+    outline: 2px solid #4f46e5;
+    outline-offset: 1px;
+}
+
+/* ── Admin: incident-list ajustes de columna (4 col: icon, body, status, actions) ── */
+#incidenciasList.incident-list .incident-item {
+    grid-template-columns: 40px 1fr auto auto;
+}
+
+/* ── Admin: section header con buscador ── */
+.section .section__header.admin-incidencias-header {
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+/* ── Botón campana notificaciones ── */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.btn-notif-bell {
+    position: relative;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    width: 42px;
+    height: 42px;
+    font-size: 1.15rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .15s;
+    flex-shrink: 0;
+}
+
+.btn-notif-bell:hover {
+    background: #f3f4f6;
+}
+
+.badge-notif {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: #ef4444;
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    pointer-events: none;
+}
+
+/* ══════════════════════════════════════════
+   DRAWER NOTIFICACIONES ADMIN
+══════════════════════════════════════════ */
+.notif-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.35);
+    z-index: 9998;
+    display: flex;
+    justify-content: flex-end;
+    backdrop-filter: blur(2px);
+}
+
+.notif-overlay.hidden {
+    display: none;
+}
+
+.notif-drawer {
+    width: 380px;
+    height: 100vh;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -8px 0 32px rgba(0,0,0,.12);
+    animation: slideInRight .22s ease;
+}
+
+@keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to   { transform: translateX(0);    opacity: 1; }
+}
+
+/* ── Header ── */
+.notif-drawer__header {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid #f0f0f0;
+    background: #fafafa;
+}
+
+.notif-drawer__close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: #f1f5f9;
+    border-radius: 6px;
+    font-size: .8rem;
+    color: #64748b;
+    cursor: pointer;
+    margin-bottom: 14px;
+    transition: background .15s;
+}
+
+.notif-drawer__close:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+.notif-drawer__header-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.notif-drawer__icon {
+    font-size: 1.5rem;
+    width: 44px;
+    height: 44px;
+    background: #fef3c7;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.notif-drawer__title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+}
+
+.notif-drawer__subtitle {
+    font-size: .75rem;
+    color: #6b7280;
+    margin: 2px 0 0;
+}
+
+/* ── Body ── */
+.notif-drawer__body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 16px;
+}
+
+.notif-drawer__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* ── Cada notify-card dentro del drawer ── */
+.notif-drawer__list .notify-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 14px;
+    gap: 12px;
+    cursor: pointer;
+    transition: border-color .15s, box-shadow .15s;
+}
+
+.notif-drawer__list .notify-card:hover {
+    border-color: #a5b4fc;
+    box-shadow: 0 2px 8px rgba(99,102,241,.1);
+}
+
+.notif-drawer__list .notify-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: #fef3c7;
+    font-size: 1.1rem;
+}
+
+.notif-drawer__list .notify-info h4 {
+    font-size: .87rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.notif-drawer__list .notify-info p {
+    font-size: .73rem;
+    color: #6b7280;
+    margin-top: 3px;
+}
+
+/* ── Empty state ── */
+.notif-drawer__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    gap: 10px;
+    color: #9ca3af;
+}
+
+.notif-drawer__empty-icon {
+    font-size: 2rem;
+}
+
+.notif-drawer__empty p {
+    font-size: .88rem;
+    font-weight: 500;
+}
+
+/* ── Footer ── */
+.notif-drawer__footer {
+    padding: 16px 20px;
+    border-top: 1px solid #f0f0f0;
+    background: #fafafa;
+}
+
+.notif-drawer__btn-leidas {
+    width: 100%;
+    padding: 11px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    background: white;
+    font-size: .85rem;
+    font-weight: 600;
+    color: #374151;
+    cursor: pointer;
+    transition: background .15s, border-color .15s;
+}
+
+.notif-drawer__btn-leidas:hover {
+    background: #f9fafb;
+    border-color: #6366f1;
+    color: #4f46e5;
+}
+
+.notifications-container {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+}
+
+.notification-btn {
+    position: relative;
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    border: 1px solid #eee;
+    background: white;
+    cursor: pointer;
+    font-size: 22px;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #ef4444;
+    color: white;
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+.notifications-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 380px;
+    height: 100vh;
+    background: white;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -10px 0 30px rgba(0,0,0,.15);
+}
+
+.notifications-header {
+    padding: 24px;
+    border-bottom: 1px solid #eee;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.notifications-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.notification-item {
+    padding: 14px;
+    border-radius: 14px;
+    background: #f8fafc;
+    margin-bottom: 12px;
+}
+
+.notification-item strong {
+    display: block;
+    margin-bottom: 6px;
+}
+
+.notifications-footer {
+    padding: 20px;
+    border-top: 1px solid #eee;
+}
+
+.notifications-footer button {
+    width: 100%;
+    border: none;
+    border-radius: 14px;
+    padding: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.notifications-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15,23,42,.35);
+    z-index: 9998;
+}
+
+#modal-chat-admin .modal--chat {
+    max-width: 760px;
+    height: 80vh;
+}
+
+#modal-chat-admin #listaMensajes {
+    flex: 1;
+    padding: 18px;
+    background: #f8fafc;
+    overflow-y: auto;
+}
+
+#modal-chat-admin #listaMensajes .mensaje {
+    max-width: 280px;
+    margin-bottom: 12px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: white;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+#modal-chat-admin #listaMensajes .mensaje strong {
+    display: block;
+    color: #4f46e5;
+    margin-bottom: 4px;
+}
+
+#modal-chat-admin #listaMensajes .mensaje p {
+    margin: 0;
+}
+
+#modal-chat-admin #listaMensajes .mensaje small {
+    display: block;
+    text-align: right;
+    margin-top: 6px;
+    color: #64748b;
+    font-size: 12px;
+}
+
+#modal-chat-admin #listaMensajes .mensaje--admin {
+    margin-left: auto;
+    background: #4f46e5;
+    color: white;
+}
+
+#modal-chat-admin #listaMensajes .mensaje--admin strong,
+#modal-chat-admin #listaMensajes .mensaje--admin small {
+    color: white;
+}
+
+#modal-chat-admin #listaMensajes .mensaje--user {
+    margin-right: auto;
+}
+
+#modal-chat-admin .btn-enviar {
+    background: #000 !important;
+}
+
+#btnVerConversacionAdmin {
+    width: auto !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 12px 20px;
+    border-radius: 12px;
+
+    background: #111827;
+    color: white;
+
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.detalle__campo--full {
+    align-items: flex-start;
 }
