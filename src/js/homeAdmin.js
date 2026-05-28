@@ -431,3 +431,55 @@ function inicializarDescargarContrato() {
     window.location.href = `../php/descargarContrato.php?id_piso=${pisoSeleccionado.id_piso}`;
   });
 }
+
+/* ================= DARK MODE ================= */
+
+const darkToggle =
+  document.getElementById("darkModeToggle");
+
+/* ===== CARGAR ===== */
+
+if (
+  localStorage.getItem("darkMode")
+  === "true"
+) {
+
+  document.documentElement
+    .classList.add("dark");
+
+  if (darkToggle) {
+    darkToggle.checked = true;
+  }
+
+}
+
+/* ===== TOGGLE ===== */
+
+darkToggle?.addEventListener(
+  "change",
+  () => {
+
+    if (darkToggle.checked) {
+
+      document.documentElement
+        .classList.add("dark");
+
+      localStorage.setItem(
+        "darkMode",
+        "true"
+      );
+
+    } else {
+
+      document.documentElement
+        .classList.remove("dark");
+
+      localStorage.setItem(
+        "darkMode",
+        "false"
+      );
+
+    }
+
+  }
+);
