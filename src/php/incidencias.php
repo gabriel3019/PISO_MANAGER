@@ -59,17 +59,15 @@ switch ($accion) {
         $urgencia_raw    = $_POST['urgencia']          ?? 'baja';
         $urgencia        = normalizarUrgencia($urgencia_raw);
         $notificar_admin = (int)($_POST['notificar_admin'] ?? 0);
-        $estado          = 'abierta'; // Siempre empieza como abierta
+        $estado          = 'abierta';
         $fecha_inicio    = $_POST['fecha_inicio'] ?? null;
         $fecha_fin       = !empty($_POST['fecha_fin']) ? $_POST['fecha_fin'] : null;
 
-        // Validación servidor — campos obligatorios
         if (!$titulo || !$descripcion || !$tipo) {
             echo json_encode(['success' => false, 'error' => 'Faltan campos obligatorios (título, descripción, tipo)']);
             exit;
         }
 
-        // Validación servidor — fecha
         $hoy = date('Y-m-d');
         if (!$fecha_inicio || $fecha_inicio < $hoy) {
             echo json_encode(['success' => false, 'error' => 'La fecha de inicio es obligatoria y no puede ser anterior a hoy']);
@@ -115,6 +113,7 @@ switch ($accion) {
         if ($stmt->execute()) {
             $id_incidencia = $stmt->insert_id;
 
+            // ── Insertar comentario del admin si existe ──
             if (!empty($_POST['comentario_admin']) && !empty($_POST['id_usuario_comentario'])) {
                 $comentario            = trim($_POST['comentario_admin']);
                 $id_usuario_comentario = (int)$_POST['id_usuario_comentario'];
@@ -125,6 +124,17 @@ switch ($accion) {
                 $stmt_msg->bind_param("iis", $id_incidencia, $id_usuario_comentario, $comentario);
                 $stmt_msg->execute();
                 $stmt_msg->close();
+            }
+
+            // ── NUEVO: Notificar al usuario cuando se crea la incidencia ──
+            if ($notificar_admin) {
+                $mensaje_notif = "Tu incidencia '$titulo' ha sido registrada y el administrador ha sido notificado.";
+                $stmt_notif = $conn->prepare(
+                    "INSERT INTO notificaciones (id_usuario, id_incidencia, mensaje) VALUES (?, ?, ?)"
+                );
+                $stmt_notif->bind_param("iis", $id_usuario, $id_incidencia, $mensaje_notif);
+                $stmt_notif->execute();
+                $stmt_notif->close();
             }
 
             echo json_encode(['success' => true, 'id' => $id_incidencia]);

@@ -123,6 +123,44 @@ async function initIncidencias() {
         btn.addEventListener("click", () => cerrarModal(btn.dataset.modalClose));
     });
 
+    // ─── LIGHTBOX de imagen en detalle ───────────────────────────
+    const lightboxOverlay = document.getElementById("lightbox-overlay");
+    const lightboxImg = document.getElementById("lightbox-img");
+    const lightboxClose = document.getElementById("lightbox-close");
+
+    function abrirLightbox(src) {
+        if (!lightboxOverlay || !src) return;
+        lightboxImg.src = src;
+        lightboxOverlay.classList.add("active");
+        document.body.style.overflow = "hidden";
+    }
+
+    function cerrarLightbox() {
+        if (!lightboxOverlay) return;
+        lightboxOverlay.classList.remove("active");
+        lightboxImg.src = "";
+        const hayModal = [...document.querySelectorAll(".modal-overlay")]
+            .some(m => !m.classList.contains("modal--hidden"));
+        if (!hayModal) document.body.style.overflow = "";
+    }
+
+    document.getElementById("detalle-imagen")?.addEventListener("click", () => {
+        const src = document.getElementById("detalle-imagen").src;
+        abrirLightbox(src);
+    });
+
+    lightboxClose?.addEventListener("click", cerrarLightbox);
+
+    lightboxOverlay?.addEventListener("click", (e) => {
+        if (e.target === lightboxOverlay) cerrarLightbox();
+    });
+
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && lightboxOverlay?.classList.contains("active")) {
+            cerrarLightbox();
+        }
+    });
+
     // ─── MOSTRAR COMENTARIO SI SE MARCA "NOTIFICAR ADMIN" ────────────
     function initToggleComentario() {
         ['nueva', 'editar'].forEach(prefix => {
@@ -802,6 +840,17 @@ async function initIncidencias() {
             irAPaso(1);
             initToggleComentario();
             setMinDateToday('nueva-fecha-inicio');
+
+            // ── Limpiar preview de imagen del formulario anterior ──
+            const inputImagen = document.getElementById("nueva-imagen");
+            if (inputImagen) inputImagen.value = "";
+
+            const previewAnterior = document.getElementById("nueva-imagen-preview");
+            if (previewAnterior) previewAnterior.remove();
+
+            const dropzone = document.querySelector('label[for="nueva-imagen"].modal__dropzone');
+            if (dropzone) dropzone.style.display = "";
+
             abrirModal("modal-nueva-incidencia");
 
             // Limpiar rojo en tiempo real al escribir
