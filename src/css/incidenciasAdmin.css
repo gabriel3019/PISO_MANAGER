@@ -12,16 +12,17 @@ body {
     display: flex;
 }
 
+/* ── Fix scroll lateral admin ── */
+html, body {
+    height: 100vh;
+    overflow: hidden;
+}
+
 .app {
     display: flex;
     width: 100%;
     min-height: 100vh;
-}
-
-.main {
-    flex: 1;
-    padding: 32px;
-    overflow-y: auto;
+    overflow: hidden;
 }
 
 /* SIDEBAR */
@@ -896,4 +897,25 @@ select {
 
 .detalle__campo--full {
     align-items: flex-start;
+}
+
+.input-error-text {
+    color: #ef4444;
+    font-size: 0.8rem;
+    margin-top: 4px;
+    display: block;
+}
+
+.modal__preview-img {
+    width: 100%;
+    max-height: 220px;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+.incident-img {
+    width: 46px;
+    height: 46px;
+    object-fit: cover;
+    border-radius: 10px;
 }
