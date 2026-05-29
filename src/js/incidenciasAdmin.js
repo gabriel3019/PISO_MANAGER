@@ -832,38 +832,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-        const fechaInicioInput =
-            document.getElementById("nueva-fecha-inicio");
-
-        const fechaInicioError =
-            document.getElementById("nueva-fecha-inicio-error");
-
-        fechaInicioInput?.addEventListener("input", () => {
-
-            if (fechaInicioInput.value) {
-
-                fechaInicioError.style.display = "none";
-
-                fechaInicioInput.classList.remove("input-error");
-            }
-        });
-
-        const fechaFinInput =
-            document.getElementById("nueva-fecha-fin");
-
-        const fechaFinError =
-            document.getElementById("nueva-fecha-fin-error");
-
-        fechaFinInput?.addEventListener("input", () => {
-
-            if (fechaFinInput.value) {
-
-                fechaFinError.style.display = "none";
-
-                fechaFinInput.classList.remove("input-error");
-            }
-        });
-
         input?.addEventListener("input", () => {
 
             const error = input.parentNode.querySelector(".input-error-text");
