@@ -1115,6 +1115,7 @@ async function initIncidencias() {
 
     async function comprobarNuevasNotificaciones() {
         const idUsuario = obtenerIdUsuario();
+        console.log("ID usuario para notificaciones:", idUsuario);
         if (!idUsuario) return;
 
         idUsuarioActual = idUsuario;

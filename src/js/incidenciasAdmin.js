@@ -563,6 +563,7 @@ document.getElementById("btnEnviarRespuesta")?.addEventListener("click", async (
         });
 
         const texto = await response.text();
+        console.log("PHP RAW:", texto);
         console.log("Respuesta responder:", texto);
 
         const data = JSON.parse(texto);

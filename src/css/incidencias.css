@@ -2168,7 +2168,7 @@ body.dark .notif-drawer__item-icon {
     position: sticky;
     top: 0;
     background: var(--bg-page);
-    z-index: 100000;
+    z-index: 1000;
   }
 
   .page-header__info {
@@ -2218,6 +2218,7 @@ body.dark .notif-drawer__item-icon {
   .section {
     margin: 0 16px 16px;
   }
+  
 }
 
 @media (max-width: 768px) {

@@ -1,5 +1,6 @@
 <?php
 header('Content-Type: application/json');
+ini_set('display_errors', 0);
 require_once("BBDD/conecta.php");
 
 $accion = $_REQUEST['accion'] ?? '';
@@ -297,62 +298,44 @@ switch ($accion) {
             'notificaciones' => $notificaciones
         ]);
         break;
-
-    case 'crear':
-        $id_piso            = intval($_POST['id_piso']    ?? 1);
-        $id_usuario         = intval($_POST['id_usuario'] ?? 1);
-        $tipo               = trim($_POST['tipo']         ?? '');
-        $titulo             = trim($_POST['titulo']       ?? '');
-        $descripcion        = trim($_POST['descripcion']  ?? '');
-        $urgencia           = $_POST['urgencia']          ?? 'baja';
-        $fecha_inicio       = $_POST['fecha_inicio']      ?? date('Y-m-d');
-        $fecha_fin          = $_POST['fecha_fin']         ?? null;
-        $notificar_inquilino = 1;
-        $estado             = 'abierta';
-
-        // Cuando el admin crea la incidencia no necesita notificarse a sí mismo
-        $notificar_admin = 0;
-        $leido_admin     = 1;
+case 'crear':
+        $id_piso             = intval($_POST['id_piso']    ?? 1);
+        $id_usuario          = intval($_POST['id_usuario'] ?? 1);
+        $tipo                = trim($_POST['tipo']         ?? '');
+        $titulo              = trim($_POST['titulo']       ?? '');
+        $descripcion         = trim($_POST['descripcion']  ?? '');
+        $urgencia            = $_POST['urgencia']          ?? 'baja';
+        $fecha_inicio        = $_POST['fecha_inicio']      ?? date('Y-m-d');
+        $fecha_fin           = !empty($_POST['fecha_fin']) ? $_POST['fecha_fin'] : null;
+        $notificar_inquilino = intval($_POST['notificar_inquilino'] ?? 0);
+        $estado              = 'abierta';
+        $notificar_admin     = 0;
+        $leido_admin         = 1;
 
         $imagen_path = null;
 
         if (!empty($_FILES['imagen']['name'])) {
-
             if ($_FILES['imagen']['error'] !== UPLOAD_ERR_OK) {
-                echo json_encode([
-                    'success' => false,
-                    'error' => 'Error al subir imagen: ' . $_FILES['imagen']['error']
-                ]);
+                echo json_encode(['success' => false, 'error' => 'Error al subir imagen: ' . $_FILES['imagen']['error']]);
                 exit;
             }
 
             $dir = __DIR__ . '/../uploads/incidencias/';
+            if (!is_dir($dir)) mkdir($dir, 0755, true);
 
-            if (!is_dir($dir)) {
-                mkdir($dir, 0755, true);
-            }
-
-            $ext = strtolower(pathinfo($_FILES['imagen']['name'], PATHINFO_EXTENSION));
-
+            $ext     = strtolower(pathinfo($_FILES['imagen']['name'], PATHINFO_EXTENSION));
             $allowed = ['jpg', 'jpeg', 'png', 'webp'];
 
             if (!in_array($ext, $allowed)) {
-                echo json_encode([
-                    'success' => false,
-                    'error' => 'Formato de imagen no permitido'
-                ]);
+                echo json_encode(['success' => false, 'error' => 'Formato de imagen no permitido']);
                 exit;
             }
 
-            $nombre = uniqid('inc_') . '.' . $ext;
-
+            $nombre     = uniqid('inc_') . '.' . $ext;
             $rutaFisica = $dir . $nombre;
 
             if (!move_uploaded_file($_FILES['imagen']['tmp_name'], $rutaFisica)) {
-                echo json_encode([
-                    'success' => false,
-                    'error' => 'No se pudo mover la imagen'
-                ]);
+                echo json_encode(['success' => false, 'error' => 'No se pudo mover la imagen']);
                 exit;
             }
 
@@ -360,10 +343,7 @@ switch ($accion) {
         }
 
         if ($tipo === '' || $titulo === '' || $descripcion === '') {
-            echo json_encode([
-                'success' => false,
-                'error'   => 'Faltan campos obligatorios'
-            ]);
+            echo json_encode(['success' => false, 'error' => 'Faltan campos obligatorios']);
             exit;
         }
 
@@ -403,40 +383,40 @@ switch ($accion) {
         $id_nueva_incidencia = $conn->insert_id;
         $stmt->close();
 
+        // ── Guardar comentario para el inquilino si existe ──
         $comentario_inquilino = trim($_POST['comentario_inquilino'] ?? '');
-
         if (!empty($comentario_inquilino)) {
-
             $stmtMsg = $conn->prepare("
-        INSERT INTO incidencia_mensajes
-        (id_incidencia, id_usuario, mensaje)
-        VALUES (?, ?, ?)
-    ");
-
-            $stmtMsg->bind_param(
-                "iis",
-                $id_nueva_incidencia,
-                $id_usuario,
-                $comentario_inquilino
-            );
-
+                INSERT INTO incidencia_mensajes (id_incidencia, id_usuario, mensaje)
+                VALUES (?, ?, ?)
+            ");
+            $stmtMsg->bind_param("iis", $id_nueva_incidencia, $id_usuario, $comentario_inquilino);
             $stmtMsg->execute();
             $stmtMsg->close();
         }
 
-        // Si el admin marcó "Notificar al inquilino", crear notificación para ese usuario
-        if ($notificar_inquilino === 1 && $id_usuario > 0) {
+        // ── Notificar a TODOS los usuarios del piso ──
+        if ($notificar_inquilino === 1) {
             $textoNotificacion = "El administrador ha creado una nueva incidencia: \"$titulo\".";
 
-            $stmt = $conn->prepare("
-                INSERT INTO notificaciones
-                    (id_usuario, id_incidencia, mensaje)
-                VALUES (?, ?, ?)
+            $stmt_usuarios = $conn->prepare("
+                SELECT DISTINCT id_usuario 
+                FROM incidencias 
+                WHERE id_piso = ?
             ");
+            $stmt_usuarios->bind_param("i", $id_piso);
+            $stmt_usuarios->execute();
+            $result_usuarios = $stmt_usuarios->get_result();
+            $stmt_usuarios->close();
 
-            $stmt->bind_param("iis", $id_usuario, $id_nueva_incidencia, $textoNotificacion);
-            $stmt->execute();
-            $stmt->close();
+            $stmt_notif = $conn->prepare("
+                INSERT INTO notificaciones (id_usuario, id_incidencia, mensaje) VALUES (?, ?, ?)
+            ");
+            while ($u = $result_usuarios->fetch_assoc()) {
+                $stmt_notif->bind_param("iis", $u['id_usuario'], $id_nueva_incidencia, $textoNotificacion);
+                $stmt_notif->execute();
+            }
+            $stmt_notif->close();
         }
 
         echo json_encode([
@@ -444,8 +424,6 @@ switch ($accion) {
             'message' => 'Incidencia creada correctamente',
             'id'      => $id_nueva_incidencia
         ]);
-
-
         break;
 
     case 'marcar_todas_leidas':
