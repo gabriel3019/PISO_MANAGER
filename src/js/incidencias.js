@@ -1,5 +1,10 @@
 const nombreUsuario = document.getElementById("nombreUsuario");
 
+function normalizarRutaImagen(ruta) {
+    if (!ruta) return "";
+    const nombreArchivo = ruta.split("/").pop();
+    return "../uploads/incidencias/" + nombreArchivo;
+}
 /* ─────────────────────────────────────────────────────────────
    TOAST HELPER
    ───────────────────────────────────────────────────────────── */
@@ -347,10 +352,11 @@ async function initIncidencias() {
                     otros: "📋"
                 }[inc.tipo] || "📋";
 
-                const iconoHTML = inc.imagen
-                    ? `<img src="${inc.imagen}" class="incident-img"
+                const rutaImagen = normalizarRutaImagen(inc.imagen);
+                const iconoHTML = rutaImagen
+                    ? `<img src="${rutaImagen}" class="incident-img"
                             style="width:48px;height:48px;object-fit:cover;border-radius:8px;"
-                            onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'incident-icon',textContent:'${icono}'}))">`
+                             onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<div class=\\'incident-icon\\'>${icono}</div>')">`
                     : `<div class="incident-icon">${icono}</div>`;
 
                 const estadoClase =
@@ -383,7 +389,7 @@ async function initIncidencias() {
                         data-desc="${inc.descripcion?.replace(/"/g, '&quot;')}"
                         data-estado="${inc.estado}"
                         data-fecha="${inc.fecha || inc.fecha_creacion || ''}"
-                        data-imagen="${inc.imagen || ''}"
+                        data-imagen="${normalizarRutaImagen(inc.imagen)}"
                         data-notificar="${inc.notificar_admin || 0}"
                         data-fecha-inicio="${inc.fecha_inicio || ''}"
                         data-fecha-fin="${inc.fecha_fin || ''}"
@@ -491,7 +497,11 @@ async function initIncidencias() {
         }
 
         const fechaInicio = item.dataset.fechaInicio ? new Date(item.dataset.fechaInicio).toLocaleDateString('es-ES') : '—';
-        const fechaFin = item.dataset.fechaFin ? new Date(item.dataset.fechaFin).toLocaleDateString('es-ES') : 'Pendiente';
+        const fechaFinRaw = item.dataset.fechaFin;
+        const fechaFinDate = fechaFinRaw ? new Date(fechaFinRaw) : null;
+        const fechaFin = (fechaFinDate && !isNaN(fechaFinDate))
+            ? fechaFinDate.toLocaleDateString('es-ES')
+            : 'Pendiente';
         document.getElementById("detalle-fecha-inicio").textContent = fechaInicio;
         document.getElementById("detalle-fecha-fin").textContent = fechaFin;
 

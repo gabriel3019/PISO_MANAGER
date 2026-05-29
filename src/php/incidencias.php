@@ -81,7 +81,7 @@ switch ($accion) {
             if (in_array($ext, $allowed)) {
                 $nombre = uniqid('inc_') . '.' . $ext;
                 if (move_uploaded_file($_FILES['imagen']['tmp_name'], $dir . $nombre)) {
-                    $imagen_path = $dir . $nombre;
+                    $imagen_path = 'uploads/incidencias/' . $nombre;
                 }
             }
         }
