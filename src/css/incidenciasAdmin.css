@@ -956,7 +956,7 @@ select {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 99999;
+    z-index: 999999;
     padding: 40px;
 }
 
@@ -979,4 +979,15 @@ select {
     color: white;
     font-size: 40px;
     cursor: pointer;
+}
+
+#nueva-comentario-inquilino-wrap {
+    margin-top: 12px;
+}
+
+.modal__hint--error {
+    color: #ef4444;
+    display: none;
+    margin-top: 6px;
+    font-size: 13px;
 }

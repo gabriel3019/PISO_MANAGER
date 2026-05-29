@@ -25,7 +25,6 @@ let filtroActual = "todas";
 
 document.addEventListener("DOMContentLoaded", () => {
     cargarIncidencias();
-    //cargarNotificaciones();
 });
 
 function rutaImagen(imagen) {
@@ -833,6 +832,38 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
+        const fechaInicioInput =
+            document.getElementById("nueva-fecha-inicio");
+
+        const fechaInicioError =
+            document.getElementById("nueva-fecha-inicio-error");
+
+        fechaInicioInput?.addEventListener("input", () => {
+
+            if (fechaInicioInput.value) {
+
+                fechaInicioError.style.display = "none";
+
+                fechaInicioInput.classList.remove("input-error");
+            }
+        });
+
+        const fechaFinInput =
+            document.getElementById("nueva-fecha-fin");
+
+        const fechaFinError =
+            document.getElementById("nueva-fecha-fin-error");
+
+        fechaFinInput?.addEventListener("input", () => {
+
+            if (fechaFinInput.value) {
+
+                fechaFinError.style.display = "none";
+
+                fechaFinInput.classList.remove("input-error");
+            }
+        });
+
         input?.addEventListener("input", () => {
 
             const error = input.parentNode.querySelector(".input-error-text");
@@ -854,10 +885,10 @@ async function crearIncidenciaAdmin() {
     const titulo = document.getElementById("nueva-titulo").value.trim();
     const descripcion = document.getElementById("nueva-desc").value.trim();
     const fechaInicio = document.getElementById("nueva-fecha-inicio").value;
-    const notificarInquilino = document.getElementById("nueva-notificar-inquilino")?.checked ? 1 : 0;
-    const imagen = document.getElementById("nueva-imagen")?.files[0];
     const fechaFin = document.getElementById("nueva-fecha-fin").value;
-    const comentarioInquilino = document.getElementById("nueva-comentario-inquilino")?.value.trim();
+    const notificarInquilino = document.getElementById("nueva-notificar-inquilino")?.checked ? 1 : 0;
+    const comentarioInquilino = document.getElementById("nueva-comentario-inquilino")?.value.trim() || "";
+    const imagen = document.getElementById("nueva-imagen")?.files[0];
 
     const urgenciaBtn = document.querySelector(
         "#modal-nueva-incidencia .modal__urgencia-btn--active"
@@ -874,8 +905,23 @@ async function crearIncidenciaAdmin() {
     });
 
     if (!fechaInicio) {
+
         inputFechaInicio.classList.add("input-error");
+
+        document.getElementById("nueva-fecha-inicio-error")
+            .style.display = "block";
+
+        document.getElementById("nueva-fecha-inicio-error")
+            .textContent = "La fecha de inicio es obligatoria";
+
         hayErrores = true;
+
+    } else {
+
+        document.getElementById("nueva-fecha-inicio-error")
+            .style.display = "none";
+
+        inputFechaInicio.classList.remove("input-error");
     }
 
     if (fechaInicio && fechaInicio < hoy) {
@@ -906,7 +952,6 @@ async function crearIncidenciaAdmin() {
     formData.append("tipo", tipo);
     formData.append("titulo", titulo);
     formData.append("descripcion", descripcion);
-    formData.append("comentario_inquilino", comentarioInquilino);
     formData.append("urgencia", urgenciaBtn ? urgenciaBtn.dataset.urgencia : "baja");
 
     formData.append("fecha_inicio", fechaInicio);
@@ -917,6 +962,7 @@ async function crearIncidenciaAdmin() {
     }
 
     formData.append("notificar_inquilino", notificarInquilino);
+    formData.append("comentario_inquilino", comentarioInquilino);
 
     const response = await fetch("../php/incidenciasAdmin.php", {
         method: "POST",
