@@ -1117,6 +1117,8 @@ async function initIncidencias() {
         const idUsuario = obtenerIdUsuario();
         if (!idUsuario) return;
 
+        console.log("ID USUARIO ACTUAL:", idUsuario);
+
         idUsuarioActual = idUsuario;
 
         try {
@@ -1124,6 +1126,8 @@ async function initIncidencias() {
                 `../php/incidencias.php?accion=obtener_notificaciones_usuario&id_usuario=${idUsuario}`
             );
             const data = await resp.json();
+
+            console.log("NOTIFICACIONES:", data);
 
             if (data.success && data.notificaciones.length > 0) {
                 mostrarModalNotificaciones(data.notificaciones);
