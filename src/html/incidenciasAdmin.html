@@ -83,7 +83,7 @@
             <section class="content">
                 <div class="section__header admin-incidencias-header">
                     <div class="admin-incidencias-actions">
-                        
+
                         <div class="filters">
                             <button class="filter active" data-filter="todas">Todas</button>
                             <button class="filter" data-filter="abierta">Abiertas</button>
@@ -319,6 +319,15 @@
                     <label class="modal__checkbox-label">
                         <input type="checkbox" id="nueva-notificar-inquilino" name="notificar_inquilino"
                             class="modal__checkbox" />
+                        <div class="modal__field" id="nueva-comentario-inquilino-wrap" style="display:none;">
+                            <label class="modal__label" for="nueva-comentario-inquilino">
+                                COMENTARIO PARA EL INQUILINO
+                            </label>
+
+                            <textarea class="modal__textarea" id="nueva-comentario-inquilino"
+                                name="comentario_inquilino"
+                                placeholder="Añade un mensaje para el inquilino..."></textarea>
+                        </div>
                         <span>Notificar al inquilino</span>
                     </label>
                     <p class="modal__checkbox-hint">El inquilino recibirá una notificación sobre esta incidencia.</p>

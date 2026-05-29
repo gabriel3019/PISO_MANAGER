@@ -611,6 +611,8 @@ function limpiarFormularioNuevaIncidenciaAdmin() {
     document.getElementById("nueva-fecha-fin").value = "";
     document.getElementById("nueva-notificar-inquilino").checked = false;
     document.getElementById("nueva-imagen").value = "";
+    document.getElementById("nueva-comentario-inquilino").value = "";
+    document.getElementById("nueva-comentario-inquilino-wrap").style.display = "none";
 
     document.querySelectorAll("#modal-nueva-incidencia .modal__urgencia-btn")
         .forEach(btn => {
@@ -719,12 +721,33 @@ function irAPasoNuevaAdmin(paso) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+
     document.querySelectorAll(".btn-abrir-nueva").forEach(btn => {
         btn.addEventListener("click", abrirModalNuevaIncidenciaAdmin);
     });
 
     document.querySelectorAll('[data-modal-close="modal-nueva-incidencia"]').forEach(btn => {
         btn.addEventListener("click", cerrarModalNuevaIncidenciaAdmin);
+    });
+
+    const checkNotificarInquilino =
+        document.getElementById("nueva-notificar-inquilino");
+
+    const comentarioInquilinoWrap =
+        document.getElementById("nueva-comentario-inquilino-wrap");
+
+    checkNotificarInquilino?.addEventListener("change", () => {
+
+        if (checkNotificarInquilino.checked) {
+
+            comentarioInquilinoWrap.style.display = "block";
+
+        } else {
+
+            comentarioInquilinoWrap.style.display = "none";
+
+            document.getElementById("nueva-comentario-inquilino").value = "";
+        }
     });
 
     document.getElementById("btn-nueva-izquierda")?.addEventListener("click", () => {
@@ -744,34 +767,36 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    const inputImagen = document.getElementById("nueva-imagen");
+    const dropzone = document.querySelector(".modal__dropzone");
+
+    inputImagen?.addEventListener("change", () => {
+
+        const file = inputImagen.files[0];
+
+        if (!file) return;
+
+        dropzone.querySelector(".modal__preview-img")?.remove();
+
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+
+            dropzone.querySelector(".modal__dropzone-icon").style.display = "none";
+            dropzone.querySelector("span:last-of-type").style.display = "none";
+
+            const preview = document.createElement("img");
+            preview.src = e.target.result;
+            preview.alt = "Preview";
+            preview.className = "modal__preview-img";
+
+            dropzone.appendChild(preview);
+        };
+
+        reader.readAsDataURL(file);
+    });
+
     document.querySelectorAll("#modal-nueva-incidencia .modal__urgencia-btn").forEach(btn => {
-
-        const inputImagen = document.getElementById("nueva-imagen");
-        const dropzone = document.querySelector(".modal__dropzone");
-
-        inputImagen?.addEventListener("change", () => {
-
-            const file = inputImagen.files[0];
-
-            if (!file) return;
-
-            const reader = new FileReader();
-
-            reader.onload = (e) => {
-
-                dropzone.querySelector(".modal__dropzone-icon").style.display = "none";
-                dropzone.querySelector("span:last-of-type").style.display = "none";
-
-                const preview = document.createElement("img");
-                preview.src = e.target.result;
-                preview.alt = "Preview";
-                preview.className = "modal__preview-img";
-
-                dropzone.appendChild(preview);
-            };
-
-            reader.readAsDataURL(file);
-        });
 
         btn.addEventListener("click", () => {
 
@@ -832,6 +857,7 @@ async function crearIncidenciaAdmin() {
     const notificarInquilino = document.getElementById("nueva-notificar-inquilino")?.checked ? 1 : 0;
     const imagen = document.getElementById("nueva-imagen")?.files[0];
     const fechaFin = document.getElementById("nueva-fecha-fin").value;
+    const comentarioInquilino = document.getElementById("nueva-comentario-inquilino")?.value.trim();
 
     const urgenciaBtn = document.querySelector(
         "#modal-nueva-incidencia .modal__urgencia-btn--active"
@@ -880,6 +906,7 @@ async function crearIncidenciaAdmin() {
     formData.append("tipo", tipo);
     formData.append("titulo", titulo);
     formData.append("descripcion", descripcion);
+    formData.append("comentario_inquilino", comentarioInquilino);
     formData.append("urgencia", urgenciaBtn ? urgenciaBtn.dataset.urgencia : "baja");
 
     formData.append("fecha_inicio", fechaInicio);
