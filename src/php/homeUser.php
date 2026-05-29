@@ -362,8 +362,6 @@ JOIN usuarios u
 WHERE t.id_piso = ?
 
 ORDER BY t.id_tarea DESC
-
-LIMIT 5
 ";
 
 $stmt = $conn->prepare($sql);
@@ -391,14 +389,16 @@ while ($row = $res->fetch_assoc()) {
 $sql = "
 SELECT
     titulo,
-    descripcion
-
-FROM avisos
-
+    CONCAT(
+        UPPER(tipo),
+        ' • ',
+        fecha,
+        ' • ',
+        estado
+    ) AS descripcion
+FROM calendario_eventos
 WHERE id_piso = ?
-
-ORDER BY id_aviso DESC
-
+ORDER BY fecha DESC, id_evento DESC
 LIMIT 3
 ";
 
@@ -411,8 +411,7 @@ $stmt->bind_param(
 
 $stmt->execute();
 
-$res =
-    $stmt->get_result();
+$res = $stmt->get_result();
 
 while ($row = $res->fetch_assoc()) {
 
