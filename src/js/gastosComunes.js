@@ -16,6 +16,13 @@ let gastoAEliminar = null;
 let gastoDetalleActual = null;
 
 let filtroActivo = "todos";
+let paginaActual = 1;
+
+const menuToggle =
+  document.getElementById("menuToggle");
+
+const sidebar =
+  document.getElementById("sidebar");
 
 const usuarioActual =
   JSON.parse(
@@ -45,6 +52,35 @@ let textoConfirmarPago;
 /* ================================================= */
 /* ================= INIT ========================== */
 /* ================================================= */
+
+/* ================= MENU ================= */
+
+if (menuToggle && sidebar) {
+
+  menuToggle.addEventListener(
+    "click",
+    () => {
+
+      sidebar.classList.toggle("active");
+
+      menuToggle.classList.toggle("active");
+
+      if (
+        sidebar.classList.contains("active")
+      ) {
+
+        menuToggle.innerHTML = "✕";
+
+      } else {
+
+        menuToggle.innerHTML = "☰";
+
+      }
+
+    }
+  );
+
+}
 
 document.addEventListener(
   "DOMContentLoaded",
@@ -516,6 +552,8 @@ function renderLista() {
   let listaFinal =
     [...gastos];
 
+  /* ================= PENDIENTES ================= */
+
   if (filtroActivo === "pendientes") {
 
     listaFinal =
@@ -529,6 +567,8 @@ function renderLista() {
 
   }
 
+  /* ================= LIQUIDADOS ================= */
+
   if (filtroActivo === "liquidados") {
 
     listaFinal =
@@ -541,6 +581,31 @@ function renderLista() {
       );
 
   }
+
+  /* ================= ESTE MES ================= */
+
+  if (filtroActivo === "mes") {
+
+    const ahora = new Date();
+
+    listaFinal =
+      listaFinal.filter(g => {
+
+        const fecha =
+          new Date(g.fecha);
+
+        return (
+
+          fecha.getMonth() === ahora.getMonth() &&
+          fecha.getFullYear() === ahora.getFullYear()
+
+        );
+
+      });
+
+  }
+
+  /* ================= BUSCADOR ================= */
 
   const texto =
     document
@@ -562,6 +627,8 @@ function renderLista() {
 
   }
 
+  /* ================= VACIO ================= */
+
   if (!listaFinal.length) {
 
     lista.innerHTML = `
@@ -576,7 +643,28 @@ function renderLista() {
 
   }
 
-  listaFinal.forEach(gasto => {
+  /* ================= PAGINACION ================= */
+
+  const GASTOS_POR_PAGINA = 4;
+
+  const inicio =
+
+    (paginaActual - 1)
+    *
+    GASTOS_POR_PAGINA;
+
+  const fin =
+
+    inicio +
+    GASTOS_POR_PAGINA;
+
+  const gastosPagina =
+
+    listaFinal.slice(inicio, fin);
+
+  /* ================= RENDER ================= */
+
+  gastosPagina.forEach(gasto => {
 
     lista.appendChild(
       crearCardGasto(gasto)
@@ -584,12 +672,99 @@ function renderLista() {
 
   });
 
+  /* ================= PAGINACION UI ================= */
+
+  renderPaginacion(
+    listaFinal.length,
+    GASTOS_POR_PAGINA
+  );
+
 }
+
+function renderPaginacion(
+  totalGastos,
+  porPagina
+) {
+
+  const totalPaginas =
+
+    Math.ceil(
+      totalGastos / porPagina
+    );
+
+  const vieja =
+    document.querySelector(
+      ".pagination"
+    );
+
+  if (vieja) {
+
+    vieja.remove();
+
+  }
+
+  if (totalPaginas <= 1) {
+
+    return;
+
+  }
+
+  const div =
+    document.createElement("div");
+
+  div.className =
+    "pagination";
+
+  for (
+    let i = 1;
+    i <= totalPaginas;
+    i++
+  ) {
+
+    div.innerHTML += `
+
+      <button
+        class="
+          page-btn
+          ${i === paginaActual ? "active" : ""}
+        "
+        data-page="${i}"
+      >
+
+        ${i}
+
+      </button>
+
+    `;
+
+  }
+
+  lista.after(div);
+
+  div
+    .querySelectorAll(".page-btn")
+    .forEach(btn => {
+
+      btn.onclick = () => {
+
+        paginaActual =
+
+          Number(
+            btn.dataset.page
+          );
+
+        renderLista();
+
+      };
+
+    });
+
+}
+
 
 /* ================================================= */
 /* ================= CARD GASTO ==================== */
 /* ================================================= */
-
 function crearCardGasto(gasto) {
 
   const div =
@@ -598,11 +773,21 @@ function crearCardGasto(gasto) {
   div.className =
     "expense-item";
 
+  /* ================= PENDIENTE ================= */
+
   const pendiente =
 
     gasto.participantes.some(
       p => Number(p.pagado) === 0
     );
+
+  /* ================= ES MIO ================= */
+
+  const esMio =
+
+    Number(gasto.id_pagador)
+    ===
+    Number(usuarioActual.id);
 
   div.innerHTML = `
 
@@ -624,12 +809,21 @@ function crearCardGasto(gasto) {
             Pagado por ${gasto.pagador}
           </div>
 
+          <div class="expense-date">
+
+            ${new Date(gasto.fecha)
+              .toLocaleDateString("es-ES")}
+
+          </div>
+
           <div class="
             expense-status
             ${pendiente ? "pending" : "paid"}
           ">
 
-            ${pendiente ? "Pendiente" : "Liquidado"}
+            ${pendiente
+              ? "Pendiente"
+              : "Liquidado"}
 
           </div>
 
@@ -640,7 +834,8 @@ function crearCardGasto(gasto) {
       <div class="right">
 
         <div class="amount">
-          ${parseFloat(gasto.importe).toFixed(2)} €
+          ${parseFloat(gasto.importe)
+            .toFixed(2)} €
         </div>
 
         <div class="expense-actions">
@@ -649,13 +844,17 @@ function crearCardGasto(gasto) {
             Ver detalles
           </button>
 
-          <span class="edit-btn">
-            ✏️
-          </span>
+          ${esMio ? `
 
-          <span class="delete-btn">
-            🗑️
-          </span>
+            <span class="edit-btn">
+              ✏️
+            </span>
+
+            <span class="delete-btn">
+              🗑️
+            </span>
+
+          ` : ""}
 
         </div>
 
@@ -665,25 +864,40 @@ function crearCardGasto(gasto) {
 
   `;
 
+  /* ================= DETALLE ================= */
+
   div
     .querySelector(".detail-btn")
     .onclick = () =>
       abrirDetalle(gasto);
 
-  div
-    .querySelector(".edit-btn")
-    .onclick = () =>
+  /* ================= EDITAR ================= */
+
+  const editBtn =
+    div.querySelector(".edit-btn");
+
+  if (editBtn) {
+
+    editBtn.onclick = () =>
       editarGasto(gasto);
 
-  div
-    .querySelector(".delete-btn")
-    .onclick = () =>
+  }
+
+  /* ================= ELIMINAR ================= */
+
+  const deleteBtn =
+    div.querySelector(".delete-btn");
+
+  if (deleteBtn) {
+
+    deleteBtn.onclick = () =>
       abrirDelete(gasto);
+
+  }
 
   return div;
 
 }
-
 /* ================================================= */
 /* ================= MODAL GASTO =================== */
 /* ================================================= */

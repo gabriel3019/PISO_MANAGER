@@ -1551,57 +1551,417 @@ body {
     background: #1d4ed8;
     transform: translateY(-2px);
 }
+/* ================================================= */
+/* ================= DARK MODE ===================== */
+/* ================================================= */
 
-/* ================= DARK MODE ================= */
-body.dark .settings {
-    color: #e5e7eb;
-}
+body.dark {
 
-body.dark .card {
     background: #020617;
-    border-color: #1e293b;
-}
 
-body.dark .form-group input {
-    background: #020617;
     color: #e5e7eb;
+
+}
+
+/* ================= SIDEBAR ================= */
+
+body.dark .sidebar {
+
+    background: #020617;
+
     border-color: #1e293b;
+
 }
 
-body.dark label {
-    color: #cbd5f5;
+body.dark .sidebar li a {
+
+    color: #cbd5e1;
+
 }
 
-body.dark .avatar button {
+body.dark .sidebar li:hover a {
+
+    background: #111827;
+
+}
+
+body.dark .sidebar li.active a {
+
     background: #1e293b;
-    color: #e5e7eb;
+
+    color: #60a5fa;
+
 }
 
-body.dark .slider {
-    background: #374151;
+/* ================= MAIN ================= */
+
+body.dark .calendar-main,
+body.dark .calendar-sidebar {
+
+    background: #0f172a;
+
+    border-color: #1e293b;
+
 }
 
-body.dark input:checked+.slider {
-    background: #2563eb;
+/* ================= HEADER ================= */
+
+body.dark .calendar-header h1,
+body.dark .calendar-header p,
+body.dark .calendar-month-bar h2 {
+
+    color: #f8fafc;
+
 }
 
-body,
-.card,
-input,
-.slider {
-    transition: all 0.3s ease;
+/* ================= WEEKDAYS ================= */
+
+body.dark .calendar-weekdays div,
+body.dark .legend-item {
+
+    color: #94a3b8;
+
 }
 
-.field-error {
-    color: #dc2626;
-    font-size: 12px;
-    font-weight: 600;
-    margin-top: -2px;
-    margin-bottom: 4px;
+/* ================= DAYS ================= */
+
+body.dark .calendar-day {
+
+    background: #111827;
+
+    border-color: #1e293b;
+
 }
 
-#people-fields.field-error {
-    display: block;
+body.dark .calendar-day:hover {
+
+    background: #1e293b;
+
+}
+
+body.dark .calendar-day-number {
+
+    color: #f8fafc;
+
+}
+
+body.dark .other-month {
+
+    opacity: 0.35;
+
+}
+
+/* ================= EVENTS ================= */
+
+body.dark .more-events {
+
+    background: #1e293b;
+
+    color: #f8fafc;
+
+}
+
+body.dark .more-events:hover {
+
+    background: #334155;
+
+}
+
+/* ================= BUTTONS ================= */
+
+body.dark .calendar-actions button,
+body.dark .btn-secondary,
+body.dark #calendar-view {
+
+    background: #111827;
+
+    color: #f8fafc;
+
+    border-color: #1e293b;
+
+}
+
+body.dark .calendar-actions button:hover,
+body.dark .btn-secondary:hover {
+
+    background: #1e293b;
+
+}
+
+/* ================= YEAR VIEW ================= */
+
+body.dark .year-month-card {
+
+    background: #111827;
+
+    border-color: #1e293b;
+
+}
+
+body.dark .year-month-title,
+body.dark .year-day {
+
+    color: #f8fafc;
+
+}
+
+body.dark .year-day:hover {
+
+    background: #1e293b;
+
+}
+
+/* ================= MODALS ================= */
+
+body.dark .modal-content {
+
+    background: #0f172a;
+
+    color: #f8fafc;
+
+}
+
+body.dark .modal-header h3 {
+
+    color: #f8fafc;
+
+}
+
+body.dark .modal-form input,
+body.dark .modal-form select {
+
+    background: #111827;
+
+    color: #f8fafc;
+
+    border-color: #334155;
+
+}
+
+body.dark .modal-form label {
+
+    color: #cbd5e1;
+
+}
+
+/* ================================================= */
+/* ================= WEEK VIEW DARK ================ */
+/* ================================================= */
+
+body.dark .week-header-row {
+
+    background: #111827;
+
+    border-color: #334155;
+
+}
+
+body.dark .week-day-header strong {
+
+    color: #f8fafc;
+
+}
+
+body.dark .week-day-header span {
+
+    color: #94a3b8;
+
+}
+
+body.dark .week-hour-row {
+
+    border-color: #334155;
+
+}
+
+body.dark .week-hour-label {
+
+    color: #94a3b8;
+
+    border-color: #334155;
+
+}
+
+body.dark .week-hour-cell {
+
+    border-color: #334155;
+
+}
+
+/* ================================================= */
+/* ================= DAY VIEW DARK ================= */
+/* ================================================= */
+
+body.dark .calendar-grid.day-view {
+
+    background: #111827;
+
+}
+
+body.dark .day-hour-row {
+
+    border-color: #334155;
+
+}
+
+body.dark .day-hour-label {
+
+    color: #94a3b8;
+
+    border-color: #334155;
+
+}
+
+body.dark .day-weekday {
+
+    color: #94a3b8;
+
+}
+
+body.dark .day-weekday.active-day {
+
+    color: #f8fafc;
+
+}
+
+/* ================================================= */
+/* ================= DETAILS DARK ================== */
+/* ================================================= */
+
+body.dark .details-card {
+
+    background: #0f172a;
+
+}
+
+body.dark .detail-box {
+
+    background: #111827;
+
+    border-color: #334155;
+
+}
+
+body.dark .detail-label {
+
+    color: #94a3b8;
+
+}
+
+body.dark .detail-value {
+
+    color: #f8fafc;
+
+}
+
+/* ================================================= */
+/* ================= MODAL DAY DARK ================ */
+/* ================================================= */
+
+body.dark .day-modal-content {
+
+    background: #0f172a;
+
+}
+
+body.dark .day-modal-content .modal-header {
+
+    border-color: #334155;
+
+}
+
+body.dark .day-modal-content .modal-close {
+
+    background: #111827;
+
+    color: #f8fafc;
+
+}
+
+body.dark .day-modal-content .modal-close:hover {
+
+    background: #1e293b;
+
+}
+
+/* ================================================= */
+/* ================= YEAR DARK ===================== */
+/* ================================================= */
+
+body.dark .year-weekday {
+
+    color: #94a3b8;
+
+}
+
+body.dark .year-day {
+
+    color: #f8fafc;
+
+}
+
+body.dark .year-day:hover {
+
+    background: #1e293b;
+
+}
+
+/* ================= EVENTOS MES DARK ================= */
+
+body.dark .event.incidencia {
+
+    background: #3b1f24;
+
+    color: #fecaca;
+
+}
+
+body.dark .event.tarea {
+
+    background: #1b3327;
+
+    color: #bbf7d0;
+
+}
+
+body.dark .event.evento {
+
+    background: #1e3a5f;
+
+    color: #bfdbfe;
+
+}
+
+body.dark .event-text {
+
+    color: inherit;
+
+}
+
+/* ================= LEGEND DARK ================= */
+
+body.dark .legend-color.incidencia {
+
+    background: #ef4444;
+
+}
+
+body.dark .legend-color.tarea {
+
+    background: #22c55e;
+
+}
+
+body.dark .legend-color.evento {
+
+    background: #3b82f6;
+
+}
+
+body.dark .legend-item {
+
+    color: #f8fafc;
+
 }
 
 /* ================= RESPONSIVE ================= */

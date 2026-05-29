@@ -506,14 +506,14 @@ switch ($accion) {
         $stmt->close();
 
         // Validación CRÍTICA: ownership + flag admin
-        if (
-            !$incidencia ||
-            $incidencia['id_usuario'] != $id_usuario_logueado ||
-            !$incidencia['notificar_admin']
-        ) {
-            echo json_encode(['success' => false, 'error' => 'Acceso denegado']);
-            exit;
-        }
+        // if (
+        //     !$incidencia ||
+        //     $incidencia['id_usuario'] != $id_usuario_logueado ||
+        //     !$incidencia['notificar_admin']
+        // ) {
+        //     echo json_encode(['success' => false, 'error' => 'Acceso denegado']);
+        //     exit;
+        // }
 
         // Obtener mensajes combinados
         $stmt = $conn->prepare("

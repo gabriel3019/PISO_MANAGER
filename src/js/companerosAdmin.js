@@ -1,110 +1,239 @@
+const API_URL = "../php/companeros.php";
+
+/* ================================================= */
+/* ================= ELEMENTOS ===================== */
+/* ================================================= */
+
 const modal =
-    document.getElementById("modalMiembro");
+document.getElementById("modalMiembro");
 
 const abrir =
-    document.getElementById("btnAbrirModal");
+document.getElementById("btnAbrirModal");
 
 const cerrar =
-    document.getElementById("cerrarModal");
+document.getElementById("cerrarModal");
 
 const form =
-    document.getElementById("formMiembro");
+document.getElementById("formMiembro");
+
+const container =
+document.getElementById("companerosContainer");
 
 /* ================================================= */
 /* ================= PASOS ========================= */
 /* ================================================= */
 
 const pasos =
-    document.querySelectorAll(".form-step");
+document.querySelectorAll(".form-step");
 
 const indicadores =
-    document.querySelectorAll(".step");
-
-/* BOTONES */
+document.querySelectorAll(".step");
 
 const btnPaso1 =
-    document.getElementById("btnPaso1");
+document.getElementById("btnPaso1");
 
 const btnPaso2 =
-    document.getElementById("btnPaso2");
+document.getElementById("btnPaso2");
 
 const volver1 =
-    document.getElementById("volver1");
+document.getElementById("volver1");
 
 const volver2 =
-    document.getElementById("volver2");
+document.getElementById("volver2");
+
+/* ================================================= */
+/* ================= INIT ========================== */
+/* ================================================= */
+
+document.addEventListener(
+"DOMContentLoaded",
+() => {
+
+    cargarCompaneros();
+
+}
+);
 
 /* ================================================= */
 /* ================= MODAL ========================= */
 /* ================================================= */
 
-abrir.addEventListener("click", () => {
+abrir.addEventListener(
+"click",
+() => {
 
     modal.classList.add("active");
 
     mostrarPaso(1);
 
-});
+}
+);
 
-cerrar.addEventListener("click", () => {
+cerrar.addEventListener(
+"click",
+() => {
 
     cerrarModal();
 
-});
+}
+);
 
-window.addEventListener("click", (e) => {
+window.addEventListener(
+"click",
+(e) => {
 
-    if (e.target === modal) {
+    if(e.target === modal){
 
         cerrarModal();
 
     }
 
-});
+}
+);
 
-function cerrarModal() {
+function cerrarModal(){
 
-    modal.classList.remove("active");
+modal.classList.remove("active");
 
-    form.reset();
+form.reset();
 
-    mostrarPaso(1);
+mostrarPaso(1);
+
+limpiarTodosErrores();
 
 }
 
 /* ================================================= */
-/* ================= CAMBIO PASOS ================== */
+/* ================= PASOS ========================= */
 /* ================================================= */
 
-function mostrarPaso(numero) {
+function mostrarPaso(numero){
 
-    pasos.forEach(step => {
+pasos.forEach(step => {
 
-        step.classList.add("hidden");
+    step.classList.add("hidden");
 
-    });
+});
 
-    document
-        .getElementById(`step${numero}`)
-        .classList
-        .remove("hidden");
+document
+    .getElementById(`step${numero}`)
+    .classList
+    .remove("hidden");
 
-    indicadores.forEach((step, index) => {
+indicadores.forEach((step,index) => {
 
-        step.classList.toggle(
-            "active",
-            index < numero
+    step.classList.toggle(
+        "active",
+        index < numero
+    );
+
+});
+
+}
+
+/* ================================================= */
+/* ================= ERRORES ======================= */
+/* ================================================= */
+
+function mostrarError(input,mensaje){
+
+input.classList.add(
+    "input-error"
+);
+
+let error =
+    input.parentElement.querySelector(
+        ".error-text"
+    );
+
+if(!error){
+
+    error =
+        document.createElement("span");
+
+    error.className =
+        "error-text";
+
+    input.parentElement.appendChild(
+        error
+    );
+
+}
+
+error.textContent =
+    mensaje;
+
+}
+
+function limpiarError(input){
+
+input.classList.remove(
+    "input-error"
+);
+
+const error =
+    input.parentElement.querySelector(
+        ".error-text"
+    );
+
+if(error){
+
+    error.remove();
+
+}
+
+}
+
+function limpiarTodosErrores(){
+
+document
+    .querySelectorAll(".input-error")
+    .forEach(input => {
+
+        input.classList.remove(
+            "input-error"
         );
 
     });
 
+document
+    .querySelectorAll(".error-text")
+    .forEach(error => {
+
+        error.remove();
+
+    });
+
 }
+
+/* ================================================= */
+/* ================= LIMPIAR ======================= */
+/* ================================================= */
+
+document
+.querySelectorAll("input")
+.forEach(input => {
+
+    input.addEventListener(
+        "input",
+        () => {
+
+            limpiarError(input);
+
+        }
+    );
+
+});
 
 /* ================================================= */
 /* ================= VALIDACIONES ================== */
 /* ================================================= */
 
-btnPaso1.addEventListener("click", () => {
+btnPaso1.addEventListener(
+"click",
+() => {
+
+    limpiarTodosErrores();
 
     const nombre =
         form.nombre.value.trim();
@@ -118,15 +247,70 @@ btnPaso1.addEventListener("click", () => {
     const password =
         form.password.value.trim();
 
-    if (
-        !nombre ||
-        !apellidos ||
-        !email ||
-        !password
-    ) {
+    let valido = true;
+
+    if(!nombre){
+
+        mostrarError(
+            form.nombre,
+            "Por favor completa este campo"
+        );
+
+        valido = false;
+
+    }
+
+    if(!apellidos){
+
+        mostrarError(
+            form.apellidos,
+            "Por favor completa este campo"
+        );
+
+        valido = false;
+
+    }
+
+    if(!email){
+
+        mostrarError(
+            form.email,
+            "Por favor completa este campo"
+        );
+
+        valido = false;
+
+    }
+
+    if(!password){
+
+        mostrarError(
+            form.password,
+            "Por favor completa este campo"
+        );
+
+        valido = false;
+
+    }
+
+    if(
+        password &&
+        password.length < 6
+    ){
+
+        mostrarError(
+            form.password,
+            "Mínimo 6 caracteres"
+        );
+
+        valido = false;
+
+    }
+
+    if(!valido){
 
         mostrarToast(
-            "Completa todos los campos",
+            "Revisa los campos",
             "error"
         );
 
@@ -136,52 +320,252 @@ btnPaso1.addEventListener("click", () => {
 
     mostrarPaso(2);
 
-});
+}
+);
 
-btnPaso2.addEventListener("click", () => {
+/* ================= PASO 2 ================= */
+
+btnPaso2.addEventListener(
+"click",
+() => {
+
+    limpiarTodosErrores();
+
+    const dni =
+        form.dni.value.trim();
+
+    const nacimiento =
+        form.fecha_nacimiento.value;
+
+    const nacionalidad =
+        form.nacionalidad.value.trim();
+
+    const telefono =
+        form.telefono.value.trim();
+
+    let valido = true;
+
+    if(!dni){
+
+        mostrarError(
+            form.dni,
+            "Por favor completa este campo"
+        );
+
+        valido = false;
+
+    }
+
+    if(!nacimiento){
+
+        mostrarError(
+            form.fecha_nacimiento,
+            "Selecciona una fecha"
+        );
+
+        valido = false;
+
+    }
+
+    if(!nacionalidad){
+
+        mostrarError(
+            form.nacionalidad,
+            "Por favor completa este campo"
+        );
+
+        valido = false;
+
+    }
+
+    if(!telefono){
+
+        mostrarError(
+            form.telefono,
+            "Por favor completa este campo"
+        );
+
+        valido = false;
+
+    }
+
+    if(
+        telefono &&
+        telefono.length < 9
+    ){
+
+        mostrarError(
+            form.telefono,
+            "Teléfono inválido"
+        );
+
+        valido = false;
+
+    }
+
+    if(!valido){
+
+        mostrarToast(
+            "Revisa los campos",
+            "error"
+        );
+
+        return;
+
+    }
 
     mostrarPaso(3);
 
-});
+}
+);
 
-volver1.addEventListener("click", () => {
+/* ================= VOLVER ================= */
+
+volver1.addEventListener(
+"click",
+() => {
 
     mostrarPaso(1);
 
-});
+}
+);
 
-volver2.addEventListener("click", () => {
+volver2.addEventListener(
+"click",
+() => {
 
     mostrarPaso(2);
 
-});
+}
+);
 
 /* ================================================= */
 /* ================= FORMULARIO ==================== */
 /* ================================================= */
 
-form.addEventListener("submit", async (e) => {
+form.addEventListener(
+"submit",
+async (e) => {
 
     e.preventDefault();
+
+    limpiarTodosErrores();
+
+    const direccion =
+        form.direccion.value.trim();
+
+    const ciudad =
+        form.ciudad.value.trim();
+
+    const codigoPostal =
+        form.codigo_postal.value.trim();
+
+    const fechaEntrada =
+        form.fecha_entrada.value;
+
+    const contacto =
+        form.contacto_emergencia.value.trim();
+
+    const telefonoEmergencia =
+        form.telefono_emergencia.value.trim();
+
+    let valido = true;
+
+    if(!direccion){
+
+        mostrarError(
+            form.direccion,
+            "Por favor completa este campo"
+        );
+
+        valido = false;
+
+    }
+
+    if(!ciudad){
+
+        mostrarError(
+            form.ciudad,
+            "Por favor completa este campo"
+        );
+
+        valido = false;
+
+    }
+
+    if(!codigoPostal){
+
+        mostrarError(
+            form.codigo_postal,
+            "Por favor completa este campo"
+        );
+
+        valido = false;
+
+    }
+
+    if(!fechaEntrada){
+
+        mostrarError(
+            form.fecha_entrada,
+            "Selecciona una fecha"
+        );
+
+        valido = false;
+
+    }
+
+    if(!contacto){
+
+        mostrarError(
+            form.contacto_emergencia,
+            "Por favor completa este campo"
+        );
+
+        valido = false;
+
+    }
+
+    if(!telefonoEmergencia){
+
+        mostrarError(
+            form.telefono_emergencia,
+            "Por favor completa este campo"
+        );
+
+        valido = false;
+
+    }
+
+    if(!valido){
+
+        mostrarToast(
+            "Revisa los campos",
+            "error"
+        );
+
+        return;
+
+    }
 
     const formData =
         new FormData(form);
 
-    try {
+    try{
 
         const response =
             await fetch(
                 "../php/crearMiembro.php",
                 {
-                    method: "POST",
-                    body: formData
+                    method:"POST",
+                    body:formData
                 }
             );
 
         const data =
             await response.json();
 
-        if (data.success) {
+        if(data.success){
 
             mostrarToast(
                 "Miembro creado correctamente",
@@ -190,13 +574,9 @@ form.addEventListener("submit", async (e) => {
 
             cerrarModal();
 
-            setTimeout(() => {
+            cargarCompaneros();
 
-                location.reload();
-
-            }, 1000);
-
-        } else {
+        }else{
 
             mostrarToast(
                 data.message ||
@@ -206,7 +586,7 @@ form.addEventListener("submit", async (e) => {
 
         }
 
-    } catch (error) {
+    }catch(error){
 
         mostrarToast(
             "Error del servidor",
@@ -215,44 +595,248 @@ form.addEventListener("submit", async (e) => {
 
     }
 
+}
+);
+
+/* ================================================= */
+/* ================= CARGAR ======================== */
+/* ================================================= */
+
+async function cargarCompaneros(){
+
+try{
+
+    const res =
+        await fetch(
+            API_URL,
+            {
+                method:"POST",
+
+                headers:{
+                    "Content-Type":
+                    "application/json"
+                },
+
+                body:JSON.stringify({
+                    action:"listar"
+                })
+            }
+        );
+
+    const data =
+        await res.json();
+
+    if(data.success){
+
+        renderCompaneros(
+            data.usuarios
+        );
+
+    }
+
+}catch(error){
+
+    console.error(error);
+
+}
+
+}
+
+/* ================================================= */
+/* ================= RENDER ======================== */
+/* ================================================= */
+
+function renderCompaneros(lista){
+
+container.innerHTML = "";
+
+lista.forEach(u => {
+
+    const div =
+        document.createElement("div");
+
+    div.className =
+        "companero";
+
+    div.innerHTML = `
+
+        <div class="left">
+
+            <img
+                src="../${u.foto}"
+                class="mini-avatar"
+            >
+
+            <div>
+
+                <p>${u.nombre}</p>
+
+                <div class="meta">
+
+                    <span class="date">
+                        ${u.email}
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="right">
+
+            <span class="rol ${u.rol}">
+                ${u.rol}
+            </span>
+
+        </div>
+
+    `;
+
+    div.addEventListener(
+        "click",
+        () => {
+
+            abrirInfo(u);
+
+        }
+    );
+
+    container.appendChild(div);
+
 });
+
+}
 
 /* ================================================= */
 /* ================= TOAST ========================= */
 /* ================================================= */
 
 function mostrarToast(
-    mensaje,
-    tipo = "success"
-) {
+mensaje,
+tipo = "success"
+){
 
-    const toast =
-        document.createElement("div");
+const toast =
+    document.createElement("div");
 
-    toast.className =
-        `toast toast-${tipo}`;
+toast.className =
+    `toast toast-${tipo}`;
 
-    toast.textContent =
-        mensaje;
+toast.textContent =
+    mensaje;
 
-    document.body.appendChild(toast);
+document.body.appendChild(
+    toast
+);
+
+setTimeout(() => {
+
+    toast.classList.add(
+        "show"
+    );
+
+},100);
+
+setTimeout(() => {
+
+    toast.classList.remove(
+        "show"
+    );
 
     setTimeout(() => {
 
-        toast.classList.add("show");
+        toast.remove();
 
-    }, 100);
+    },300);
 
-    setTimeout(() => {
-
-        toast.classList.remove("show");
-
-        setTimeout(() => {
-
-            toast.remove();
-
-        }, 300);
-
-    }, 3000);
+},3000);
 
 }
+
+/* ================================================= */
+/* ================= MODAL INFO ==================== */
+/* ================================================= */
+
+const modalCompanero =
+document.getElementById(
+    "modalCompanero"
+);
+
+function abrirInfo(u){
+
+document.getElementById(
+    "modalNombre"
+).textContent =
+    u.nombre || "-";
+
+document.getElementById(
+    "modalEmail"
+).textContent =
+    u.email || "-";
+
+const modalRol =
+    document.getElementById(
+        "modalRol"
+    );
+
+modalRol.textContent =
+    u.rol || "-";
+
+modalRol.className =
+    `modal-rol ${u.rol}`;
+
+document.getElementById(
+    "modalDni"
+).textContent =
+    u.dni || "-";
+
+document.getElementById(
+    "modalTelefono"
+).textContent =
+    u.telefono || "-";
+
+document.getElementById(
+    "modalFoto"
+).src =
+    "../" + u.foto;
+
+modalCompanero.classList.add(
+    "active"
+);
+
+}
+
+/* ================= CERRAR ================= */
+
+document
+.getElementById(
+    "cerrarInfoModal"
+)
+.addEventListener(
+    "click",
+    () => {
+
+        modalCompanero.classList.remove(
+            "active"
+        );
+
+    }
+);
+
+modalCompanero.addEventListener(
+"click",
+(e) => {
+
+    if(
+        e.target === modalCompanero
+    ){
+
+        modalCompanero.classList.remove(
+            "active"
+        );
+
+    }
+
+}
+);

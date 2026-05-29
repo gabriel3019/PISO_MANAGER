@@ -194,30 +194,29 @@ nav a.active{
     gap:14px;
 }
 
-/* ================================================= */
-/* ================= CARD ========================== */
-/* ================================================= */
+/* ================= CARD USER STYLE ================= */
 
 .companero{
     display:flex;
     justify-content:space-between;
     align-items:center;
 
-    padding:18px;
+    padding:16px 20px;
+
+    min-height:82px;
 
     border-radius:18px;
 
     background:white;
 
-    border:1px solid #e5e7eb;
+    border:1px solid #eef2f7;
 
     transition:.2s;
 }
 
 .companero:hover{
     transform:translateY(-2px);
-
-    box-shadow:0 10px 24px rgba(0,0,0,.05);
+    box-shadow:0 8px 20px rgba(0,0,0,.05);
 }
 
 .companero .left{
@@ -226,26 +225,39 @@ nav a.active{
     gap:14px;
 }
 
-.avatar-mini{
+.mini-avatar{
     width:46px;
     height:46px;
 
+    min-width:46px;
+
     border-radius:50%;
 
-    background:#e5e7eb;
+    object-fit:cover;
 
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    font-weight:700;
-
-    color:#374151;
+    border:2px solid #f1f5f9;
 }
 
 .companero p{
-    font-size:14px;
+    margin:0;
+    font-size:15px;
     font-weight:600;
+    color:#111827;
+}
+
+.meta{
+    margin-top:3px;
+}
+
+.date{
+    font-size:13px;
+    color:#94a3b8;
+}
+
+.right span{
+    font-size:14px;
+    font-weight:500;
+    color:#374151;
 }
 
 .email{
@@ -264,13 +276,27 @@ nav a.active{
 }
 
 .rol.admin{
-    background:#fee2e2;
-    color:#dc2626;
+    background:#7f1d1d;
+    color:#fecaca;
+
+    border:1px solid #991b1b;
 }
 
 .rol.miembro{
-    background:#dbeafe;
-    color:#2563eb;
+    background:#1e3a8a;
+    color:#bfdbfe;
+
+    border:1px solid #2563eb;
+}
+
+.dark .rol.admin{
+    background:#7f1d1d;
+    color:#fecaca;
+}
+
+.dark .rol.miembro{
+    background:#1e40af;
+    color:#dbeafe;
 }
 
 /* ================================================= */
@@ -282,6 +308,8 @@ nav a.active{
     inset:0;
 
     background:rgba(0,0,0,.45);
+
+    backdrop-filter:blur(3px);
 
     display:none;
 
@@ -298,16 +326,19 @@ nav a.active{
 }
 
 .modal{
-    width:640px;
+    width:480px;
     max-width:92%;
+
+    max-height:90vh;
+    overflow-y:auto;
 
     background:white;
 
-    border-radius:30px;
+    border-radius:24px;
 
-    padding:34px;
+    padding:26px;
 
-    animation:fadeIn .2s ease;
+    animation:fadeIn .18s ease;
 }
 
 /* ================================================= */
@@ -319,22 +350,28 @@ nav a.active{
     justify-content:space-between;
     align-items:center;
 
-    margin-bottom:28px;
+    margin-bottom:20px;
 }
 
 .modal-header h2{
-    font-size:28px;
+    font-size:22px;
     font-weight:700;
+
+    color:#111827;
 }
+
+/* ================= CLOSE ================= */
 
 .close-btn{
     border:none;
 
     background:none;
 
-    font-size:34px;
+    font-size:30px;
 
     cursor:pointer;
+
+    line-height:1;
 }
 
 /* ================================================= */
@@ -346,12 +383,12 @@ nav a.active{
     align-items:center;
     justify-content:center;
 
-    margin-bottom:34px;
+    margin-bottom:22px;
 }
 
 .step{
-    width:42px;
-    height:42px;
+    width:34px;
+    height:34px;
 
     border-radius:50%;
 
@@ -361,6 +398,7 @@ nav a.active{
     align-items:center;
     justify-content:center;
 
+    font-size:14px;
     font-weight:700;
 
     transition:.2s;
@@ -372,7 +410,7 @@ nav a.active{
 }
 
 .line{
-    width:70px;
+    width:50px;
     height:2px;
 
     background:#d1d5db;
@@ -395,29 +433,31 @@ nav a.active{
     display:flex;
     flex-direction:column;
 
-    margin-bottom:14px;
+    margin-bottom:12px;
 }
 
 .input-group label{
-    margin-bottom:8px;
+    margin-bottom:6px;
 
-    font-size:15px;
+    font-size:14px;
 
     font-weight:600;
+
+    color:#374151;
 }
 
 .input-group input{
     width:100%;
 
-    height:50px;
+    height:44px;
 
     border:1px solid #d1d5db;
 
-    border-radius:14px;
+    border-radius:12px;
 
-    padding:0 16px;
+    padding:0 14px;
 
-    font-size:15px;
+    font-size:14px;
 
     outline:none;
 
@@ -428,19 +468,26 @@ nav a.active{
     border-color:#111827;
 }
 
+/* ================= GRID ================= */
+
 .row-2{
     display:grid;
     grid-template-columns:1fr 1fr;
-    gap:16px;
+    gap:12px;
 }
+
+/* ================================================= */
+/* ================= ACTIONS ======================= */
+/* ================================================= */
 
 .step-actions{
     display:flex;
-    justify-content:flex-end;
 
-    gap:12px;
+    justify-content:center;
 
-    margin-top:20px;
+    gap:14px;
+
+    margin-top:18px;
 }
 
 /* ================================================= */
@@ -448,27 +495,24 @@ nav a.active{
 /* ================================================= */
 
 .btn-submit{
-    width:220px;
+    width:160px;
 
-    height:54px;
+    height:44px;
 
     border:none;
 
-    border-radius:14px;
+    border-radius:12px;
 
     background:#111827;
 
     color:white;
 
+    font-size:14px;
     font-weight:600;
 
     cursor:pointer;
 
     transition:.2s;
-
-    align-self:flex-end;
-
-    margin-top:10px;
 }
 
 .btn-submit:hover{
@@ -476,19 +520,51 @@ nav a.active{
 }
 
 .btn-secondary{
-    width:160px;
+    width:120px;
 
-    height:54px;
+    height:44px;
 
     border:none;
 
-    border-radius:14px;
+    border-radius:12px;
 
     background:#e5e7eb;
 
-    cursor:pointer;
+    color:#111827;
 
+    font-size:14px;
     font-weight:600;
+
+    cursor:pointer;
+}
+
+/* ================================================= */
+/* ================= RESPONSIVE ==================== */
+/* ================================================= */
+
+@media(max-width:600px){
+
+    .modal{
+        padding:22px;
+    }
+
+    .modal-header h2{
+        font-size:20px;
+    }
+
+    .row-2{
+        grid-template-columns:1fr;
+    }
+
+    .step-actions{
+        flex-direction:column;
+    }
+
+    .btn-submit,
+    .btn-secondary{
+        width:100%;
+    }
+
 }
 
 /* ================================================= */
@@ -531,6 +607,27 @@ nav a.active{
     background:#dc2626;
 }
 
+/* ================= ERROR INPUT ================= */
+
+.input-error{
+    border-color:#dc2626 !important;
+
+    background:#fef2f2;
+
+    box-shadow:
+        0 0 0 4px rgba(220,38,38,.12);
+}
+
+.error-text{
+    margin-top:6px;
+
+    font-size:12px;
+
+    color:#dc2626;
+
+    font-weight:500;
+}
+
 /* ================================================= */
 /* ================= ANIMACIONES =================== */
 /* ================================================= */
@@ -545,6 +642,413 @@ nav a.active{
     to{
         opacity:1;
         transform:translateY(0);
+    }
+
+}
+
+/* ================================================= */
+/* ================= MODAL INFO ==================== */
+/* ================================================= */
+
+.modal-companero{
+    width:100%;
+    max-width:520px;
+
+    background:white;
+
+    border-radius:24px;
+
+    padding:24px;
+
+    position:relative;
+
+    animation:fadeIn .2s ease;
+
+    box-shadow:0 20px 40px rgba(0,0,0,.18);
+}
+
+/* ================= CERRAR ================= */
+
+.cerrar-modal{
+    position:absolute;
+
+    top:14px;
+    right:14px;
+
+    width:38px;
+    height:38px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:transparent;
+
+    font-size:28px;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.cerrar-modal:hover{
+    background:#f3f4f6;
+}
+
+/* ================= HEADER ================= */
+
+.modal-top{
+    display:flex;
+    align-items:center;
+    gap:16px;
+
+    margin-bottom:22px;
+}
+
+/* ================= FOTO ================= */
+
+.modal-avatar{
+    width:74px;
+    height:74px;
+
+    min-width:74px;
+
+    border-radius:50%;
+
+    object-fit:cover;
+
+    border:2px solid #f1f5f9;
+}
+
+/* ================= TEXTOS ================= */
+
+.modal-top h2{
+    margin:0;
+
+    font-size:30px;
+
+    line-height:1;
+
+    color:#0f172a;
+}
+
+.modal-top p{
+    margin:6px 0;
+
+    font-size:15px;
+
+    color:#64748b;
+}
+
+/* ================= ROL ================= */
+
+.modal-rol{
+    display:inline-flex;
+
+    align-items:center;
+    justify-content:center;
+
+    padding:6px 14px;
+
+    border-radius:999px;
+
+    font-size:12px;
+    font-weight:700;
+
+    border:1px solid transparent;
+}
+
+/* ADMIN */
+
+.modal-rol.admin{
+    background:#7f1d1d;
+    color:#fecaca;
+
+    border-color:#991b1b;
+}
+
+/* MIEMBRO */
+
+.modal-rol.miembro{
+    background:#1e3a8a;
+    color:#dbeafe;
+
+    border-color:#2563eb;
+}
+
+/* ================= GRID ================= */
+
+.modal-grid{
+    display:grid;
+    gap:12px;
+}
+
+/* ================= CARDS ================= */
+
+.info-card{
+    background:#f8fafc;
+
+    border:1px solid #eef2f7;
+
+    border-radius:16px;
+
+    padding:16px 18px;
+}
+
+.info-card span{
+    display:block;
+
+    font-size:13px;
+
+    color:#94a3b8;
+
+    margin-bottom:6px;
+}
+
+.info-card p{
+    margin:0;
+
+    font-size:20px;
+
+    font-weight:600;
+
+    color:#0f172a;
+}
+
+/* ================================================= */
+/* ================= DARK ========================== */
+/* ================================================= */
+
+.dark .modal-companero{
+    background:#1f1f1f;
+}
+
+.dark .cerrar-modal{
+    color:white;
+}
+
+.dark .cerrar-modal:hover{
+    background:#2b2b2b;
+}
+
+.dark .modal-avatar{
+    border-color:#333;
+}
+
+.dark .modal-top h2{
+    color:white;
+}
+
+.dark .modal-top p{
+    color:#b4b4b4;
+}
+
+.dark .info-card{
+    background:#2a2a2a;
+
+    border-color:#333;
+}
+
+.dark .info-card p{
+    color:white;
+}
+
+.dark .info-card span{
+    color:#9ca3af;
+}
+
+/* ================================================= */
+/* ================= DARK MODE FIX ================= */
+/* ================================================= */
+
+.dark body{
+    background:#020617;
+    color:white;
+}
+
+/* ================= SIDEBAR ================= */
+
+.dark .sidebar-admin{
+    background:#0f172a;
+    border-right:1px solid #1e293b;
+}
+
+.dark nav a{
+    color:#cbd5e1;
+}
+
+.dark nav a:hover{
+    background:#172036;
+}
+
+.dark nav a.active{
+    background:#1e293b;
+    color:white;
+}
+
+.dark .admin-info{
+    border-color:#1e293b;
+}
+
+.dark .logout{
+    border-top:1px solid #1e293b;
+}
+
+/* ================= MAIN ================= */
+
+.dark .main{
+    background:#020617;
+}
+
+.dark .topbar h1{
+    color:white;
+}
+
+/* ================= CARDS ================= */
+
+.dark .companero{
+    background:#0f172a;
+    border:1px solid #1e293b;
+}
+
+.dark .companero p{
+    color:white;
+}
+
+.dark .date{
+    color:#94a3b8;
+}
+
+.dark .right span{
+    color:#e2e8f0;
+}
+
+/* ================= MODAL FORM ================= */
+
+.dark .modal{
+    background:#0f172a;
+    border:1px solid #1e293b;
+}
+
+.dark .modal-header h2{
+    color:white;
+}
+
+.dark .close-btn{
+    color:white;
+}
+
+.dark .step{
+    background:#334155;
+    color:white;
+}
+
+.dark .step.active{
+    background:white;
+    color:#0f172a;
+}
+
+.dark .line{
+    background:#334155;
+}
+
+/* ================= INPUTS ================= */
+
+.dark .input-group label{
+    color:#e2e8f0;
+}
+
+.dark .input-group input{
+    background:#020617;
+    border:1px solid #334155;
+    color:white;
+}
+
+.dark .input-group input::placeholder{
+    color:#64748b;
+}
+
+.dark .input-group input:focus{
+    border-color:#3b82f6;
+
+    box-shadow:
+        0 0 0 4px rgba(59,130,246,.15);
+}
+
+/* ================= BOTONES ================= */
+
+.dark .btn-secondary{
+    background:#1e293b;
+    color:white;
+}
+
+.dark .btn-submit{
+    background:white;
+    color:#0f172a;
+}
+
+/* ================= MODAL INFO ================= */
+
+.dark .modal-companero{
+    background:#111827;
+    border:1px solid #1f2937;
+}
+
+.dark .modal-top h2{
+    color:white;
+}
+
+.dark .modal-top p{
+    color:#94a3b8;
+}
+
+.dark .info-card{
+    background:#1f2937;
+    border:1px solid #374151;
+}
+
+.dark .info-card span{
+    color:#94a3b8;
+}
+
+.dark .info-card p{
+    color:white;
+}
+
+/* ================= ERRORES ================= */
+
+.dark .input-error{
+    border-color:#ef4444 !important;
+
+    background:
+        rgba(127,29,29,.25);
+
+    box-shadow:
+        0 0 0 4px rgba(239,68,68,.12);
+}
+
+.dark .error-text{
+    color:#f87171;
+}
+
+/* ================================================= */
+/* ================= RESPONSIVE ==================== */
+/* ================================================= */
+
+@media(max-width:700px){
+
+    .modal-companero{
+        padding:22px;
+    }
+
+    .modal-top{
+        flex-direction:column;
+
+        text-align:center;
+    }
+
+    .modal-top h2{
+        font-size:26px;
     }
 
 }

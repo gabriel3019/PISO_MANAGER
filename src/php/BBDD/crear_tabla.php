@@ -9,7 +9,7 @@ $conn->set_charset("utf8mb4");
 /* ================= RESETEAR BD ================= */
 
 $conn->query("
-    CREATE DATABASE piso_manager
+    CREATE DATABASE IF NOT EXISTS piso_manager
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci
 ");
