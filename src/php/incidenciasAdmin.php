@@ -403,6 +403,27 @@ switch ($accion) {
         $id_nueva_incidencia = $conn->insert_id;
         $stmt->close();
 
+        $comentario_inquilino = trim($_POST['comentario_inquilino'] ?? '');
+
+        if (!empty($comentario_inquilino)) {
+
+            $stmtMsg = $conn->prepare("
+        INSERT INTO incidencia_mensajes
+        (id_incidencia, id_usuario, mensaje)
+        VALUES (?, ?, ?)
+    ");
+
+            $stmtMsg->bind_param(
+                "iis",
+                $id_nueva_incidencia,
+                $id_usuario,
+                $comentario_inquilino
+            );
+
+            $stmtMsg->execute();
+            $stmtMsg->close();
+        }
+
         // Si el admin marcó "Notificar al inquilino", crear notificación para ese usuario
         if ($notificar_inquilino === 1 && $id_usuario > 0) {
             $textoNotificacion = "El administrador ha creado una nueva incidencia: \"$titulo\".";
