@@ -427,19 +427,54 @@ switch ($accion) {
             $stmtMsg->close();
         }
 
-        // Si el admin marcó "Notificar al inquilino", crear notificación para ese usuario
-        if ($notificar_inquilino === 1 && $id_usuario > 0) {
-            $textoNotificacion = "El administrador ha creado una nueva incidencia: \"$titulo\".";
+        // Si el admin marcó "Notificar al inquilino", notificar a TODOS los usuarios del piso
+        if ($notificar_inquilino === 1) {
 
-            $stmt = $conn->prepare("
-                INSERT INTO notificaciones
-                    (id_usuario, id_incidencia, mensaje)
-                VALUES (?, ?, ?)
-            ");
+            $textoNotificacion =
+                "El administrador ha creado una nueva incidencia: \"$titulo\".";
 
-            $stmt->bind_param("iis", $id_usuario, $id_nueva_incidencia, $textoNotificacion);
-            $stmt->execute();
-            $stmt->close();
+            // Obtener todos los usuarios del piso
+            $stmtUsuarios = $conn->prepare("
+    SELECT id_usuario
+    FROM usuarios_pisos
+    WHERE id_piso = ?
+");
+
+            if (!$stmtUsuarios) {
+                echo json_encode([
+                    'success' => false,
+                    'error' => $conn->error
+                ]);
+                exit;
+            }
+
+            $stmtUsuarios->bind_param("i", $id_piso);
+            $stmtUsuarios->execute();
+
+            $resultadoUsuarios = $stmtUsuarios->get_result();
+
+            while ($usuario = $resultadoUsuarios->fetch_assoc()) {
+
+                $idUsuarioDestino = $usuario['id_usuario'];
+
+                $stmtNotif = $conn->prepare("
+            INSERT INTO notificaciones
+            (id_usuario, id_incidencia, mensaje)
+            VALUES (?, ?, ?)
+        ");
+
+                $stmtNotif->bind_param(
+                    "iis",
+                    $idUsuarioDestino,
+                    $id_nueva_incidencia,
+                    $textoNotificacion
+                );
+
+                $stmtNotif->execute();
+                $stmtNotif->close();
+            }
+
+            $stmtUsuarios->close();
         }
 
         echo json_encode([

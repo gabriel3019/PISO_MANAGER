@@ -100,3 +100,181 @@ body.dark .btn-secondary {
 .dark .sidebar li.active a .icon{
   filter: brightness(0) invert(1);
 }
+
+/* ================================================= */
+/* ================= ADMIN DARK ==================== */
+/* ================================================= */
+
+.dark body {
+
+    background: #020617;
+
+}
+
+/* SIDEBAR */
+
+.dark .sidebar-admin {
+
+    background: #0f172a;
+
+    border-color: #1e293b;
+
+}
+
+.dark .admin-info {
+
+    border-color: #1e293b;
+
+}
+
+.dark .admin-info h3 {
+
+    color: #f8fafc;
+
+}
+
+.dark .admin-info p {
+
+    color: #94a3b8;
+
+}
+
+.dark nav a {
+
+    color: #cbd5e1;
+
+}
+
+.dark nav a:hover {
+
+    background: #111827;
+
+}
+
+.dark nav a.active {
+
+    background: #1e293b;
+
+    color: #60a5fa;
+
+    border-color: #3b82f6;
+
+}
+
+/* MAIN */
+
+.dark .admin-main {
+
+    background: #020617;
+
+}
+
+.dark .admin-main header h1 {
+
+    color: #f8fafc;
+
+}
+
+.dark .admin-main header p {
+
+    color: #94a3b8;
+
+}
+
+/* CARDS */
+
+.dark .card {
+
+    background: #0f172a;
+
+    border-color: #1e293b;
+
+}
+
+.dark .card h2,
+.dark .card p {
+
+    color: #f8fafc;
+
+}
+
+.dark .card label,
+.dark .setting-row span {
+
+    color: #94a3b8;
+
+}
+
+/* INPUTS */
+
+.dark .card input,
+.dark select {
+
+    background: #111827;
+
+    border-color: #334155;
+
+    color: #f8fafc;
+
+}
+
+/* BOTONES */
+
+.dark .card button,
+.dark .btn-secondary {
+
+    background: #111827;
+
+    border-color: #334155;
+
+    color: #f8fafc;
+
+}
+
+.dark .card button:hover,
+.dark .btn-secondary:hover {
+
+    background: #1e293b;
+
+}
+
+/* SAVE */
+
+.dark .save-btn {
+
+    background: #2563eb;
+
+}
+
+.dark .save-btn:hover {
+
+    background: #1d4ed8;
+
+}
+
+/* MODALS */
+
+.dark .modal-content {
+
+    background: #0f172a;
+
+    color: #f8fafc;
+
+}
+
+.dark .modal-content h3,
+.dark .modal-content h2 {
+
+    color: #f8fafc;
+
+}
+
+.dark .modal-content input {
+
+    background: #111827;
+
+    border-color: #334155;
+
+    color: white;
+
+}

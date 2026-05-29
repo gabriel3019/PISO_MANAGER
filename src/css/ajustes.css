@@ -152,3 +152,158 @@ input,
 .slider {
   transition: all 0.3s ease;
 }
+
+/* ================================================= */
+/* ================= MENU HAMBURGUESA ============== */
+/* ================================================= */
+
+.menu-toggle {
+
+  display: none;
+
+  position: relative;
+
+  z-index: 100002;
+
+  width: 42px;
+  height: 42px;
+
+  min-width: 42px;
+
+  background: #ffffff;
+
+  border: none;
+
+  border-radius: 10px;
+
+  font-size: 24px;
+
+  cursor: pointer;
+
+  align-items: center;
+  justify-content: center;
+
+  box-shadow:
+    0 2px 8px rgba(0,0,0,0.10);
+
+  transition: 0.2s;
+}
+
+.menu-toggle:hover {
+
+  transform: scale(1.03);
+
+}
+
+/* ================================================= */
+/* ================= RESPONSIVE ==================== */
+/* ================================================= */
+
+@media (max-width:1000px) {
+
+  .app {
+
+    position: relative;
+
+  }
+
+  /* ================= SIDEBAR ================= */
+
+  .sidebar {
+
+    position: fixed;
+
+    top: 0;
+    left: -260px;
+
+    width: 250px;
+    height: 100vh;
+
+    background: #ffffff;
+
+    z-index: 999;
+
+    transition: left 0.3s ease;
+
+    padding: 20px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    box-shadow:
+      0 0 20px rgba(0,0,0,0.15);
+
+    padding-top: 80px;
+
+  }
+
+  .sidebar.active {
+
+    left: 0;
+
+  }
+
+  /* ================= BOTON ================= */
+
+  .menu-toggle {
+
+    display: flex;
+
+  }
+
+  /* ================= TOPBAR ================= */
+
+  .topbar {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    margin-bottom: 25px;
+
+  }
+
+  .topbar h1 {
+
+    margin: 0;
+
+  }
+
+  /* ================= MAIN ================= */
+
+  .main {
+
+    width: 100%;
+
+    margin-left: 0;
+
+    padding: 20px;
+
+  }
+
+  /* ================= SETTINGS ================= */
+
+  .settings {
+
+    width: 100%;
+
+  }
+
+  .profile {
+
+    flex-direction: column;
+
+    align-items: flex-start;
+
+  }
+
+  .row {
+
+    flex-direction: column;
+
+  }
+
+}
