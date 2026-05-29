@@ -562,6 +562,27 @@ switch ($accion) {
         ]);
         break;
 
+    case 'cambiar_estado':
+        $id     = intval($_POST['id'] ?? 0);
+        $estado = trim($_POST['estado'] ?? '');
+
+        $estadosValidos = ['abierta', 'en_curso', 'resuelta'];
+        if (!$id || !in_array($estado, $estadosValidos)) {
+            echo json_encode(['success' => false, 'error' => 'Datos inválidos']);
+            exit;
+        }
+
+        $stmt = $conn->prepare("UPDATE incidencias SET estado = ? WHERE id_incidencia = ?");
+        $stmt->bind_param("si", $estado, $id);
+
+        if ($stmt->execute()) {
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'error' => $conn->error]);
+        }
+        $stmt->close();
+        break;
+
     default:
         error_log("ACCIÓN NO VÁLIDA RECIBIDA: $accion | POST: " . print_r($_POST, true));
         echo json_encode([

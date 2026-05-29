@@ -685,6 +685,14 @@ async function initIncidencias() {
                 const notificarBadge = inc.notificar_admin == 1
                     ? `<span style="font-size:.7rem;background:#dbeafe;color:#1d4ed8;padding:2px 7px;border-radius:999px;font-weight:600;margin-left:6px;">Admin</span>`
                     : '';
+                const dropdownEstado = inc.notificar_admin == 0 ? `
+                    <div class="incident-status-select">
+                        <select class="inline-estado-select" data-id="${inc.id}" title="Cambiar estado">
+                            <option value="abierta"  ${estadoNorm === 'abierta' ? 'selected' : ''}>Abierta</option>
+                            <option value="en_curso" ${estadoNorm === 'en_curso' || estadoNorm === 'en curso' ? 'selected' : ''}>En curso</option>
+                            <option value="resuelta" ${estadoNorm === 'resuelta' ? 'selected' : ''}>Resuelta</option>
+                        </select>
+                    </div>` : '';
 
                 const html = `
                     <li class="incident-item"
@@ -719,6 +727,7 @@ async function initIncidencias() {
                             <span class="priority-dot priority-dot--${prioridadClase}">
                                 ${urgenciaLabel}
                             </span>
+                            ${dropdownEstado}
                         </div>
 
                         <div class="incident-actions">
@@ -744,6 +753,42 @@ async function initIncidencias() {
 
             aplicarFiltro(filtroActivo);
 
+            // ── Dropdown estado inline (solo incidencias no notificadas al admin) ──
+            document.querySelectorAll(".inline-estado-select").forEach(select => {
+                select.addEventListener("change", async (e) => {
+                    e.stopPropagation();
+                    const nuevoEstado = e.target.value;
+                    const idInc = e.target.dataset.id;
+
+                    const etiquetas = {
+                        abierta: 'Abierta',
+                        en_curso: 'En curso',
+                        resuelta: 'Resuelta'
+                    };
+
+                    const formData = new FormData();
+                    formData.append("accion", "cambiar_estado");
+                    formData.append("id", idInc);
+                    formData.append("estado", nuevoEstado);
+
+                    try {
+                        const res = await fetch("../php/incidencias.php", { method: "POST", body: formData });
+                        const result = await res.json();
+
+                        if (result.success) {
+                            mostrarToast(`Estado actualizado a "${etiquetas[nuevoEstado]}" ✅`, "success");
+                            cargarIncidencias();
+                        } else {
+                            mostrarToast("Error al cambiar el estado: " + (result.error || ""), "error");
+                            cargarIncidencias();
+                        }
+                    } catch (err) {
+                        mostrarToast("Error de conexión al cambiar el estado.", "error");
+                        cargarIncidencias();
+                    }
+                });
+            });
+
         } catch (error) {
             console.error("Error cargando incidencias:", error);
         }
@@ -755,7 +800,7 @@ async function initIncidencias() {
     document.addEventListener("click", (e) => {
         const item = e.target.closest(".incident-item");
         if (!item) return;
-        if (e.target.closest(".btn-abrir-editar") || e.target.closest(".btn-abrir-eliminar")) return;
+        if (e.target.closest(".btn-abrir-editar") || e.target.closest(".btn-abrir-eliminar") || e.target.closest(".inline-estado-select")) return;
 
         const icono = {
             fontaneria: "💧",
