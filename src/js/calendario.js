@@ -1287,7 +1287,9 @@ eventTypeInput.addEventListener("change", () => {
 });
 
 document.getElementById("btn-prev").addEventListener("click", () => {
-    if (currentView === "week") {
+    if (currentView === "day") {
+        currentDate.setDate(currentDate.getDate() - 1);
+    } else if (currentView === "week") {
         currentDate.setDate(currentDate.getDate() - 7);
     } else if (currentView === "year") {
         currentDate.setFullYear(currentDate.getFullYear() - 1);
@@ -1299,7 +1301,9 @@ document.getElementById("btn-prev").addEventListener("click", () => {
 });
 
 document.getElementById("btn-next").addEventListener("click", () => {
-    if (currentView === "week") {
+    if (currentView === "day") {
+        currentDate.setDate(currentDate.getDate() + 1);
+    } else if (currentView === "week") {
         currentDate.setDate(currentDate.getDate() + 7);
     } else if (currentView === "year") {
         currentDate.setFullYear(currentDate.getFullYear() + 1);

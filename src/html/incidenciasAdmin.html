@@ -82,22 +82,22 @@
 
             <section class="content">
                 <div class="section__header admin-incidencias-header">
-                    <h2 class="section__title">Todas las incidencias</h2>
-
                     <div class="admin-incidencias-actions">
+
+                        <div class="filters">
+                            <button class="filter active" data-filter="todas">Todas</button>
+                            <button class="filter" data-filter="abierta">Abiertas</button>
+                            <button class="filter" data-filter="en_curso">En curso</button>
+                            <button class="filter" data-filter="resuelta">Resueltas</button>
+                        </div>
+
                         <input type="text" id="searchInput" placeholder="Buscar incidencia...">
 
                         <button type="button" class="btn-new btn-abrir-nueva">
                             + Nueva Incidencia
                         </button>
                     </div>
-                </div>
-
-                <div class="filters">
-                    <button class="filter active" data-filter="todas">Todas</button>
-                    <button class="filter" data-filter="abierta">Abiertas</button>
-                    <button class="filter" data-filter="en_curso">En curso</button>
-                    <button class="filter" data-filter="resuelta">Resueltas</button>
+                    <div class="filters"></div>
                 </div>
 
                 <ul id="incidenciasList" class="incident-list"></ul>
@@ -239,12 +239,12 @@
             <div class="modal__stepper">
                 <div class="stepper__step stepper__step--active" id="step-indicator-1">
                     <div class="stepper__circle">1</div>
-                    <span class="stepper__label">Información básica</span>
+                    <span class="stepper__label"></span>
                 </div>
                 <div class="stepper__line"></div>
                 <div class="stepper__step" id="step-indicator-2">
                     <div class="stepper__circle">2</div>
-                    <span class="stepper__label">Detalles y fechas</span>
+                    <span class="stepper__label"></span>
                 </div>
             </div>
 
@@ -316,12 +316,31 @@
                 </div>
 
                 <div class="modal__field">
+
                     <label class="modal__checkbox-label">
                         <input type="checkbox" id="nueva-notificar-inquilino" name="notificar_inquilino"
                             class="modal__checkbox" />
+
                         <span>Notificar al inquilino</span>
                     </label>
-                    <p class="modal__checkbox-hint">El inquilino recibirá una notificación sobre esta incidencia.</p>
+
+                    <p class="modal__checkbox-hint">
+                        El inquilino recibirá una notificación sobre esta incidencia.
+                    </p>
+
+                </div>
+
+                <div class="modal__field" id="nueva-comentario-inquilino-wrap" style="display:none;">
+
+                    <label class="modal__label" for="nueva-comentario-inquilino">
+
+                        COMENTARIO PARA EL INQUILINO
+
+                    </label>
+
+                    <textarea class="modal__textarea" id="nueva-comentario-inquilino" name="comentario_inquilino"
+                        placeholder="Añade un mensaje para el inquilino..."></textarea>
+
                 </div>
 
                 <div class="modal__field">
@@ -336,8 +355,7 @@
 
             <!-- ── Footer unificado (un solo footer para ambos pasos) ── -->
             <div class="modal__footer" id="nueva-footer-unificado">
-                <button type="button" class="modal__btn modal__btn--cancel" id="btn-nueva-izquierda"
-                    data-modal-close="modal-nueva-incidencia">Cancelar</button>
+                <button type="button" class="modal__btn modal__btn--cancel" id="btn-nueva-izquierda">Cancelar</button>
                 <button type="button" class="modal__btn modal__btn--primary" id="btn-nueva-derecha">
                     Siguiente →
                 </button>
@@ -372,6 +390,12 @@
                 </button>
             </div>
         </div>
+    </div>
+
+    <div id="modal-imagen-grande" class="modal-imagen-grande hidden">
+        <span id="cerrar-imagen-grande">✕</span>
+
+        <img id="imagen-grande-src" src="" alt="Imagen grande">
     </div>
 
     <script src="../js/incidenciasAdmin.js"></script>

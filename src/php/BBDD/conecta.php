@@ -4,8 +4,6 @@ $username = "root";
 $password = "";
 $dbname = "piso_manager";
 
-require_once __DIR__ . '/crear_tabla.php';
-
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 if ($conn->connect_error) {

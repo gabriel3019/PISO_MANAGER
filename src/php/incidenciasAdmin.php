@@ -314,6 +314,51 @@ switch ($accion) {
         $notificar_admin = 0;
         $leido_admin     = 1;
 
+        $imagen_path = null;
+
+        if (!empty($_FILES['imagen']['name'])) {
+
+            if ($_FILES['imagen']['error'] !== UPLOAD_ERR_OK) {
+                echo json_encode([
+                    'success' => false,
+                    'error' => 'Error al subir imagen: ' . $_FILES['imagen']['error']
+                ]);
+                exit;
+            }
+
+            $dir = __DIR__ . '/../uploads/incidencias/';
+
+            if (!is_dir($dir)) {
+                mkdir($dir, 0755, true);
+            }
+
+            $ext = strtolower(pathinfo($_FILES['imagen']['name'], PATHINFO_EXTENSION));
+
+            $allowed = ['jpg', 'jpeg', 'png', 'webp'];
+
+            if (!in_array($ext, $allowed)) {
+                echo json_encode([
+                    'success' => false,
+                    'error' => 'Formato de imagen no permitido'
+                ]);
+                exit;
+            }
+
+            $nombre = uniqid('inc_') . '.' . $ext;
+
+            $rutaFisica = $dir . $nombre;
+
+            if (!move_uploaded_file($_FILES['imagen']['tmp_name'], $rutaFisica)) {
+                echo json_encode([
+                    'success' => false,
+                    'error' => 'No se pudo mover la imagen'
+                ]);
+                exit;
+            }
+
+            $imagen_path = 'uploads/incidencias/' . $nombre;
+        }
+
         if ($tipo === '' || $titulo === '' || $descripcion === '') {
             echo json_encode([
                 'success' => false,
@@ -325,14 +370,14 @@ switch ($accion) {
         $stmt = $conn->prepare("
             INSERT INTO incidencias
                 (id_piso, id_usuario, tipo, titulo, descripcion, urgencia, estado,
-                 notificar_admin, leido_admin, notificar_inquilino, fecha_inicio, fecha_fin, fecha_creacion)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 notificar_admin, leido_admin, notificar_inquilino, fecha_inicio, fecha_fin, fecha_creacion, imagen)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
 
         $fecha_creacion = date('Y-m-d');
 
         $stmt->bind_param(
-            "iisssssiiisss",
+            "iisssssiiissss",
             $id_piso,
             $id_usuario,
             $tipo,
@@ -345,7 +390,8 @@ switch ($accion) {
             $notificar_inquilino,
             $fecha_inicio,
             $fecha_fin,
-            $fecha_creacion
+            $fecha_creacion,
+            $imagen_path
         );
 
         if (!$stmt->execute()) {
@@ -356,6 +402,27 @@ switch ($accion) {
 
         $id_nueva_incidencia = $conn->insert_id;
         $stmt->close();
+
+        $comentario_inquilino = trim($_POST['comentario_inquilino'] ?? '');
+
+        if (!empty($comentario_inquilino)) {
+
+            $stmtMsg = $conn->prepare("
+        INSERT INTO incidencia_mensajes
+        (id_incidencia, id_usuario, mensaje)
+        VALUES (?, ?, ?)
+    ");
+
+            $stmtMsg->bind_param(
+                "iis",
+                $id_nueva_incidencia,
+                $id_usuario,
+                $comentario_inquilino
+            );
+
+            $stmtMsg->execute();
+            $stmtMsg->close();
+        }
 
         // Si el admin marcó "Notificar al inquilino", crear notificación para ese usuario
         if ($notificar_inquilino === 1 && $id_usuario > 0) {
@@ -377,6 +444,8 @@ switch ($accion) {
             'message' => 'Incidencia creada correctamente',
             'id'      => $id_nueva_incidencia
         ]);
+
+
         break;
 
     case 'marcar_todas_leidas':

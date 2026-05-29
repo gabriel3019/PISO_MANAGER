@@ -1,5 +1,11 @@
 const nombreUsuario = document.getElementById("nombreUsuario");
 
+function normalizarRutaImagen(ruta) {
+    if (!ruta) return "";
+    const nombreArchivo = ruta.split("/").pop();
+    return "../uploads/incidencias/" + nombreArchivo;
+}
+
 /* ─────────────────────────────────────────────────────────────
    TOAST HELPER
    ───────────────────────────────────────────────────────────── */
@@ -53,7 +59,6 @@ async function initIncidencias() {
     const menuToggle = document.getElementById("menuToggle");
     const sidebar = document.getElementById("sidebar");
 
-    // Crear overlay para cerrar al hacer clic fuera
     const sidebarOverlay = document.createElement("div");
     sidebarOverlay.style.cssText =
         "display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:998;";
@@ -65,7 +70,6 @@ async function initIncidencias() {
         menuToggle.classList.remove("active");
         sidebarOverlay.style.display = "none";
         document.body.classList.remove("sidebar-open");
-        // ── AÑADIR: devolver el botón al header ──
         const header = document.querySelector(".page-header");
         if (header) header.insertBefore(menuToggle, header.firstChild);
     }
@@ -87,7 +91,6 @@ async function initIncidencias() {
 
         sidebarOverlay.addEventListener("click", cerrarSidebar);
 
-        // Cerrar también al navegar a otra página desde el sidebar
         sidebar.querySelectorAll(".sidebar-link").forEach(link => {
             link.addEventListener("click", cerrarSidebar);
         });
@@ -118,6 +121,44 @@ async function initIncidencias() {
 
     document.querySelectorAll("[data-modal-close]").forEach((btn) => {
         btn.addEventListener("click", () => cerrarModal(btn.dataset.modalClose));
+    });
+
+    // ─── LIGHTBOX de imagen en detalle ───────────────────────────
+    const lightboxOverlay = document.getElementById("lightbox-overlay");
+    const lightboxImg = document.getElementById("lightbox-img");
+    const lightboxClose = document.getElementById("lightbox-close");
+
+    function abrirLightbox(src) {
+        if (!lightboxOverlay || !src) return;
+        lightboxImg.src = src;
+        lightboxOverlay.classList.add("active");
+        document.body.style.overflow = "hidden";
+    }
+
+    function cerrarLightbox() {
+        if (!lightboxOverlay) return;
+        lightboxOverlay.classList.remove("active");
+        lightboxImg.src = "";
+        const hayModal = [...document.querySelectorAll(".modal-overlay")]
+            .some(m => !m.classList.contains("modal--hidden"));
+        if (!hayModal) document.body.style.overflow = "";
+    }
+
+    document.getElementById("detalle-imagen")?.addEventListener("click", () => {
+        const src = document.getElementById("detalle-imagen").src;
+        abrirLightbox(src);
+    });
+
+    lightboxClose?.addEventListener("click", cerrarLightbox);
+
+    lightboxOverlay?.addEventListener("click", (e) => {
+        if (e.target === lightboxOverlay) cerrarLightbox();
+    });
+
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && lightboxOverlay?.classList.contains("active")) {
+            cerrarLightbox();
+        }
     });
 
     // ─── MOSTRAR COMENTARIO SI SE MARCA "NOTIFICAR ADMIN" ────────────
@@ -172,13 +213,11 @@ async function initIncidencias() {
         });
     }
 
-    // Inicializar validaciones y fechas mínimas
     setMinDateToday('nueva-fecha-inicio');
     setMinDateToday('editar-fecha-inicio');
     setupFechaInicioValidation('nueva-fecha-inicio', 'nueva-fecha-inicio-error');
     setupFechaInicioValidation('editar-fecha-inicio', 'editar-fecha-inicio-error');
 
-    // Inicializar toggle de comentario
     initToggleComentario();
 
     // ─── Urgencia buttons (selección) ────────────────────────────────
@@ -209,7 +248,6 @@ async function initIncidencias() {
         const inputFile = document.getElementById(previewId.replace("-preview", ""));
         const dropzone = inputFile?.closest("label.modal__dropzone");
 
-        // Ocultar el recuadro
         if (dropzone) dropzone.style.display = "none";
 
         let preview = document.getElementById(previewId);
@@ -218,7 +256,6 @@ async function initIncidencias() {
             preview.id = previewId;
             preview.style.cssText =
                 "width:100%;max-height:180px;object-fit:cover;border-radius:8px;margin-top:8px;cursor:pointer;";
-            // Al hacer clic en la preview, se puede cambiar la imagen
             preview.title = "Clic para cambiar imagen";
             preview.addEventListener("click", () => inputFile?.click());
             dropzone?.parentElement?.appendChild(preview);
@@ -238,8 +275,155 @@ async function initIncidencias() {
     });
 
     // ══════════════════════════════════════════════════════════════
+    // HELPERS DE VALIDACIÓN POR CAMPO
+    // ══════════════════════════════════════════════════════════════
+
+    function mostrarErrorCampo(inputEl, errorId) {
+        if (inputEl) {
+            inputEl.classList.add("modal__input--error");
+            inputEl.classList.add("modal__select--error");
+            inputEl.classList.add("modal__textarea--error");
+        }
+        const err = document.getElementById(errorId);
+        if (err) err.classList.add("modal__field-error--visible");
+    }
+
+    function limpiarErrorCampo(inputEl, errorId) {
+        if (inputEl) {
+            inputEl.classList.remove("modal__input--error");
+            inputEl.classList.remove("modal__select--error");
+            inputEl.classList.remove("modal__textarea--error");
+        }
+        const err = document.getElementById(errorId);
+        if (err) err.classList.remove("modal__field-error--visible");
+    }
+
+    function limpiarTodosErrores(prefijo) {
+        const modal = document.getElementById(`modal-${prefijo}-incidencia`);
+        if (!modal) return;
+        modal.querySelectorAll(".modal__field-error")
+            .forEach(el => el.classList.remove("modal__field-error--visible"));
+        modal.querySelectorAll(".modal__input--error, .modal__select--error, .modal__textarea--error")
+            .forEach(el => {
+                el.classList.remove("modal__input--error");
+                el.classList.remove("modal__select--error");
+                el.classList.remove("modal__textarea--error");
+            });
+        modal.querySelectorAll(".modal__hint--error")
+            .forEach(el => el.style.display = 'none');
+    }
+
+    // ─── Validaciones ────────────────────────────────────────────────
+    function validarNuevaPaso1() {
+        let ok = true;
+
+        const tipo = document.getElementById("nueva-tipo");
+        if (!tipo.value) { mostrarErrorCampo(tipo, "nueva-tipo-error"); ok = false; }
+        else { limpiarErrorCampo(tipo, "nueva-tipo-error"); }
+
+        const titulo = document.getElementById("nueva-titulo");
+        if (!titulo.value.trim()) { mostrarErrorCampo(titulo, "nueva-titulo-error"); ok = false; }
+        else { limpiarErrorCampo(titulo, "nueva-titulo-error"); }
+
+        const desc = document.getElementById("nueva-desc");
+        if (!desc.value.trim()) { mostrarErrorCampo(desc, "nueva-desc-error"); ok = false; }
+        else { limpiarErrorCampo(desc, "nueva-desc-error"); }
+
+        const urgenciaActiva = document.querySelector("#modal-nueva-incidencia .modal__urgencia-btn--active");
+        const urgenciaError = document.getElementById("nueva-urgencia-error");
+        if (!urgenciaActiva) {
+            if (urgenciaError) urgenciaError.classList.add("modal__field-error--visible");
+            ok = false;
+        } else {
+            if (urgenciaError) urgenciaError.classList.remove("modal__field-error--visible");
+        }
+
+        return ok;
+    }
+
+    function validarNuevaPaso2() {
+        let ok = true;
+
+        const fechaInicio = document.getElementById("nueva-fecha-inicio");
+        const errorVacia = document.getElementById("nueva-fecha-inicio-vacia-error");
+        const errorPasada = document.getElementById("nueva-fecha-inicio-error");
+
+        if (errorVacia) errorVacia.classList.remove("modal__field-error--visible");
+        if (errorPasada) errorPasada.style.display = 'none';
+        fechaInicio.classList.remove("modal__input--error");
+
+        if (!fechaInicio.value) {
+            if (errorVacia) errorVacia.classList.add("modal__field-error--visible");
+            fechaInicio.classList.add("modal__input--error");
+            ok = false;
+        } else {
+            const hoy = new Date().toISOString().split('T')[0];
+            if (fechaInicio.value < hoy) {
+                if (errorPasada) errorPasada.style.display = 'block';
+                fechaInicio.classList.add("modal__input--error");
+                ok = false;
+            }
+        }
+
+        return ok;
+    }
+
+    function validarEditarPaso1() {
+        let ok = true;
+
+        const tipo = document.getElementById("editar-tipo");
+        if (!tipo.value) { mostrarErrorCampo(tipo, "editar-tipo-error"); ok = false; }
+        else { limpiarErrorCampo(tipo, "editar-tipo-error"); }
+
+        const titulo = document.getElementById("editar-titulo");
+        if (!titulo.value.trim()) { mostrarErrorCampo(titulo, "editar-titulo-error"); ok = false; }
+        else { limpiarErrorCampo(titulo, "editar-titulo-error"); }
+
+        const desc = document.getElementById("editar-desc");
+        if (!desc.value.trim()) { mostrarErrorCampo(desc, "editar-desc-error"); ok = false; }
+        else { limpiarErrorCampo(desc, "editar-desc-error"); }
+
+        const urgenciaActiva = document.querySelector("#modal-editar-incidencia .modal__urgencia-btn--active");
+        const urgenciaError = document.getElementById("editar-urgencia-error");
+        if (!urgenciaActiva) {
+            if (urgenciaError) urgenciaError.classList.add("modal__field-error--visible");
+            ok = false;
+        } else {
+            if (urgenciaError) urgenciaError.classList.remove("modal__field-error--visible");
+        }
+
+        return ok;
+    }
+
+    function validarEditarPaso2() {
+        let ok = true;
+
+        const fechaInicio = document.getElementById("editar-fecha-inicio");
+        const errorVacia = document.getElementById("editar-fecha-inicio-vacia-error");
+        const errorPasada = document.getElementById("editar-fecha-inicio-error");
+
+        if (errorVacia) errorVacia.classList.remove("modal__field-error--visible");
+        if (errorPasada) errorPasada.style.display = 'none';
+        fechaInicio.classList.remove("modal__input--error");
+
+        if (!fechaInicio.value) {
+            if (errorVacia) errorVacia.classList.add("modal__field-error--visible");
+            fechaInicio.classList.add("modal__input--error");
+            ok = false;
+        } else {
+            const hoy = new Date().toISOString().split('T')[0];
+            if (fechaInicio.value < hoy) {
+                if (errorPasada) errorPasada.style.display = 'block';
+                fechaInicio.classList.add("modal__input--error");
+                ok = false;
+            }
+        }
+
+        return ok;
+    }
+
+    // ══════════════════════════════════════════════════════════════
     // LÓGICA DE 2 PASOS — MODAL NUEVA INCIDENCIA
-    // Footer unificado: un solo div con dos botones que cambian según el paso
     // ══════════════════════════════════════════════════════════════
 
     let pasoActual = 1;
@@ -255,63 +439,191 @@ async function initIncidencias() {
         const btnDer = document.getElementById("btn-nueva-derecha");
 
         if (paso === 1) {
-            // ── Mostrar paso 1, ocultar paso 2
             paso1.classList.remove("modal--hidden");
             paso2.classList.add("modal--hidden");
 
-            // ── Stepper
             ind1.classList.add("stepper__step--active");
             ind1.classList.remove("stepper__step--done");
             ind2.classList.remove("stepper__step--active", "stepper__step--done");
 
-            // ── Botón izquierdo → Cancelar (cierra el modal)
             btnIzq.textContent = "Cancelar";
             btnIzq.setAttribute("data-modal-close", "modal-nueva-incidencia");
             delete btnIzq.dataset.accion;
 
-            // ── Botón derecho → Siguiente
             btnDer.textContent = "Siguiente →";
             btnDer.dataset.accion = "siguiente";
 
+            // CAMBIO 2: limpiar errores al volver al paso 1
+            limpiarTodosErrores("nueva");
+
         } else {
-            // ── Mostrar paso 2, ocultar paso 1
             paso1.classList.add("modal--hidden");
             paso2.classList.remove("modal--hidden");
 
-            // ── Stepper
             ind1.classList.remove("stepper__step--active");
             ind1.classList.add("stepper__step--done");
             ind2.classList.add("stepper__step--active");
             ind2.classList.remove("stepper__step--done");
 
-            // ── Botón izquierdo → Volver (no cierra el modal)
             btnIzq.textContent = "← Volver";
             btnIzq.removeAttribute("data-modal-close");
             btnIzq.dataset.accion = "volver";
 
-            // ── Botón derecho → Enviar incidencia
             btnDer.textContent = "Enviar incidencia";
             btnDer.dataset.accion = "enviar";
+
+            // CAMBIO 3: limpiar errores al avanzar al paso 2
+            limpiarTodosErrores("nueva");
         }
     }
 
-    // ─── Listener del botón izquierdo del footer unificado ──────────
     document.getElementById("btn-nueva-izquierda")?.addEventListener("click", () => {
         const btnIzq = document.getElementById("btn-nueva-izquierda");
-        if (btnIzq.dataset.accion === "volver") {
-            irAPaso(1);
-        }
-        // Si tiene data-modal-close, el listener global de data-modal-close ya lo gestiona
+        if (btnIzq.dataset.accion === "volver") irAPaso(1); limpiarTodosErrores("nueva");
     });
 
-    // ─── Listener del botón derecho del footer unificado ────────────
     document.getElementById("btn-nueva-derecha")?.addEventListener("click", () => {
         const btnDer = document.getElementById("btn-nueva-derecha");
         if (btnDer.dataset.accion === "siguiente") {
-            irAPaso(2);
+            if (validarNuevaPaso1()) irAPaso(2);
         } else if (btnDer.dataset.accion === "enviar") {
-            enviarNuevaIncidencia();
+            if (validarNuevaPaso2()) enviarNuevaIncidencia();
         }
+    });
+
+    // ══════════════════════════════════════════════════════════════
+    // LÓGICA DE 2 PASOS — MODAL EDITAR INCIDENCIA
+    // ══════════════════════════════════════════════════════════════
+
+    let pasoActualEditar = 1;
+
+    function irAPasoEditar(paso) {
+        pasoActualEditar = paso;
+
+        const paso1 = document.getElementById("editar-paso-1");
+        const paso2 = document.getElementById("editar-paso-2");
+        const ind1 = document.getElementById("editar-step-indicator-1");
+        const ind2 = document.getElementById("editar-step-indicator-2");
+        const btnIzq = document.getElementById("btn-editar-izquierda");
+        const btnDer = document.getElementById("btn-editar-derecha");
+
+        if (paso === 1) {
+            paso1.classList.remove("modal--hidden");
+            paso2.classList.add("modal--hidden");
+
+            ind1.classList.add("stepper__step--active");
+            ind1.classList.remove("stepper__step--done");
+            ind2.classList.remove("stepper__step--active", "stepper__step--done");
+
+            btnIzq.textContent = "Cancelar";
+            btnIzq.setAttribute("data-modal-close", "modal-editar-incidencia");
+            delete btnIzq.dataset.accion;
+
+            btnDer.textContent = "Siguiente →";
+            btnDer.dataset.accion = "siguiente";
+
+            limpiarTodosErrores("editar");
+
+        } else {
+            paso1.classList.add("modal--hidden");
+            paso2.classList.remove("modal--hidden");
+
+            ind1.classList.remove("stepper__step--active");
+            ind1.classList.add("stepper__step--done");
+            ind2.classList.add("stepper__step--active");
+            ind2.classList.remove("stepper__step--done");
+
+            btnIzq.textContent = "← Volver";
+            btnIzq.removeAttribute("data-modal-close");
+            btnIzq.dataset.accion = "volver";
+
+            btnDer.textContent = "Guardar cambios";
+            btnDer.dataset.accion = "guardar";
+
+            limpiarTodosErrores("editar");
+        }
+    }
+
+    document.getElementById("btn-editar-izquierda")?.addEventListener("click", () => {
+        const btn = document.getElementById("btn-editar-izquierda");
+        if (btn.dataset.accion === "volver") irAPasoEditar(1);
+    });
+
+    document.getElementById("btn-editar-derecha")?.addEventListener("click", () => {
+        const btn = document.getElementById("btn-editar-derecha");
+        if (btn.dataset.accion === "siguiente") {
+            if (validarEditarPaso1()) irAPasoEditar(2);
+        } else if (btn.dataset.accion === "guardar") {
+            guardarEdicionIncidencia();
+        }
+    });
+
+    // ══════════════════════════════════════════════════════════════
+    // SISTEMA DE FILTROS
+    // ══════════════════════════════════════════════════════════════
+
+    let filtroActivo = 'todas';
+
+    function aplicarFiltro(filtro) {
+        filtroActivo = filtro;
+
+        const seccionActivas = document.getElementById("seccion-activas");
+        const seccionResueltas = document.getElementById("seccion-resueltas");
+        const listaActivas = document.getElementById("lista-activas");
+        const listaResueltas = document.getElementById("lista-resueltas");
+
+        document.querySelectorAll(".filtro-btn").forEach(btn => {
+            btn.classList.toggle("filtro-btn--active", btn.dataset.filtro === filtro);
+        });
+
+        if (filtro === 'todas') {
+            seccionActivas.classList.remove("section--filtro-oculto");
+            seccionResueltas.classList.remove("section--filtro-oculto");
+            listaActivas.querySelectorAll(".incident-item").forEach(el => el.style.display = "");
+            listaResueltas.querySelectorAll(".incident-item").forEach(el => el.style.display = "");
+
+        } else if (filtro === 'resuelta') {
+            seccionActivas.classList.add("section--filtro-oculto");
+            seccionResueltas.classList.remove("section--filtro-oculto");
+            listaResueltas.querySelectorAll(".incident-item").forEach(el => el.style.display = "");
+
+        } else {
+            seccionActivas.classList.remove("section--filtro-oculto");
+            seccionResueltas.classList.add("section--filtro-oculto");
+
+            listaActivas.querySelectorAll(".incident-item").forEach(el => {
+                const estadoItem = (el.dataset.estado || '').toLowerCase().trim();
+                const estadoNorm = estadoItem.replace(' ', '_');
+                el.style.display = (estadoNorm === filtro) ? "" : "none";
+            });
+        }
+
+        actualizarMensajeVacio(listaActivas, filtro === 'todas' || filtro !== 'resuelta');
+        actualizarMensajeVacio(listaResueltas, filtro === 'todas' || filtro === 'resuelta');
+    }
+
+    function actualizarMensajeVacio(lista, esVisible) {
+        if (!lista) return;
+        const anterior = lista.querySelector(".filtro-vacio");
+        if (anterior) anterior.remove();
+
+        if (!esVisible) return;
+
+        const itemsVisibles = [...lista.querySelectorAll(".incident-item")]
+            .filter(el => el.style.display !== "none");
+
+        if (itemsVisibles.length === 0) {
+            const msg = document.createElement("li");
+            msg.className = "filtro-vacio";
+            msg.textContent = "No hay incidencias con este estado.";
+            lista.appendChild(msg);
+        }
+    }
+
+    document.querySelectorAll(".filtro-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            aplicarFiltro(btn.dataset.filtro);
+        });
     });
 
     // ─── CARGAR INCIDENCIAS ──────────────────────────────────────────
@@ -347,10 +659,11 @@ async function initIncidencias() {
                     otros: "📋"
                 }[inc.tipo] || "📋";
 
-                const iconoHTML = inc.imagen
-                    ? `<img src="${inc.imagen}" class="incident-img"
+                const rutaImagen = normalizarRutaImagen(inc.imagen);
+                const iconoHTML = rutaImagen
+                    ? `<img src="${rutaImagen}" class="incident-img"
                             style="width:48px;height:48px;object-fit:cover;border-radius:8px;"
-                            onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'incident-icon',textContent:'${icono}'}))">`
+                             onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<div class=\\'incident-icon\\'>${icono}</div>')">`
                     : `<div class="incident-icon">${icono}</div>`;
 
                 const estadoClase =
@@ -383,7 +696,7 @@ async function initIncidencias() {
                         data-desc="${inc.descripcion?.replace(/"/g, '&quot;')}"
                         data-estado="${inc.estado}"
                         data-fecha="${inc.fecha || inc.fecha_creacion || ''}"
-                        data-imagen="${inc.imagen || ''}"
+                        data-imagen="${normalizarRutaImagen(inc.imagen)}"
                         data-notificar="${inc.notificar_admin || 0}"
                         data-fecha-inicio="${inc.fecha_inicio || ''}"
                         data-fecha-fin="${inc.fecha_fin || ''}"
@@ -428,6 +741,8 @@ async function initIncidencias() {
             document.getElementById("stat-total").textContent = incidencias.length;
             document.getElementById("badge-incidencias").textContent =
                 contadores.abierta + contadores.en_curso;
+
+            aplicarFiltro(filtroActivo);
 
         } catch (error) {
             console.error("Error cargando incidencias:", error);
@@ -491,7 +806,11 @@ async function initIncidencias() {
         }
 
         const fechaInicio = item.dataset.fechaInicio ? new Date(item.dataset.fechaInicio).toLocaleDateString('es-ES') : '—';
-        const fechaFin = item.dataset.fechaFin ? new Date(item.dataset.fechaFin).toLocaleDateString('es-ES') : 'Pendiente';
+        const fechaFinRaw = item.dataset.fechaFin;
+        const fechaFinDate = fechaFinRaw ? new Date(fechaFinRaw) : null;
+        const fechaFin = (fechaFinDate && !isNaN(fechaFinDate))
+            ? fechaFinDate.toLocaleDateString('es-ES')
+            : 'Pendiente';
         document.getElementById("detalle-fecha-inicio").textContent = fechaInicio;
         document.getElementById("detalle-fecha-fin").textContent = fechaFin;
 
@@ -517,10 +836,45 @@ async function initIncidencias() {
     document.querySelectorAll(".btn-abrir-nueva").forEach(btn => {
         btn.addEventListener("click", () => {
             limpiarFormulario("modal-nueva-incidencia");
+            limpiarTodosErrores("nueva");
             irAPaso(1);
             initToggleComentario();
             setMinDateToday('nueva-fecha-inicio');
+
+            // ── Limpiar preview de imagen del formulario anterior ──
+            const inputImagen = document.getElementById("nueva-imagen");
+            if (inputImagen) inputImagen.value = "";
+
+            const previewAnterior = document.getElementById("nueva-imagen-preview");
+            if (previewAnterior) previewAnterior.remove();
+
+            const dropzone = document.querySelector('label[for="nueva-imagen"].modal__dropzone');
+            if (dropzone) dropzone.style.display = "";
+
             abrirModal("modal-nueva-incidencia");
+
+            // Limpiar rojo en tiempo real al escribir
+            document.getElementById("nueva-tipo")?.addEventListener("change", function () {
+                limpiarErrorCampo(this, "nueva-tipo-error");
+            });
+            document.getElementById("nueva-titulo")?.addEventListener("input", function () {
+                limpiarErrorCampo(this, "nueva-titulo-error");
+            });
+            document.getElementById("nueva-desc")?.addEventListener("input", function () {
+                limpiarErrorCampo(this, "nueva-desc-error");
+            });
+            document.querySelectorAll("#modal-nueva-incidencia .modal__urgencia-btn").forEach(b => {
+                b.addEventListener("click", () => {
+                    const err = document.getElementById("nueva-urgencia-error");
+                    if (err) err.classList.remove("modal__field-error--visible");
+                });
+            });
+            document.getElementById("nueva-fecha-inicio")?.addEventListener("change", function () {
+                limpiarErrorCampo(this, "nueva-fecha-inicio-vacia-error");
+                const errorPasada = document.getElementById("nueva-fecha-inicio-error");
+                if (errorPasada) errorPasada.style.display = 'none';
+                this.classList.remove("modal__input--error");
+            });
         });
     });
 
@@ -566,6 +920,8 @@ async function initIncidencias() {
             initToggleComentario();
             setupFechaInicioValidation('editar-fecha-inicio', 'editar-fecha-inicio-error');
 
+            limpiarTodosErrores("editar");
+            irAPasoEditar(1);
             abrirModal("modal-editar-incidencia");
         }
 
@@ -576,7 +932,7 @@ async function initIncidencias() {
         }
     });
 
-    // ─── CREAR (función extraída para llamarla desde el footer unificado) ──
+    // ─── CREAR ───────────────────────────────────────────────────────
     async function enviarNuevaIncidencia() {
 
         const titulo = document.getElementById("nueva-titulo").value.trim();
@@ -589,23 +945,6 @@ async function initIncidencias() {
         );
         const notificar = document.getElementById("nueva-notificar-admin").checked ? 1 : 0;
 
-        if (!titulo || !descripcion || !tipo) {
-            mostrarToast("Rellena los campos de información básica.", "error");
-            irAPaso(1);
-            return;
-        }
-
-        if (!fechaInicio) {
-            mostrarToast("La fecha de inicio es obligatoria.", "error");
-            return;
-        }
-
-        const hoy = new Date().toISOString().split('T')[0];
-        if (fechaInicio < hoy) {
-            document.getElementById("nueva-fecha-inicio-error").style.display = 'block';
-            return;
-        }
-
         const idUsuario = obtenerIdUsuario();
 
         const formData = new FormData();
@@ -617,7 +956,7 @@ async function initIncidencias() {
         formData.append("tipo", tipo);
         formData.append("fecha_inicio", fechaInicio);
         formData.append("fecha_fin", fechaFin);
-        formData.append("urgencia", urgenciaBtn ? urgenciaBtn.dataset.urgencia : "bajo");
+        formData.append("urgencia", urgenciaBtn ? urgenciaBtn.dataset.urgencia : "baja");
         formData.append("notificar_admin", notificar);
 
         if (notificar) {
@@ -647,9 +986,9 @@ async function initIncidencias() {
         }
     }
 
-    // ─── EDITAR ──────────────────────────────────────────────────────
-    document.getElementById("btn-confirmar-editar")?.addEventListener("click", async (e) => {
-        e.preventDefault();
+    // ─── GUARDAR EDICIÓN ─────────────────────────────────────────────
+    async function guardarEdicionIncidencia() {
+        if (!validarEditarPaso2()) return;
 
         const modal = document.getElementById("modal-editar-incidencia");
         const id = modal.dataset.incidenciaId;
@@ -662,17 +1001,6 @@ async function initIncidencias() {
         const urgenciaBtn = modal.querySelector(".modal__urgencia-btn--active");
         const notificar = document.getElementById("editar-notificar-admin").checked ? 1 : 0;
 
-        if (!titulo || !descripcion || !fechaInicio) {
-            mostrarToast("Rellena título, descripción y fecha de inicio.", "error");
-            return;
-        }
-
-        const hoy = new Date().toISOString().split('T')[0];
-        if (fechaInicio < hoy) {
-            document.getElementById("editar-fecha-inicio-error").style.display = 'block';
-            return;
-        }
-
         const formData = new FormData();
         formData.append("accion", "editar");
         formData.append("id", id);
@@ -682,7 +1010,7 @@ async function initIncidencias() {
         formData.append("estado", estado);
         formData.append("fecha_inicio", fechaInicio);
         formData.append("fecha_fin", fechaFin);
-        formData.append("urgencia", urgenciaBtn ? urgenciaBtn.dataset.urgencia : "bajo");
+        formData.append("urgencia", urgenciaBtn ? urgenciaBtn.dataset.urgencia : "baja");
         formData.append("notificar_admin", notificar);
 
         if (notificar) {
@@ -697,11 +1025,7 @@ async function initIncidencias() {
         if (imagenFile) formData.append("imagen", imagenFile);
 
         try {
-            const res = await fetch("../php/incidencias.php", {
-                method: "POST",
-                body: formData
-            });
-
+            const res = await fetch("../php/incidencias.php", { method: "POST", body: formData });
             const text = await res.text();
             const result = JSON.parse(text);
 
@@ -716,7 +1040,7 @@ async function initIncidencias() {
             console.error("❌ Error en fetch:", error);
             mostrarToast("Error de conexión al editar.", "error");
         }
-    });
+    }
 
     // ─── ELIMINAR ────────────────────────────────────────────────────
     document.getElementById("btn-confirmar-eliminar")?.addEventListener("click", async () => {
@@ -761,7 +1085,7 @@ async function initIncidencias() {
         }
     });
 
-    // ─── Util ────────────────────────────────────────────────────────
+    // ─── Util: limpiar formulario ────────────────────────────────────
     function limpiarFormulario(modalId) {
         const modal = document.getElementById(modalId);
         if (!modal) return;
@@ -805,7 +1129,6 @@ async function initIncidencias() {
                 mostrarModalNotificaciones(data.notificaciones);
                 actualizarBadgeNotificaciones(data.notificaciones.length);
             } else {
-                // Sin notificaciones: limpiar badge y drawer
                 actualizarBadgeNotificaciones(0);
                 renderizarDrawerNotificaciones([]);
             }
@@ -814,13 +1137,11 @@ async function initIncidencias() {
         }
     }
 
-    // ─── MODIFICADO: ya no abre el modal antiguo, renderiza en el drawer ───
     function mostrarModalNotificaciones(notificaciones) {
         actualizarBadgeNotificaciones(notificaciones.length);
         renderizarDrawerNotificaciones(notificaciones);
     }
 
-    // ─── NUEVO: renderiza las notificaciones en el drawer lateral ──────────
     function renderizarDrawerNotificaciones(notificaciones) {
         const lista = document.getElementById("listaNotificacionesUser");
         const vacio = document.getElementById("notify-empty-user");
@@ -1029,7 +1350,6 @@ async function initIncidencias() {
         return div.innerHTML;
     }
 
-    // Event: Enviar mensaje al admin
     document.getElementById("btn-enviar-mensaje-admin")?.addEventListener("click", async () => {
         const input = document.getElementById("chat-input-mensaje");
         const mensaje = input.value.trim();
@@ -1059,7 +1379,6 @@ async function initIncidencias() {
         }
     });
 
-    // Event: Ver detalle completo desde el chat
     document.getElementById("btn-ver-detalle-completo")?.addEventListener("click", () => {
         cerrarModal("modal-conversacion-admin");
         const incidenciaEl = document.querySelector(`.incident-item[data-id="${idIncidenciaChatActual}"]`);
@@ -1068,7 +1387,6 @@ async function initIncidencias() {
         }
     });
 
-    // Event: Enter para enviar mensaje (sin Shift)
     document.getElementById("chat-input-mensaje")?.addEventListener("keydown", (e) => {
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
@@ -1084,11 +1402,9 @@ async function initIncidencias() {
         const btn = document.getElementById('btn-ver-conversacion');
         if (!btn) return;
 
-        const idUsuarioLogueado = obtenerIdUsuario();
-        const idCreador = parseInt(incidenciaData.id_usuario || 0);
         const requiereAdmin = parseInt(incidenciaData.notificar_admin || 0) === 1;
 
-        if (idUsuarioLogueado && idCreador === idUsuarioLogueado && requiereAdmin) {
+        if (requiereAdmin) {
             btn.style.display = 'inline-block';
             btn.dataset.incidenciaId = incidenciaData.id_incidencia;
         } else {
@@ -1163,7 +1479,7 @@ async function initIncidencias() {
     });
 
     // ═══════════════════════════════════════════════════════════════
-    // 🔔 EVENT LISTENERS PARA NOTIFICACIONES (modal antiguo — mantenido por compatibilidad)
+    // 🔔 EVENT LISTENERS PARA NOTIFICACIONES
     // ═══════════════════════════════════════════════════════════════
 
     iniciarPollingNotificaciones();
@@ -1217,7 +1533,6 @@ async function initIncidencias() {
         }
     });
 
-    // ─── DRAWER: marcar leída al pulsar un item ───────────────────────
     document.getElementById("listaNotificacionesUser")?.addEventListener("click", async (e) => {
         const item = e.target.closest(".notif-drawer__item");
         if (!item) return;
@@ -1271,10 +1586,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     });
 
-    // ─── Marcar todas leídas desde el drawer y cerrarlo ──────────────
     marcarBtn?.addEventListener("click", async () => {
-        // Reusamos la función global de marcar todas leídas
-        // que se inicializa dentro de initIncidencias
         const items = document.querySelectorAll("#listaNotificacionesUser .notif-drawer__item");
         for (const item of items) {
             const idNotif = item.dataset.idNotificacion;
@@ -1296,7 +1608,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
         modal.classList.add("hidden");
-        // Forzar refresco del badge y drawer
         const badge = document.getElementById("contadorNotificacionesUser");
         if (badge) badge.classList.add("hidden");
         const lista = document.getElementById("listaNotificacionesUser");

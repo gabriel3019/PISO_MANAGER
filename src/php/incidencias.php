@@ -59,11 +59,15 @@ switch ($accion) {
         $urgencia_raw    = $_POST['urgencia']          ?? 'baja';
         $urgencia        = normalizarUrgencia($urgencia_raw);
         $notificar_admin = (int)($_POST['notificar_admin'] ?? 0);
-        $estado          = 'abierta'; // Siempre empieza como abierta
+        $estado          = 'abierta';
         $fecha_inicio    = $_POST['fecha_inicio'] ?? null;
         $fecha_fin       = !empty($_POST['fecha_fin']) ? $_POST['fecha_fin'] : null;
 
-        // Validación servidor
+        if (!$titulo || !$descripcion || !$tipo) {
+            echo json_encode(['success' => false, 'error' => 'Faltan campos obligatorios (título, descripción, tipo)']);
+            exit;
+        }
+
         $hoy = date('Y-m-d');
         if (!$fecha_inicio || $fecha_inicio < $hoy) {
             echo json_encode(['success' => false, 'error' => 'La fecha de inicio es obligatoria y no puede ser anterior a hoy']);
@@ -81,7 +85,7 @@ switch ($accion) {
             if (in_array($ext, $allowed)) {
                 $nombre = uniqid('inc_') . '.' . $ext;
                 if (move_uploaded_file($_FILES['imagen']['tmp_name'], $dir . $nombre)) {
-                    $imagen_path = $dir . $nombre;
+                    $imagen_path = 'uploads/incidencias/' . $nombre;
                 }
             }
         }
@@ -91,7 +95,6 @@ switch ($accion) {
              (id_piso, id_usuario, tipo, titulo, descripcion, urgencia, estado, imagen, notificar_admin, fecha_inicio, fecha_fin)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
-        // ii=id_piso,id_usuario | sssss=tipo,titulo,desc,urgencia,estado | s=imagen | i=notificar | ss=fechas
         $stmt->bind_param(
             "iissssssiss",
             $id_piso,
@@ -110,6 +113,7 @@ switch ($accion) {
         if ($stmt->execute()) {
             $id_incidencia = $stmt->insert_id;
 
+            // ── Insertar comentario del admin si existe ──
             if (!empty($_POST['comentario_admin']) && !empty($_POST['id_usuario_comentario'])) {
                 $comentario            = trim($_POST['comentario_admin']);
                 $id_usuario_comentario = (int)$_POST['id_usuario_comentario'];
@@ -120,6 +124,17 @@ switch ($accion) {
                 $stmt_msg->bind_param("iis", $id_incidencia, $id_usuario_comentario, $comentario);
                 $stmt_msg->execute();
                 $stmt_msg->close();
+            }
+
+            // ── NUEVO: Notificar al usuario cuando se crea la incidencia ──
+            if ($notificar_admin) {
+                $mensaje_notif = "Tu incidencia '$titulo' ha sido registrada y el administrador ha sido notificado.";
+                $stmt_notif = $conn->prepare(
+                    "INSERT INTO notificaciones (id_usuario, id_incidencia, mensaje) VALUES (?, ?, ?)"
+                );
+                $stmt_notif->bind_param("iis", $id_usuario, $id_incidencia, $mensaje_notif);
+                $stmt_notif->execute();
+                $stmt_notif->close();
             }
 
             echo json_encode(['success' => true, 'id' => $id_incidencia]);
@@ -148,12 +163,22 @@ switch ($accion) {
         $fecha_inicio    = $_POST['fecha_inicio'] ?? null;
         $fecha_fin       = !empty($_POST['fecha_fin']) ? $_POST['fecha_fin'] : null;
 
-        if ($fecha_inicio) {
-            $hoy = date('Y-m-d');
-            if ($fecha_inicio < $hoy) {
-                echo json_encode(['success' => false, 'error' => 'La fecha de inicio no puede ser anterior a hoy']);
-                exit;
-            }
+        // Validación servidor — campos obligatorios
+        if (!$id || !$titulo || !$descripcion || !$tipo) {
+            echo json_encode(['success' => false, 'error' => 'Faltan campos obligatorios (título, descripción, tipo)']);
+            exit;
+        }
+
+        // Validación servidor — fecha
+        if (!$fecha_inicio) {
+            echo json_encode(['success' => false, 'error' => 'La fecha de inicio es obligatoria']);
+            exit;
+        }
+
+        $hoy = date('Y-m-d');
+        if ($fecha_inicio < $hoy) {
+            echo json_encode(['success' => false, 'error' => 'La fecha de inicio no puede ser anterior a hoy']);
+            exit;
         }
 
         $imagen_path = null;
@@ -178,7 +203,6 @@ switch ($accion) {
                  SET titulo=?, descripcion=?, tipo=?, urgencia=?, estado=?, notificar_admin=?, fecha_inicio=?, fecha_fin=?, imagen=?
                  WHERE id_incidencia=?"
             );
-            // sssss=titulo,desc,tipo,urgencia,estado | i=notificar | ss=fechas | s=imagen | i=id
             $stmt->bind_param(
                 "ssssssissi",
                 $titulo,
@@ -198,7 +222,6 @@ switch ($accion) {
                  SET titulo=?, descripcion=?, tipo=?, urgencia=?, estado=?, notificar_admin=?, fecha_inicio=?, fecha_fin=?
                  WHERE id_incidencia=?"
             );
-            // sssss=titulo,desc,tipo,urgencia,estado | i=notificar | ss=fechas | i=id
             $stmt->bind_param(
                 "sssssissi",
                 $titulo,
@@ -247,15 +270,13 @@ switch ($accion) {
             $stmtM->execute();
             $stmtM->close();
 
-            // 2. Borrar notificaciones relacionadas (El error actual viene de aquí)
+            // 2. Borrar notificaciones relacionadas
             $stmtN = $conn->prepare("DELETE FROM notificaciones WHERE id_incidencia = ?");
             $stmtN->bind_param("i", $id);
             $stmtN->execute();
             $stmtN->close();
 
-            // 3. (Opcional) Si tienes otra tabla como 'fotos_incidencia', añádela aquí también
-
-            // 4. Borrar la incidencia principal
+            // 3. Borrar la incidencia principal
             $stmt2 = $conn->prepare("DELETE FROM incidencias WHERE id_incidencia = ?");
             if ($stmt2) {
                 $stmt2->bind_param("i", $id);
@@ -329,7 +350,6 @@ switch ($accion) {
             exit;
         }
 
-        // Verificar que la notificación pertenece al usuario
         $stmt = $conn->prepare("
             UPDATE notificaciones 
             SET leida = 1 
@@ -346,7 +366,7 @@ switch ($accion) {
         break;
 
     // ═══════════════════════════════════════════════════════════════
-    // CASE: obtener_incidencia (NUEVO - para el chat)
+    // CASE: obtener_incidencia (para el chat)
     // ═══════════════════════════════════════════════════════════════
     case 'obtener_incidencia':
         $id = intval($_GET['id'] ?? 0);
@@ -374,7 +394,7 @@ switch ($accion) {
         break;
 
     // ═══════════════════════════════════════════════════════════════
-    // CASE: obtener_mensajes_incidencia (NUEVO - para el chat)
+    // CASE: obtener_mensajes_incidencia (para el chat)
     // ═══════════════════════════════════════════════════════════════
     case 'obtener_mensajes_incidencia':
         $id_incidencia = intval($_GET['id_incidencia'] ?? 0);
@@ -384,7 +404,6 @@ switch ($accion) {
             exit;
         }
 
-        // UNION de ambas tablas de mensajes: usuario y admin
         $stmt = $conn->prepare("
             SELECT 
                 m.id_mensaje,
@@ -432,7 +451,7 @@ switch ($accion) {
         break;
 
     // ═══════════════════════════════════════════════════════════════
-    // CASE: enviar_mensaje_admin (NUEVO - para responder desde usuario)
+    // CASE: enviar_mensaje_admin (para responder desde usuario)
     // ═══════════════════════════════════════════════════════════════
     case 'enviar_mensaje_admin':
         $id_incidencia = intval($_POST['id_incidencia'] ?? 0);
@@ -444,7 +463,6 @@ switch ($accion) {
             exit;
         }
 
-        // Insertar mensaje en la tabla de usuario -> admin
         $stmt = $conn->prepare("
             INSERT INTO mensajes_incidencia (id_incidencia, id_usuario, mensaje)
             VALUES (?, ?, ?)
@@ -453,9 +471,6 @@ switch ($accion) {
         $stmt->bind_param("iis", $id_incidencia, $id_usuario, $mensaje);
 
         if ($stmt->execute()) {
-            // Opcional: crear notificación al admin si no existe
-            // (ya se crea desde el lado admin cuando responde, pero podemos asegurar)
-
             echo json_encode(['success' => true]);
         } else {
             echo json_encode(['success' => false, 'error' => $stmt->error]);
@@ -467,7 +482,7 @@ switch ($accion) {
     // CASE: obtener_conversacion_segura (VALIDACIÓN DE SEGURIDAD)
     // ═══════════════════════════════════════════════════════════════
     case 'obtener_conversacion_segura':
-        // 🔐 Usar sesión para identificar al usuario (NO confiar en POST/GET)
+        // Usar sesión para identificar al usuario (NO confiar en POST/GET)
         session_start();
         $id_usuario_logueado = $_SESSION['id_usuario'] ?? $_SESSION['user_id'] ?? 0;
 
@@ -478,19 +493,19 @@ switch ($accion) {
             exit;
         }
 
-        // 1️⃣ Verificar que la incidencia existe, pertenece al usuario Y tiene notificar_admin=1
+        // Verificar que la incidencia existe, pertenece al usuario Y tiene notificar_admin=1
         $stmt = $conn->prepare("
-        SELECT id_usuario, notificar_admin, estado 
-        FROM incidencias 
-        WHERE id_incidencia = ?
-    ");
+            SELECT id_usuario, notificar_admin, estado 
+            FROM incidencias 
+            WHERE id_incidencia = ?
+        ");
         $stmt->bind_param("i", $id_incidencia);
         $stmt->execute();
         $result = $stmt->get_result();
         $incidencia = $result->fetch_assoc();
         $stmt->close();
 
-        // 🔒 Validación CRÍTICA: ownership + flag admin
+        // Validación CRÍTICA: ownership + flag admin
         if (
             !$incidencia ||
             $incidencia['id_usuario'] != $id_usuario_logueado ||
@@ -500,36 +515,36 @@ switch ($accion) {
             exit;
         }
 
-        // 2️⃣ Obtener mensajes combinados (tu lógica UNION ya es correcta)
+        // Obtener mensajes combinados
         $stmt = $conn->prepare("
-        SELECT 
-            m.id_mensaje,
-            m.id_incidencia,
-            m.id_usuario,
-            u.nombre,
-            m.mensaje,
-            m.fecha AS fecha_envio,
-            'usuario' AS origen
-        FROM mensajes_incidencia m
-        INNER JOIN usuarios u ON m.id_usuario = u.id_usuario
-        WHERE m.id_incidencia = ?
-        
-        UNION ALL
-        
-        SELECT 
-            m.id_mensaje,
-            m.id_incidencia,
-            m.id_usuario,
-            u.nombre,
-            m.mensaje,
-            m.fecha_envio,
-            'admin' AS origen
-        FROM incidencia_mensajes m
-        INNER JOIN usuarios u ON m.id_usuario = u.id_usuario
-        WHERE m.id_incidencia = ?
-        
-        ORDER BY fecha_envio ASC
-    ");
+            SELECT 
+                m.id_mensaje,
+                m.id_incidencia,
+                m.id_usuario,
+                u.nombre,
+                m.mensaje,
+                m.fecha AS fecha_envio,
+                'usuario' AS origen
+            FROM mensajes_incidencia m
+            INNER JOIN usuarios u ON m.id_usuario = u.id_usuario
+            WHERE m.id_incidencia = ?
+            
+            UNION ALL
+            
+            SELECT 
+                m.id_mensaje,
+                m.id_incidencia,
+                m.id_usuario,
+                u.nombre,
+                m.mensaje,
+                m.fecha_envio,
+                'admin' AS origen
+            FROM incidencia_mensajes m
+            INNER JOIN usuarios u ON m.id_usuario = u.id_usuario
+            WHERE m.id_incidencia = ?
+            
+            ORDER BY fecha_envio ASC
+        ");
         $stmt->bind_param("ii", $id_incidencia, $id_incidencia);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -547,43 +562,11 @@ switch ($accion) {
         ]);
         break;
 
-    case 'obtener_notificaciones_usuario':
-        $id_usuario = $_GET['id_usuario'] ?? null;
-
-        if (!$id_usuario) {
-            echo json_encode(['success' => false, 'error' => 'Falta id_usuario']);
-            exit;
-        }
-
-        $stmt = $conn->prepare("
-        SELECT *
-        FROM notificaciones
-        WHERE id_usuario = ?
-        AND leida = 0
-        ORDER BY fecha_creacion DESC
-    ");
-
-        $stmt->bind_param("i", $id_usuario);
-        $stmt->execute();
-
-        $result = $stmt->get_result();
-        $notificaciones = [];
-
-        while ($row = $result->fetch_assoc()) {
-            $notificaciones[] = $row;
-        }
-
-        echo json_encode([
-            'success' => true,
-            'notificaciones' => $notificaciones
-        ]);
-        break;
-
     default:
         error_log("ACCIÓN NO VÁLIDA RECIBIDA: $accion | POST: " . print_r($_POST, true));
         echo json_encode([
-            'success'     => false,
-            'error'       => 'Acción no válida',
+            'success'      => false,
+            'error'        => 'Acción no válida',
             'debug_accion' => $accion
         ]);
         break;
