@@ -25,13 +25,21 @@ let filtroActual = "todas";
 
 document.addEventListener("DOMContentLoaded", () => {
     cargarIncidencias();
-    cargarNotificaciones();
+    //cargarNotificaciones();
 });
+
+function rutaImagen(imagen) {
+    if (!imagen) return "";
+
+    return imagen.replace("../uploads/", "../src/uploads/");
+}
 
 async function cargarIncidencias() {
     try {
         const response = await fetch("../php/incidenciasAdmin.php?accion=listar&id_piso=1");
-        const data = await response.json();
+        const texto = await response.text();
+
+        const data = JSON.parse(texto);
 
         if (data.success) {
             incidencias = data.incidencias;
@@ -107,7 +115,16 @@ function pintarIncidencias() {
             : '';
 
         li.innerHTML = `
-            <div class="incident-icon">${icono}</div>
+            <div class="incident-icon">
+                ${incidencia.imagen
+                ? `<img 
+                        src="/PISO_MANAGER/src/${incidencia.imagen}"
+                        class="incident-img"
+                        onerror="this.style.display='none'; this.parentNode.textContent='${icono}'"
+                        >`
+                : icono
+            }
+            </div>
 
             <div class="incident-body">
                 <p class="incident-body__title">${incidencia.titulo}${notificarBadge}</p>
@@ -151,7 +168,8 @@ async function cambiarEstado(idIncidencia, nuevoEstado) {
             body: formData
         });
 
-        const data = await response.json();
+        const texto = await response.text();
+        const data = JSON.parse(texto);
 
         if (data.success) {
             cargarIncidencias();
@@ -258,6 +276,16 @@ function abrirDetalleIncidencia(idIncidencia) {
     document.getElementById("detalle-fecha").textContent = formatearFecha(incidencia.fecha || incidencia.fecha_creacion);
     document.getElementById("detalle-titulo").textContent = incidencia.titulo || "Sin título";
     document.getElementById("detalle-desc").textContent = incidencia.descripcion || "Sin descripción";
+
+    const imagenWrap = document.getElementById("detalle-imagen-wrap");
+    const imagen = document.getElementById("detalle-imagen");
+
+    if (incidencia.imagen) {
+        imagen.src = "/PISO_MANAGER/src/" + incidencia.imagen;
+    } else {
+        imagenWrap.style.display = "none";
+        imagen.src = "";
+    }
 
     document.getElementById("detalle-notificar").textContent =
         incidencia.notificar_admin == 1 ? "Sí" : "No";
@@ -564,9 +592,96 @@ function abrirModalNuevaIncidenciaAdmin() {
 
 function cerrarModalNuevaIncidenciaAdmin() {
     document.getElementById("modal-nueva-incidencia").classList.add("modal--hidden");
+    limpiarFormularioNuevaIncidenciaAdmin();
+}
+
+
+function limpiarFormularioNuevaIncidenciaAdmin() {
+
+    document.getElementById("nueva-tipo").value = "";
+    document.getElementById("nueva-titulo").value = "";
+    document.getElementById("nueva-desc").value = "";
+    document.getElementById("nueva-fecha-inicio").value = "";
+    document.getElementById("nueva-fecha-fin").value = "";
+    document.getElementById("nueva-notificar-inquilino").checked = false;
+    document.getElementById("nueva-imagen").value = "";
+
+    document.querySelectorAll("#modal-nueva-incidencia .modal__urgencia-btn")
+        .forEach(btn => {
+            btn.classList.remove("modal__urgencia-btn--active");
+            btn.classList.remove("input-error");
+        });
+
+    document.querySelectorAll("#modal-nueva-incidencia .input-error-text")
+        .forEach(error => error.remove());
+
+    document.querySelectorAll("#modal-nueva-incidencia .input-error")
+        .forEach(input => input.classList.remove("input-error"));
+
+    irAPasoNuevaAdmin(1);
 }
 
 function irAPasoNuevaAdmin(paso) {
+
+    if (paso === 2) {
+
+        const tipo = document.getElementById("nueva-tipo");
+        const titulo = document.getElementById("nueva-titulo");
+        const descripcion = document.getElementById("nueva-desc");
+        const urgenciaBtn = document.querySelector(
+            "#modal-nueva-incidencia .modal__urgencia-btn--active"
+        );
+        const urgenciaWrap = document.querySelector("#modal-nueva-incidencia .modal__urgencia-btn").parentNode;
+
+        let hayErrores = false;
+
+        // Limpiar errores anteriores
+        document.querySelectorAll(".input-error-text").forEach(el => el.remove());
+
+        function mostrarError(input, mensaje) {
+
+            const error = document.createElement("small");
+
+            error.className = "input-error-text";
+            error.textContent = mensaje;
+
+            input.parentNode.appendChild(error);
+        }
+
+        if (!tipo.value) {
+            mostrarError(tipo, "Este campo es obligatorio");
+            hayErrores = true;
+        }
+
+        if (!titulo.value.trim()) {
+            mostrarError(titulo, "Este campo es obligatorio");
+            hayErrores = true;
+        }
+
+        if (!descripcion.value.trim()) {
+            mostrarError(descripcion, "Este campo es obligatorio");
+            hayErrores = true;
+        }
+
+        if (!urgenciaBtn) {
+
+            document.querySelectorAll("#modal-nueva-incidencia .modal__urgencia-btn")
+                .forEach(b => b.classList.add("input-error"));
+
+            const error = document.createElement("small");
+
+            error.id = "error-urgencia";
+            error.className = "input-error-text";
+            error.textContent = "Selecciona un nivel de urgencia";
+
+            urgenciaWrap.insertAdjacentElement("afterend", error);
+
+            hayErrores = true;
+        }
+
+        if (hayErrores) return;
+    }
+
     pasoActualNueva = paso;
 
     const paso1 = document.getElementById("nueva-paso-1");
@@ -609,9 +724,10 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("btn-nueva-izquierda")?.addEventListener("click", () => {
         if (pasoActualNueva === 2) {
             irAPasoNuevaAdmin(1);
-        } else {
-            cerrarModalNuevaIncidenciaAdmin();
+            return;
         }
+
+        cerrarModalNuevaIncidenciaAdmin();
     });
 
     document.getElementById("btn-nueva-derecha")?.addEventListener("click", () => {
@@ -623,14 +739,84 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     document.querySelectorAll("#modal-nueva-incidencia .modal__urgencia-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-            document.querySelectorAll("#modal-nueva-incidencia .modal__urgencia-btn")
-                .forEach(b => b.classList.remove("modal__urgencia-btn--active"));
 
+        const inputImagen = document.getElementById("nueva-imagen");
+        const dropzone = document.querySelector(".modal__dropzone");
+
+        inputImagen?.addEventListener("change", () => {
+
+            const file = inputImagen.files[0];
+
+            if (!file) return;
+
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+
+                dropzone.querySelector(".modal__dropzone-icon").style.display = "none";
+                dropzone.querySelector("span:last-of-type").style.display = "none";
+
+                const preview = document.createElement("img");
+                preview.src = e.target.result;
+                preview.alt = "Preview";
+                preview.className = "modal__preview-img";
+
+                dropzone.appendChild(preview);
+            };
+
+            reader.readAsDataURL(file);
+        });
+
+        btn.addEventListener("click", () => {
+
+            // quitar active de todos
+            document.querySelectorAll("#modal-nueva-incidencia .modal__urgencia-btn")
+                .forEach(b => {
+                    b.classList.remove("modal__urgencia-btn--active");
+                    b.classList.remove("input-error");
+                });
+
+            // activar el pulsado
             btn.classList.add("modal__urgencia-btn--active");
+
+            // borrar mensaje error
+            document.getElementById("error-urgencia")?.remove();
+        });
+    });
+    [
+        "nueva-tipo",
+        "nueva-titulo",
+        "nueva-desc",
+        "nueva-fecha-inicio",
+        "nueva-fecha-fin"
+    ].forEach(id => {
+
+        const input = document.getElementById(id);
+
+        input?.addEventListener("input", () => {
+
+            const error = input.parentNode.querySelector(".input-error-text");
+
+            if (error) {
+                error.remove();
+            }
+        });
+
+        input?.addEventListener("input", () => {
+
+            const error = input.parentNode.querySelector(".input-error-text");
+
+            if (error) {
+                error.remove();
+            }
         });
     });
 });
+
+const hoy = new Date().toISOString().split("T")[0];
+
+document.getElementById("nueva-fecha-inicio").setAttribute("min", hoy);
+document.getElementById("nueva-fecha-fin").setAttribute("min", hoy);
 
 async function crearIncidenciaAdmin() {
     const tipo = document.getElementById("nueva-tipo").value;
@@ -638,24 +824,50 @@ async function crearIncidenciaAdmin() {
     const descripcion = document.getElementById("nueva-desc").value.trim();
     const fechaInicio = document.getElementById("nueva-fecha-inicio").value;
     const notificarInquilino = document.getElementById("nueva-notificar-inquilino")?.checked ? 1 : 0;
+    const imagen = document.getElementById("nueva-imagen")?.files[0];
+    const fechaFin = document.getElementById("nueva-fecha-fin").value;
 
     const urgenciaBtn = document.querySelector(
         "#modal-nueva-incidencia .modal__urgencia-btn--active"
     );
 
-    if (!tipo || !titulo || !descripcion) {
-        alert("Rellena los campos obligatorios");
-        irAPasoNuevaAdmin(1);
-        return;
-    }
+    let hayErrores = false;
+
+    const inputFechaInicio = document.getElementById("nueva-fecha-inicio");
+    const inputFechaFin = document.getElementById("nueva-fecha-fin");
+
+    // limpiar errores
+    [inputFechaInicio, inputFechaFin].forEach(input => {
+        input.classList.remove("input-error");
+    });
 
     if (!fechaInicio) {
-        alert("Selecciona una fecha de inicio");
+        inputFechaInicio.classList.add("input-error");
+        hayErrores = true;
+    }
+
+    if (fechaInicio && fechaInicio < hoy) {
+        inputFechaInicio.classList.add("input-error");
+        hayErrores = true;
+    }
+
+    if (fechaFin && fechaFin < hoy) {
+        inputFechaFin.classList.add("input-error");
+        hayErrores = true;
+    }
+
+    if (fechaFin && fechaFin < fechaInicio) {
+        inputFechaFin.classList.add("input-error");
+        hayErrores = true;
+    }
+
+    if (hayErrores) {
         irAPasoNuevaAdmin(2);
         return;
     }
 
     const formData = new FormData();
+
     formData.append("accion", "crear");
     formData.append("id_piso", 1);
     formData.append("id_usuario", 1);
@@ -663,7 +875,14 @@ async function crearIncidenciaAdmin() {
     formData.append("titulo", titulo);
     formData.append("descripcion", descripcion);
     formData.append("urgencia", urgenciaBtn ? urgenciaBtn.dataset.urgencia : "baja");
+
     formData.append("fecha_inicio", fechaInicio);
+    formData.append("fecha_fin", fechaFin);
+
+    if (imagen) {
+        formData.append("imagen", imagen);
+    }
+
     formData.append("notificar_inquilino", notificarInquilino);
 
     const response = await fetch("../php/incidenciasAdmin.php", {
@@ -671,12 +890,15 @@ async function crearIncidenciaAdmin() {
         body: formData
     });
 
-    const data = await response.json();
+    const texto = await response.text();
+
+    const data = JSON.parse(texto);
 
     if (data.success) {
         cerrarModalNuevaIncidenciaAdmin();
-        cargarIncidencias();
+        await cargarIncidencias();
     } else {
+        console.log("ERROR PHP:", data);
         alert(data.error || "No se pudo crear la incidencia");
     }
 }
@@ -698,7 +920,9 @@ async function cargarNotificacionesUser() {
     const response = await fetch(
         "../php/incidencias.php?accion=obtener_notificaciones_usuario&id_usuario=1"
     );
-    const data = await response.json();
+    const texto = await response.text();
+
+    const data = JSON.parse(texto);
 
     if (!data.success) return;
 

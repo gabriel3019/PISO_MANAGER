@@ -5,16 +5,15 @@ mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 $conn = new mysqli("localhost", "root", "");
 $conn->set_charset("utf8mb4");
 
-/* ================= VERIFICAR BD ================= */
-$sqlVerificar = "SHOW DATABASES LIKE 'piso_manager'";
-$resultado = $conn->query($sqlVerificar);
 
-/* ================= CREAR BD SI NO EXISTE ================= */
-if ($resultado && $resultado->num_rows <= 0) {
-    $conn->query("CREATE DATABASE piso_manager CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
-}
+/* ================= RESETEAR BD ================= */
 
-/* ================= USAR BD ================= */
+$conn->query("
+    CREATE DATABASE piso_manager
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci
+");
+
 $conn->select_db("piso_manager");
 
 /* ================= TABLAS ================= */
