@@ -281,9 +281,15 @@ function abrirDetalleIncidencia(idIncidencia) {
     const imagen = document.getElementById("detalle-imagen");
 
     if (incidencia.imagen) {
+
+        imagenWrap.style.display = "block";
+
         imagen.src = "/PISO_MANAGER/src/" + incidencia.imagen;
+
     } else {
+
         imagenWrap.style.display = "none";
+
         imagen.src = "";
     }
 
@@ -981,3 +987,40 @@ function pararActualizacionChatAdmin() {
         intervaloChatAdmin = null;
     }
 }
+
+/* ===== IMAGEN GRANDE ===== */
+
+const imagenDetalle = document.getElementById("detalle-imagen");
+
+imagenDetalle?.addEventListener("click", () => {
+
+    if (!imagenDetalle.src) return;
+
+    document.getElementById("imagen-grande-src").src =
+        imagenDetalle.src;
+
+    document
+        .getElementById("modal-imagen-grande")
+        .classList.remove("hidden");
+});
+
+document
+    .getElementById("cerrar-imagen-grande")
+    ?.addEventListener("click", () => {
+
+        document
+            .getElementById("modal-imagen-grande")
+            .classList.add("hidden");
+    });
+
+document
+    .getElementById("modal-imagen-grande")
+    ?.addEventListener("click", (e) => {
+
+        if (e.target.id === "modal-imagen-grande") {
+
+            document
+                .getElementById("modal-imagen-grande")
+                .classList.add("hidden");
+        }
+    });
