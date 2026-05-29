@@ -2471,3 +2471,55 @@ body.dark .filtro-btn--active:hover {
 .modal__urgencia-row--error .modal__urgencia-btn {
   border-color: #dc2626;
 }
+/* ══════════════════════════════════════════════════════════════
+   LIGHTBOX
+   ══════════════════════════════════════════════════════════════ */
+#lightbox-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    background: rgba(0, 0, 0, 0.85);
+    align-items: center;
+    justify-content: center;
+    cursor: zoom-out;
+}
+
+#lightbox-overlay.active {
+    display: flex;
+}
+
+#lightbox-img {
+    max-width: 92vw;
+    max-height: 90vh;
+    border-radius: 12px;
+    box-shadow: 0 8px 48px rgba(0, 0, 0, 0.6);
+    object-fit: contain;
+    user-select: none;
+}
+
+#lightbox-close {
+    position: absolute;
+    top: 20px;
+    right: 24px;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 2rem;
+    cursor: pointer;
+    line-height: 1;
+}
+
+#lightbox-close:hover {
+    opacity: 0.75;
+}
+
+/* ── Imagen del detalle clicable ── */
+.detalle__imagen {
+    cursor: zoom-in;
+    transition: opacity .15s;
+}
+
+.detalle__imagen:hover {
+    opacity: 0.88;
+}
