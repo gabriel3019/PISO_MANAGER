@@ -53,16 +53,43 @@ async function initIncidencias() {
     const menuToggle = document.getElementById("menuToggle");
     const sidebar = document.getElementById("sidebar");
 
+    // Crear overlay para cerrar al hacer clic fuera
+    const sidebarOverlay = document.createElement("div");
+    sidebarOverlay.style.cssText =
+        "display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:998;";
+    document.body.appendChild(sidebarOverlay);
+
+    function cerrarSidebar() {
+        sidebar.classList.remove("active");
+        menuToggle.innerHTML = "☰";
+        menuToggle.classList.remove("active");
+        sidebarOverlay.style.display = "none";
+        document.body.classList.remove("sidebar-open");
+        // ── AÑADIR: devolver el botón al header ──
+        const header = document.querySelector(".page-header");
+        if (header) header.insertBefore(menuToggle, header.firstChild);
+    }
+
     if (menuToggle && sidebar) {
         menuToggle.addEventListener("click", () => {
-            sidebar.classList.toggle("active");
-            menuToggle.classList.toggle("active");
-
-            if (sidebar.classList.contains("active")) {
-                menuToggle.innerHTML = "✕";
+            const estaAbierto = sidebar.classList.contains("active");
+            if (estaAbierto) {
+                cerrarSidebar();
             } else {
-                menuToggle.innerHTML = "☰";
+                sidebar.classList.add("active");
+                menuToggle.innerHTML = "✕";
+                menuToggle.classList.add("active");
+                sidebarOverlay.style.display = "block";
+                document.body.classList.add("sidebar-open");
+                document.body.appendChild(menuToggle);
             }
+        });
+
+        sidebarOverlay.addEventListener("click", cerrarSidebar);
+
+        // Cerrar también al navegar a otra página desde el sidebar
+        sidebar.querySelectorAll(".sidebar-link").forEach(link => {
+            link.addEventListener("click", cerrarSidebar);
         });
     }
 
@@ -179,14 +206,22 @@ async function initIncidencias() {
     });
 
     function mostrarPreviewImagen(file, previewId) {
+        const inputFile = document.getElementById(previewId.replace("-preview", ""));
+        const dropzone = inputFile?.closest("label.modal__dropzone");
+
+        // Ocultar el recuadro
+        if (dropzone) dropzone.style.display = "none";
+
         let preview = document.getElementById(previewId);
         if (!preview) {
             preview = document.createElement("img");
             preview.id = previewId;
             preview.style.cssText =
-                "width:100%;max-height:180px;object-fit:cover;border-radius:8px;margin-top:8px;";
-            const inputFile = document.getElementById(previewId.replace("-preview", ""));
-            inputFile?.closest(".modal__dropzone")?.after(preview);
+                "width:100%;max-height:180px;object-fit:cover;border-radius:8px;margin-top:8px;cursor:pointer;";
+            // Al hacer clic en la preview, se puede cambiar la imagen
+            preview.title = "Clic para cambiar imagen";
+            preview.addEventListener("click", () => inputFile?.click());
+            dropzone?.parentElement?.appendChild(preview);
         }
         preview.src = URL.createObjectURL(file);
     }
@@ -769,81 +804,78 @@ async function initIncidencias() {
             if (data.success && data.notificaciones.length > 0) {
                 mostrarModalNotificaciones(data.notificaciones);
                 actualizarBadgeNotificaciones(data.notificaciones.length);
+            } else {
+                // Sin notificaciones: limpiar badge y drawer
+                actualizarBadgeNotificaciones(0);
+                renderizarDrawerNotificaciones([]);
             }
         } catch (error) {
             console.error("Error comprobando notificaciones:", error);
         }
     }
 
+    // ─── MODIFICADO: ya no abre el modal antiguo, renderiza en el drawer ───
     function mostrarModalNotificaciones(notificaciones) {
-        const modal = document.getElementById("modal-notificaciones-usuario");
-        const lista = document.getElementById("lista-notificaciones-usuario");
-        const vacio = document.getElementById("notify-vacio-usuario");
+        actualizarBadgeNotificaciones(notificaciones.length);
+        renderizarDrawerNotificaciones(notificaciones);
+    }
 
-        if (!lista || !modal) return;
+    // ─── NUEVO: renderiza las notificaciones en el drawer lateral ──────────
+    function renderizarDrawerNotificaciones(notificaciones) {
+        const lista = document.getElementById("listaNotificacionesUser");
+        const vacio = document.getElementById("notify-empty-user");
+        if (!lista) return;
 
         lista.innerHTML = notificaciones.map(n => {
             const icono = {
-                fontaneria: "💧", electricidad: "⚡", climatizacion: "❄️",
-                carpinteria: "🔧", otros: "📋"
+                fontaneria: "💧",
+                electricidad: "⚡",
+                climatizacion: "❄️",
+                carpinteria: "🔧",
+                otros: "📋"
             }[n.tipo] || "📋";
+
+            const urgenciaLabel = n.urgencia === 'alta' ? 'ALTA' : 'BAJA';
+            const urgenciaClass = n.urgencia === 'alta' ? 'alta' : 'baja';
 
             const fecha = n.fecha_creacion
                 ? new Date(n.fecha_creacion).toLocaleDateString('es-ES', {
-                    day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
+                    day: '2-digit', month: 'numeric', year: 'numeric'
                 })
                 : 'Ahora';
 
             return `
-            <li class="notify-item" 
-                data-id-notificacion="${n.id_notificacion}" 
-                data-id-inincidencia="${n.id_incidencia}"
-                data-urgencia="${n.urgencia}">
-                
-                <div class="notify-header">
-                    <p class="notify-title">${icono} ${n.titulo}</p>
-                    <span class="notify-fecha">${fecha}</span>
-                </div>
-                <p class="notify-mensaje">${n.mensaje}</p>
-                <p class="notify-meta">Estado: ${formatearEstado(n.estado)}</p>
-                
-                <div class="notify-actions" style="margin-top:12px;display:flex;gap:8px;">
-                    <button class="btn-ver-conversacion" 
-                            data-id-notif="${n.id_notificacion}"
-                            data-id-inc="${n.id_incidencia}"
-                            style="flex:1;padding:8px 12px;background:#4f46e5;color:white;border:none;border-radius:6px;cursor:pointer;font-size:0.85rem;font-weight:600;">
-                        💬 Ver conversación
-                    </button>
-                    <button class="btn-ver-detalle-notif"
-                            data-id-inc="${n.id_incidencia}"
-                            style="flex:1;padding:8px 12px;background:#f1f5f9;color:#334155;border:1px solid #cbd5e1;border-radius:6px;cursor:pointer;font-size:0.85rem;font-weight:600;">
-                        📋 Ver detalle
-                    </button>
-                </div>
-            </li>
-        `;
+                <li class="notif-drawer__item"
+                    data-id-notificacion="${n.id_notificacion}"
+                    data-id-incidencia="${n.id_incidencia}">
+                    <div class="notif-drawer__item-inner">
+                        <div class="notif-drawer__item-icon">
+                            ${icono}
+                        </div>
+                        <div class="notif-drawer__item-body">
+                            <p class="notif-drawer__item-title">${n.titulo}</p>
+                            <p class="notif-drawer__item-sub">· ${fecha} · ${n.tipo}</p>
+                            <p class="notif-drawer__item-msg">${n.mensaje}</p>
+                        </div>
+                        <span class="notif-drawer__item-badge ${urgenciaClass}">${urgenciaLabel}</span>
+                        <span class="notif-drawer__item-dot"></span>
+                    </div>
+                </li>
+            `;
         }).join('');
 
-        vacio.style.display = notificaciones.length > 0 ? 'none' : 'block';
-        lista.style.display = notificaciones.length > 0 ? 'flex' : 'none';
-
-        if (notificaciones.length > 0) {
-            modal.classList.remove("modal--hidden");
-            document.body.style.overflow = "hidden";
-        }
+        if (vacio) vacio.style.display = notificaciones.length === 0 ? 'block' : 'none';
     }
 
     function actualizarBadgeNotificaciones(cantidad) {
-        const badge = document.getElementById("badge-incidencias");
+        const badge = document.getElementById("contadorNotificacionesUser");
         if (!badge) return;
 
         if (cantidad > 0) {
             badge.textContent = cantidad;
-            badge.classList.add("show");
-            badge.style.display = "inline-block";
+            badge.classList.remove("hidden");
         } else {
-            badge.classList.remove("show");
-            badge.style.display = "none";
+            badge.classList.add("hidden");
         }
     }
 
@@ -874,12 +906,12 @@ async function initIncidencias() {
     async function marcarTodasLeidas() {
         if (!idUsuarioActual) return;
 
-        const items = document.querySelectorAll("#lista-notificaciones-usuario .notify-item");
+        const items = document.querySelectorAll("#listaNotificacionesUser .notif-drawer__item");
         for (const item of items) {
             const idNotif = item.dataset.idNotificacion;
-            await marcarNotificacionLeida(idNotif);
+            if (idNotif) await marcarNotificacionLeida(idNotif);
         }
-        comprobarNuevasNotificaciones();
+        await comprobarNuevasNotificaciones();
     }
 
     function iniciarPollingNotificaciones() {
@@ -1090,6 +1122,10 @@ async function initIncidencias() {
         const mensajes = await cargarConversacionSegura(idIncidencia);
         if (!mensajes) return;
 
+        idIncidenciaChatActual = idIncidencia;
+
+        await cargarInfoIncidenciaChat(idIncidencia);
+
         const lista = document.getElementById('chat-mensajes-lista');
         if (lista) {
             lista.innerHTML = mensajes.length > 0
@@ -1127,7 +1163,7 @@ async function initIncidencias() {
     });
 
     // ═══════════════════════════════════════════════════════════════
-    // 🔔 EVENT LISTENERS PARA NOTIFICACIONES
+    // 🔔 EVENT LISTENERS PARA NOTIFICACIONES (modal antiguo — mantenido por compatibilidad)
     // ═══════════════════════════════════════════════════════════════
 
     iniciarPollingNotificaciones();
@@ -1181,28 +1217,26 @@ async function initIncidencias() {
         }
     });
 
+    // ─── DRAWER: marcar leída al pulsar un item ───────────────────────
+    document.getElementById("listaNotificacionesUser")?.addEventListener("click", async (e) => {
+        const item = e.target.closest(".notif-drawer__item");
+        if (!item) return;
+        const idNotif = item.dataset.idNotificacion;
+        if (idNotif) {
+            await marcarNotificacionLeida(idNotif);
+            await comprobarNuevasNotificaciones();
+        }
+    });
+
     window.addEventListener("beforeunload", detenerPollingNotificaciones);
-}
-
-async function abrirPanelNotificacionesUser() {
-    if (!panelNotificacionesUser || !overlayNotificacionesUser) {
-        console.log("Falta el panel o el overlay de notificaciones user");
-        return;
-    }
-
-    panelNotificacionesUser.classList.remove("hidden");
-    overlayNotificacionesUser.classList.remove("hidden");
-
-    await cargarNotificacionesUser();
 }
 
 document.addEventListener("DOMContentLoaded", () => {
 
     const btn = document.getElementById("btnNotificacionesUser");
-
     const modal = document.getElementById("modal-notificaciones-user");
-
     const cerrar = document.getElementById("cerrarPanelNotificacionesUser");
+    const marcarBtn = document.getElementById("marcarLeidasUser");
 
     if (!btn || !modal) {
         console.log("Faltan elementos de notificaciones user");
@@ -1218,14 +1252,45 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     modal.addEventListener("click", (e) => {
-
         if (e.target === modal) {
             modal.classList.add("hidden");
         }
+    });
 
+    // ─── Marcar todas leídas desde el drawer y cerrarlo ──────────────
+    marcarBtn?.addEventListener("click", async () => {
+        // Reusamos la función global de marcar todas leídas
+        // que se inicializa dentro de initIncidencias
+        const items = document.querySelectorAll("#listaNotificacionesUser .notif-drawer__item");
+        for (const item of items) {
+            const idNotif = item.dataset.idNotificacion;
+            if (idNotif) {
+                const usuario = JSON.parse(sessionStorage.getItem("usuario"));
+                const idUsuario = usuario?.id_usuario || usuario?.id || null;
+                if (!idUsuario) continue;
+
+                const formData = new FormData();
+                formData.append("accion", "marcar_notificacion_usuario_leida");
+                formData.append("id_notificacion", idNotif);
+                formData.append("id_usuario", idUsuario);
+
+                try {
+                    await fetch("../php/incidencias.php", { method: "POST", body: formData });
+                } catch (err) {
+                    console.error("Error marcando leída:", err);
+                }
+            }
+        }
+        modal.classList.add("hidden");
+        // Forzar refresco del badge y drawer
+        const badge = document.getElementById("contadorNotificacionesUser");
+        if (badge) badge.classList.add("hidden");
+        const lista = document.getElementById("listaNotificacionesUser");
+        if (lista) lista.innerHTML = '';
+        const vacio = document.getElementById("notify-empty-user");
+        if (vacio) vacio.style.display = 'block';
     });
 
 });
 
 document.addEventListener("DOMContentLoaded", initIncidencias);
-
