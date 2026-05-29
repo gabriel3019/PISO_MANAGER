@@ -1397,19 +1397,21 @@ async function initIncidencias() {
     // ═══════════════════════════════════════════════════════════════
     // 🔔 FUNCIONES PARA CONVERSACIÓN SEGURA DESDE DETALLE
     // ═══════════════════════════════════════════════════════════════
-
     function actualizarBotonConversacion(incidenciaData) {
         const btn = document.getElementById('btn-ver-conversacion');
         if (!btn) return;
 
-        const requiereAdmin = parseInt(incidenciaData.notificar_admin || 0) === 1;
+        const esIncidenciaConConversacion =
+            incidenciaData.notificar_admin == 1 ||
+            incidenciaData.comentario_admin ||
+            incidenciaData.id_usuario;
 
-        if (requiereAdmin) {
+        if (esIncidenciaConConversacion) {
             btn.style.display = 'inline-block';
-            btn.dataset.incidenciaId = incidenciaData.id_incidencia;
+            btn.dataset.incidenciaId =
+                incidenciaData.id_incidencia || incidenciaData.id;
         } else {
             btn.style.display = 'none';
-            btn.dataset.incidenciaId = '';
         }
     }
 
