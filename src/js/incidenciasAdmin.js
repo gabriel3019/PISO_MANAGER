@@ -609,7 +609,16 @@ function limpiarFormularioNuevaIncidenciaAdmin() {
     document.getElementById("nueva-fecha-inicio").value = "";
     document.getElementById("nueva-fecha-fin").value = "";
     document.getElementById("nueva-notificar-inquilino").checked = false;
+    
     document.getElementById("nueva-imagen").value = "";
+
+    const dropzone = document.querySelector(".modal__dropzone");
+
+    dropzone.querySelector(".modal__preview-img")?.remove();
+
+    dropzone.querySelector(".modal__dropzone-icon").style.display = "block";
+    dropzone.querySelector("span:last-of-type").style.display = "inline";
+
     document.getElementById("nueva-comentario-inquilino").value = "";
     document.getElementById("nueva-comentario-inquilino-wrap").style.display = "none";
 
