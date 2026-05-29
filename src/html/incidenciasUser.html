@@ -93,7 +93,6 @@
       <div class="notifications-container">
         <button id="btnNotificacionesUser" class="notification-btn">
           🔔
-
           <span id="contadorNotificacionesUser" class="notification-badge hidden">
             0
           </span>
@@ -274,17 +273,20 @@
                 <option value="otros">Otros</option>
               </select>
             </div>
+            <span class="modal__field-error" id="nueva-tipo-error">Selecciona un tipo de incidencia</span>
           </div>
           <div class="modal__field">
             <label class="modal__label" for="nueva-titulo">TÍTULO<span class="modal__required">*</span></label>
             <input class="modal__input" id="nueva-titulo" name="titulo" type="text"
               placeholder="Ej: Grifo roto en el baño principal" maxlength="100" />
             <span class="modal__char-count"><span id="nueva-titulo-count">0</span>/100</span>
+            <span class="modal__field-error" id="nueva-titulo-error">El título es obligatorio</span>
           </div>
           <div class="modal__field">
             <label class="modal__label" for="nueva-desc">DESCRIPCIÓN<span class="modal__required">*</span></label>
             <textarea class="modal__textarea" id="nueva-desc" name="descripcion"
               placeholder="Describe el problema con detalle..."></textarea>
+            <span class="modal__field-error" id="nueva-desc-error">La descripción es obligatoria</span>
           </div>
           <div class="modal__field">
             <label class="modal__label">NIVEL DE URGENCIA<span class="modal__required">*</span></label>
@@ -296,6 +298,7 @@
                 <span class="modal__urgencia-dot modal__urgencia-dot--high"></span>Alto
               </button>
             </div>
+            <span class="modal__field-error" id="nueva-urgencia-error">Selecciona un nivel de urgencia</span>
           </div>
         </div>
 
@@ -307,6 +310,8 @@
             <input class="modal__input" id="nueva-fecha-inicio" name="fecha_inicio" type="date" required />
             <span class="modal__hint modal__hint--error" id="nueva-fecha-inicio-error">La fecha no puede ser anterior a
               hoy</span>
+            <span class="modal__field-error" id="nueva-fecha-inicio-vacia-error">La fecha de inicio es
+              obligatoria</span>
           </div>
 
           <div class="modal__field">
@@ -352,7 +357,7 @@
       </div>
     </div>
 
-    <!-- ══════════════ MODAL EDITAR INCIDENCIA ══════════════ -->
+    <!-- ══════════════ MODAL EDITAR INCIDENCIA (2 PASOS) ══════════════ -->
     <div class="modal-overlay modal--hidden" id="modal-editar-incidencia" role="dialog" aria-modal="true"
       aria-labelledby="modal-editar-title">
       <div class="modal">
@@ -363,9 +368,28 @@
           </div>
           <button class="modal__close" aria-label="Cerrar" data-modal-close="modal-editar-incidencia">✕</button>
         </div>
-        <div class="modal__body">
+
+        <!-- Stepper -->
+        <div class="modal__stepper">
+          <div class="stepper__step stepper__step--active" id="editar-step-indicator-1">
+            <div class="stepper__circle">1</div>
+            <span class="stepper__label">Información básica</span>
+          </div>
+          <div class="stepper__line"></div>
+          <div class="stepper__step" id="editar-step-indicator-2">
+            <div class="stepper__circle">2</div>
+            <span class="stepper__label">Detalles y fechas</span>
+          </div>
+        </div>
+
+        <hr class="modal__divider" />
+
+        <!-- PASO 1: Tipo, título, descripción, urgencia -->
+        <div class="modal__body" id="editar-paso-1">
+
           <div class="modal__field">
-            <label class="modal__label" for="editar-tipo">TIPO DE INCIDENCIA</label>
+            <label class="modal__label" for="editar-tipo">TIPO DE INCIDENCIA<span
+                class="modal__required">*</span></label>
             <div class="modal__select-wrapper">
               <select class="modal__select" id="editar-tipo" name="tipo">
                 <option value="">Selecciona un tipo...</option>
@@ -376,10 +400,42 @@
                 <option value="otros">Otros</option>
               </select>
             </div>
+            <span class="modal__field-error" id="editar-tipo-error">Selecciona un tipo de incidencia</span>
           </div>
 
           <div class="modal__field">
-            <label class="modal__label" for="editar-estado">ESTADO</label>
+            <label class="modal__label" for="editar-titulo">TÍTULO<span class="modal__required">*</span></label>
+            <input class="modal__input" id="editar-titulo" name="titulo" type="text" maxlength="100" />
+            <span class="modal__char-count"><span id="editar-titulo-count">0</span>/100</span>
+            <span class="modal__field-error" id="editar-titulo-error">El título es obligatorio</span>
+          </div>
+
+          <div class="modal__field">
+            <label class="modal__label" for="editar-desc">DESCRIPCIÓN<span class="modal__required">*</span></label>
+            <textarea class="modal__textarea" id="editar-desc" name="descripcion"></textarea>
+            <span class="modal__field-error" id="editar-desc-error">La descripción es obligatoria</span>
+          </div>
+
+          <div class="modal__field">
+            <label class="modal__label">NIVEL DE URGENCIA<span class="modal__required">*</span></label>
+            <div class="modal__urgencia-row" role="group" aria-label="Nivel de urgencia">
+              <button type="button" class="modal__urgencia-btn" data-urgencia="baja">
+                <span class="modal__urgencia-dot modal__urgencia-dot--low"></span>Bajo
+              </button>
+              <button type="button" class="modal__urgencia-btn" data-urgencia="alta">
+                <span class="modal__urgencia-dot modal__urgencia-dot--high"></span>Alto
+              </button>
+            </div>
+            <span class="modal__field-error" id="editar-urgencia-error">Selecciona un nivel de urgencia</span>
+          </div>
+
+        </div>
+
+        <!-- PASO 2: Estado, fechas, notificar admin, imagen -->
+        <div class="modal__body modal--hidden" id="editar-paso-2">
+
+          <div class="modal__field">
+            <label class="modal__label" for="editar-estado">ESTADO<span class="modal__required">*</span></label>
             <div class="modal__select-wrapper">
               <select class="modal__select" id="editar-estado" name="estado">
                 <option value="abierta">Abierta</option>
@@ -390,32 +446,13 @@
           </div>
 
           <div class="modal__field">
-            <label class="modal__label" for="editar-titulo">TÍTULO</label>
-            <input class="modal__input" id="editar-titulo" name="titulo" type="text" maxlength="100" />
-            <span class="modal__char-count"><span id="editar-titulo-count">0</span>/100</span>
-          </div>
-          <div class="modal__field">
-            <label class="modal__label" for="editar-desc">DESCRIPCIÓN</label>
-            <textarea class="modal__textarea" id="editar-desc" name="descripcion"></textarea>
-          </div>
-          <div class="modal__field">
-            <label class="modal__label">NIVEL DE URGENCIA</label>
-            <div class="modal__urgencia-row" role="group" aria-label="Nivel de urgencia">
-              <button type="button" class="modal__urgencia-btn" data-urgencia="baja">
-                <span class="modal__urgencia-dot modal__urgencia-dot--low"></span>Bajo
-              </button>
-              <button type="button" class="modal__urgencia-btn" data-urgencia="alta">
-                <span class="modal__urgencia-dot modal__urgencia-dot--high"></span>Alto
-              </button>
-            </div>
-          </div>
-
-          <div class="modal__field">
             <label class="modal__label" for="editar-fecha-inicio">FECHA DE INICIO<span
                 class="modal__required">*</span></label>
-            <input class="modal__input" id="editar-fecha-inicio" name="fecha_inicio" type="date" required />
+            <input class="modal__input" id="editar-fecha-inicio" name="fecha_inicio" type="date" />
             <span class="modal__hint modal__hint--error" id="editar-fecha-inicio-error">La fecha no puede ser anterior a
               hoy</span>
+            <span class="modal__field-error" id="editar-fecha-inicio-vacia-error">La fecha de inicio es
+              obligatoria</span>
           </div>
 
           <div class="modal__field">
@@ -430,6 +467,7 @@
             <textarea class="modal__textarea" id="editar-comentario-admin" name="comentario_admin"
               placeholder="Añade una nota interna para el administrador..."></textarea>
           </div>
+
           <div class="modal__field">
             <label class="modal__checkbox-label">
               <input type="checkbox" id="editar-notificar-admin" name="notificar_admin" class="modal__checkbox" />
@@ -437,20 +475,27 @@
             </label>
             <p class="modal__checkbox-hint">El administrador podrá ver esta incidencia marcada en su panel.</p>
           </div>
+
           <div class="modal__field">
             <label class="modal__label">IMAGEN <span class="modal__optional">(opcional)</span></label>
             <label class="modal__dropzone" for="editar-imagen">
-              <span class="modal__dropzone-icon" aria-hidden="true"></span>
+              <span class="modal__dropzone-icon" aria-hidden="true">📷</span>
+              <span><span class="modal__dropzone-link">Haz clic para subir</span> o arrastra una imagen</span>
               <input type="file" id="editar-imagen" name="imagen" accept=".png,.jpg,.jpeg,.webp" hidden />
             </label>
           </div>
+
         </div>
-        <div class="modal__footer">
-          <button type="button" class="modal__btn modal__btn--cancel"
+
+        <!-- Footer unificado -->
+        <div class="modal__footer" id="editar-footer-unificado">
+          <button type="button" class="modal__btn modal__btn--cancel" id="btn-editar-izquierda"
             data-modal-close="modal-editar-incidencia">Cancelar</button>
-          <button type="button" class="modal__btn modal__btn--primary" id="btn-confirmar-editar">Guardar
-            cambios</button>
+          <button type="button" class="modal__btn modal__btn--primary" id="btn-editar-derecha">
+            Siguiente →
+          </button>
         </div>
+
       </div>
     </div>
 
@@ -554,6 +599,7 @@
       </div>
     </div>
 
+    <!-- ══════════════ DRAWER NOTIFICACIONES ══════════════ -->
     <div id="modal-notificaciones-user" class="notif-overlay hidden">
 
       <div class="notif-drawer">
@@ -587,7 +633,6 @@
           <ul id="listaNotificacionesUser" class="notif-drawer__list"></ul>
 
           <div id="notify-empty-user" class="notif-drawer__empty" style="display:none;">
-
             <p>Sin notificaciones nuevas</p>
           </div>
 
