@@ -126,155 +126,162 @@ function showSuccess(message) {
 ========================================================= */
 
 document
-.querySelector('.btn-primary')
-.addEventListener('click', async (e) => {
+    .querySelector('.btn-primary')
+    .addEventListener('click', async (e) => {
 
-    e.preventDefault();
+        e.preventDefault();
 
-    clearAllErrors();
+        clearAllErrors();
 
-    /* ================= DATOS ================= */
+        /* ================= DATOS ================= */
 
-    const email = document
-        .getElementById('email')
-        .value
-        .trim();
+        const email = document
+            .getElementById('email')
+            .value
+            .trim();
 
-    const password = document
-        .getElementById('password')
-        .value
-        .trim();
+        const password = document
+            .getElementById('password')
+            .value
+            .trim();
 
-    let hasError = false;
+        let hasError = false;
 
-    /* ================= VALIDACIONES ================= */
+        /* ================= VALIDACIONES ================= */
 
-    if (!email) {
+        if (!email) {
 
-        showError(
-            'email',
-            'El correo electrónico es obligatorio.'
-        );
-
-        hasError = true;
-
-    } else if (
-        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-    ) {
-
-        showError(
-            'email',
-            'Introduce un correo electrónico válido.'
-        );
-
-        hasError = true;
-    }
-
-    if (!password) {
-
-        showError(
-            'password',
-            'La contraseña es obligatoria.'
-        );
-
-        hasError = true;
-    }
-
-    if (hasError) return;
-
-    /* ================= FETCH LOGIN ================= */
-
-    const formData = new FormData();
-
-    formData.append('email', email);
-
-    formData.append('password', password);
-
-    try {
-
-        const response = await fetch('../php/login.php', {
-            method: 'POST',
-            body: formData
-        });
-
-        const result = await response.json();
-
-        console.log('RESPUESTA LOGIN:', result);
-
-        /* ================= LOGIN OK ================= */
-
-        if (result.success) {
-
-            const { usuario } = result;
-
-            /* ===== GUARDAR USUARIO ===== */
-
-            sessionStorage.setItem(
-                'usuario',
-                JSON.stringify(usuario)
+            showError(
+                'email',
+                'El correo electrónico es obligatorio.'
             );
 
-            /* ===== MENSAJE ===== */
+            hasError = true;
 
-            showSuccess(
-                `✓ Bienvenido/a, ${usuario.nombre}. Redirigiendo...`
+        } else if (
+            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+        ) {
+
+            showError(
+                'email',
+                'Introduce un correo electrónico válido.'
             );
 
-            /* ===== DESACTIVAR BOTÓN ===== */
+            hasError = true;
+        }
 
-            document
-                .querySelector('.btn-primary')
-                .disabled = true;
+        if (!password) {
 
-            /* =================================================
-               CAMBIO OBLIGATORIO DE CONTRASEÑA
-            ================================================= */
+            showError(
+                'password',
+                'La contraseña es obligatoria.'
+            );
 
-            if (result.forcePasswordChange) {
+            hasError = true;
+        }
+
+        if (hasError) return;
+
+        /* ================= FETCH LOGIN ================= */
+
+        console.log("EMAIL:", email);
+        console.log("PASSWORD:", password);
+
+        const formData = new FormData();
+
+        formData.append('email', email);
+        formData.append('password', password);
+
+        for (let pair of formData.entries()) {
+    console.log("FORMDATA:", pair[0], pair[1]);
+}
+
+        try {
+
+            const response = await fetch('../php/login.php', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            console.log('RESPUESTA LOGIN:', result);
+
+
+            /* ================= LOGIN OK ================= */
+
+            if (result.success) {
+
+                const { usuario } = result;
+
+                /* ===== GUARDAR USUARIO ===== */
+
+                sessionStorage.setItem(
+                    'usuario',
+                    JSON.stringify(usuario)
+                );
+
+                /* ===== MENSAJE ===== */
+
+                showSuccess(
+                    `✓ Bienvenido/a, ${usuario.nombre}. Redirigiendo...`
+                );
+
+                /* ===== DESACTIVAR BOTÓN ===== */
+
+                document
+                    .querySelector('.btn-primary')
+                    .disabled = true;
+
+                /* =================================================
+                   CAMBIO OBLIGATORIO DE CONTRASEÑA
+                ================================================= */
+
+                if (result.forcePasswordChange) {
+
+                    setTimeout(() => {
+
+                        window.location.href =
+                            '../html/cambiarPasswordObligatorio.html';
+
+                    }, 1200);
+
+                    return;
+                }
+
+                /* =================================================
+                   REDIRECCIÓN NORMAL
+                ================================================= */
 
                 setTimeout(() => {
 
-                    window.location.href =
-                        '../html/cambiarPasswordObligatorio.html';
+                    if (usuario.rol === 'admin') {
+
+                        window.location.href =
+                            '../html/homeAdmin.html';
+
+                    } else {
+
+                        window.location.href =
+                            '../html/homeUser.html';
+                    }
 
                 }, 1200);
 
-                return;
+            } else {
+
+                showGeneralError(
+                    result.message ||
+                    'Usuario o contraseña incorrectos.'
+                );
             }
 
-            /* =================================================
-               REDIRECCIÓN NORMAL
-            ================================================= */
+        } catch (error) {
 
-            setTimeout(() => {
-
-                if (usuario.rol === 'admin') {
-
-                    window.location.href =
-                        '../html/homeAdmin.html';
-
-                } else {
-
-                    window.location.href =
-                        '../html/homeUser.html';
-                }
-
-            }, 1200);
-
-        } else {
+            console.error('ERROR LOGIN:', error);
 
             showGeneralError(
-                result.message ||
-                'Usuario o contraseña incorrectos.'
+                'Error de conexión con el servidor.'
             );
         }
-
-    } catch (error) {
-
-        console.error('ERROR LOGIN:', error);
-
-        showGeneralError(
-            'Error de conexión con el servidor.'
-        );
-    }
-});
+    });
