@@ -81,7 +81,6 @@
   <div class="page-wrapper" id="page-body">
 
     <header class="page-header">
-      <!-- BOTÓN HAMBURGUESA -->
       <button class="menu-toggle" id="menuToggle">☰</button>
 
       <div class="page-header__info">
@@ -89,7 +88,6 @@
         <p class="address">Piso Calle Mayor, 12 &middot; 3 compañeros</p>
       </div>
 
-      <!-- CAMPANITA -->
       <div class="notifications-container">
         <button id="btnNotificacionesUser" class="notification-btn">
           🔔
@@ -131,7 +129,15 @@
       </div>
     </section>
 
-    <article class="section">
+    <!-- ══════════════ BARRA DE FILTROS ══════════════ -->
+    <div class="filtros-bar">
+      <button class="filtro-btn filtro-btn--active" data-filtro="todas">Todas</button>
+      <button class="filtro-btn" data-filtro="abierta">Abiertas</button>
+      <button class="filtro-btn" data-filtro="en_curso">En curso</button>
+      <button class="filtro-btn" data-filtro="resuelta">Resueltas</button>
+    </div>
+
+    <article class="section" id="seccion-activas">
       <div class="section__header">
         <h2 class="section__title">Incidencias Activas</h2>
         <button class="btn-new btn-abrir-nueva">+ Nueva Incidencia</button>
@@ -140,7 +146,7 @@
       </ul>
     </article>
 
-    <article class="section">
+    <article class="section" id="seccion-resueltas">
       <div class="section__header">
         <h2 class="section__title">Incidencias Resueltas</h2>
         <button class="section__menu-btn">⋯</button>
@@ -243,22 +249,18 @@
           <button class="modal__close" aria-label="Cerrar" data-modal-close="modal-nueva-incidencia">✕</button>
         </div>
 
-        <!-- Stepper -->
         <div class="modal__stepper">
           <div class="stepper__step stepper__step--active" id="step-indicator-1">
             <div class="stepper__circle">1</div>
-            <span class="stepper__label">Información básica</span>
           </div>
           <div class="stepper__line"></div>
           <div class="stepper__step" id="step-indicator-2">
             <div class="stepper__circle">2</div>
-            <span class="stepper__label">Detalles y fechas</span>
           </div>
         </div>
 
         <hr class="modal__divider" />
 
-        <!-- PASO 1: Tipo, título, descripción, urgencia -->
         <div class="modal__body" id="nueva-paso-1">
           <div class="modal__field">
             <label class="modal__label" for="nueva-tipo">TIPO DE INCIDENCIA<span
@@ -302,7 +304,6 @@
           </div>
         </div>
 
-        <!-- PASO 2: Fechas, notificar admin, imagen -->
         <div class="modal__body modal--hidden" id="nueva-paso-2">
           <div class="modal__field">
             <label class="modal__label" for="nueva-fecha-inicio">FECHA DE INICIO<span
@@ -345,7 +346,6 @@
           </div>
         </div>
 
-        <!-- ── Footer unificado (un solo footer para ambos pasos) ── -->
         <div class="modal__footer" id="nueva-footer-unificado">
           <button type="button" class="modal__btn modal__btn--cancel" id="btn-nueva-izquierda"
             data-modal-close="modal-nueva-incidencia">Cancelar</button>
@@ -369,22 +369,18 @@
           <button class="modal__close" aria-label="Cerrar" data-modal-close="modal-editar-incidencia">✕</button>
         </div>
 
-        <!-- Stepper -->
         <div class="modal__stepper">
           <div class="stepper__step stepper__step--active" id="editar-step-indicator-1">
             <div class="stepper__circle">1</div>
-            <span class="stepper__label">Información básica</span>
           </div>
           <div class="stepper__line"></div>
           <div class="stepper__step" id="editar-step-indicator-2">
             <div class="stepper__circle">2</div>
-            <span class="stepper__label">Detalles y fechas</span>
           </div>
         </div>
 
         <hr class="modal__divider" />
 
-        <!-- PASO 1: Tipo, título, descripción, urgencia -->
         <div class="modal__body" id="editar-paso-1">
 
           <div class="modal__field">
@@ -431,7 +427,6 @@
 
         </div>
 
-        <!-- PASO 2: Estado, fechas, notificar admin, imagen -->
         <div class="modal__body modal--hidden" id="editar-paso-2">
 
           <div class="modal__field">
@@ -487,7 +482,6 @@
 
         </div>
 
-        <!-- Footer unificado -->
         <div class="modal__footer" id="editar-footer-unificado">
           <button type="button" class="modal__btn modal__btn--cancel" id="btn-editar-izquierda"
             data-modal-close="modal-editar-incidencia">Cancelar</button>

@@ -175,13 +175,11 @@ async function initIncidencias() {
         });
     }
 
-    // Inicializar validaciones y fechas mínimas
     setMinDateToday('nueva-fecha-inicio');
     setMinDateToday('editar-fecha-inicio');
     setupFechaInicioValidation('nueva-fecha-inicio', 'nueva-fecha-inicio-error');
     setupFechaInicioValidation('editar-fecha-inicio', 'editar-fecha-inicio-error');
 
-    // Inicializar toggle de comentario
     initToggleComentario();
 
     // ─── Urgencia buttons (selección) ────────────────────────────────
@@ -273,38 +271,25 @@ async function initIncidencias() {
                 el.classList.remove("modal__select--error");
                 el.classList.remove("modal__textarea--error");
             });
-        // Limpiar también los hint--error de fecha
         modal.querySelectorAll(".modal__hint--error")
             .forEach(el => el.style.display = 'none');
     }
 
-    // ── Validar paso 1 de NUEVA ───────────────────────────────────
+    // ─── Validaciones ────────────────────────────────────────────────
     function validarNuevaPaso1() {
         let ok = true;
 
         const tipo = document.getElementById("nueva-tipo");
-        if (!tipo.value) {
-            mostrarErrorCampo(tipo, "nueva-tipo-error");
-            ok = false;
-        } else {
-            limpiarErrorCampo(tipo, "nueva-tipo-error");
-        }
+        if (!tipo.value) { mostrarErrorCampo(tipo, "nueva-tipo-error"); ok = false; }
+        else { limpiarErrorCampo(tipo, "nueva-tipo-error"); }
 
         const titulo = document.getElementById("nueva-titulo");
-        if (!titulo.value.trim()) {
-            mostrarErrorCampo(titulo, "nueva-titulo-error");
-            ok = false;
-        } else {
-            limpiarErrorCampo(titulo, "nueva-titulo-error");
-        }
+        if (!titulo.value.trim()) { mostrarErrorCampo(titulo, "nueva-titulo-error"); ok = false; }
+        else { limpiarErrorCampo(titulo, "nueva-titulo-error"); }
 
         const desc = document.getElementById("nueva-desc");
-        if (!desc.value.trim()) {
-            mostrarErrorCampo(desc, "nueva-desc-error");
-            ok = false;
-        } else {
-            limpiarErrorCampo(desc, "nueva-desc-error");
-        }
+        if (!desc.value.trim()) { mostrarErrorCampo(desc, "nueva-desc-error"); ok = false; }
+        else { limpiarErrorCampo(desc, "nueva-desc-error"); }
 
         const urgenciaActiva = document.querySelector("#modal-nueva-incidencia .modal__urgencia-btn--active");
         const urgenciaError = document.getElementById("nueva-urgencia-error");
@@ -318,7 +303,6 @@ async function initIncidencias() {
         return ok;
     }
 
-    // ── Validar paso 2 de NUEVA ───────────────────────────────────
     function validarNuevaPaso2() {
         let ok = true;
 
@@ -326,7 +310,6 @@ async function initIncidencias() {
         const errorVacia = document.getElementById("nueva-fecha-inicio-vacia-error");
         const errorPasada = document.getElementById("nueva-fecha-inicio-error");
 
-        // Limpiar errores previos de fecha
         if (errorVacia) errorVacia.classList.remove("modal__field-error--visible");
         if (errorPasada) errorPasada.style.display = 'none';
         fechaInicio.classList.remove("modal__input--error");
@@ -347,33 +330,20 @@ async function initIncidencias() {
         return ok;
     }
 
-    // ── Validar paso 1 de EDITAR ──────────────────────────────────
     function validarEditarPaso1() {
         let ok = true;
 
         const tipo = document.getElementById("editar-tipo");
-        if (!tipo.value) {
-            mostrarErrorCampo(tipo, "editar-tipo-error");
-            ok = false;
-        } else {
-            limpiarErrorCampo(tipo, "editar-tipo-error");
-        }
+        if (!tipo.value) { mostrarErrorCampo(tipo, "editar-tipo-error"); ok = false; }
+        else { limpiarErrorCampo(tipo, "editar-tipo-error"); }
 
         const titulo = document.getElementById("editar-titulo");
-        if (!titulo.value.trim()) {
-            mostrarErrorCampo(titulo, "editar-titulo-error");
-            ok = false;
-        } else {
-            limpiarErrorCampo(titulo, "editar-titulo-error");
-        }
+        if (!titulo.value.trim()) { mostrarErrorCampo(titulo, "editar-titulo-error"); ok = false; }
+        else { limpiarErrorCampo(titulo, "editar-titulo-error"); }
 
         const desc = document.getElementById("editar-desc");
-        if (!desc.value.trim()) {
-            mostrarErrorCampo(desc, "editar-desc-error");
-            ok = false;
-        } else {
-            limpiarErrorCampo(desc, "editar-desc-error");
-        }
+        if (!desc.value.trim()) { mostrarErrorCampo(desc, "editar-desc-error"); ok = false; }
+        else { limpiarErrorCampo(desc, "editar-desc-error"); }
 
         const urgenciaActiva = document.querySelector("#modal-editar-incidencia .modal__urgencia-btn--active");
         const urgenciaError = document.getElementById("editar-urgencia-error");
@@ -387,7 +357,6 @@ async function initIncidencias() {
         return ok;
     }
 
-    // ── Validar paso 2 de EDITAR ──────────────────────────────────
     function validarEditarPaso2() {
         let ok = true;
 
@@ -395,7 +364,6 @@ async function initIncidencias() {
         const errorVacia = document.getElementById("editar-fecha-inicio-vacia-error");
         const errorPasada = document.getElementById("editar-fecha-inicio-error");
 
-        // Limpiar errores previos de fecha
         if (errorVacia) errorVacia.classList.remove("modal__field-error--visible");
         if (errorPasada) errorPasada.style.display = 'none';
         fechaInicio.classList.remove("modal__input--error");
@@ -447,6 +415,9 @@ async function initIncidencias() {
             btnDer.textContent = "Siguiente →";
             btnDer.dataset.accion = "siguiente";
 
+            // CAMBIO 2: limpiar errores al volver al paso 1
+            limpiarTodosErrores("nueva");
+
         } else {
             paso1.classList.add("modal--hidden");
             paso2.classList.remove("modal--hidden");
@@ -462,18 +433,17 @@ async function initIncidencias() {
 
             btnDer.textContent = "Enviar incidencia";
             btnDer.dataset.accion = "enviar";
+
+            // CAMBIO 3: limpiar errores al avanzar al paso 2
+            limpiarTodosErrores("nueva");
         }
     }
 
-    // ─── Listener botón izquierdo — NUEVA ───────────────────────
     document.getElementById("btn-nueva-izquierda")?.addEventListener("click", () => {
         const btnIzq = document.getElementById("btn-nueva-izquierda");
-        if (btnIzq.dataset.accion === "volver") {
-            irAPaso(1);
-        }
+        if (btnIzq.dataset.accion === "volver") irAPaso(1); limpiarTodosErrores("nueva");
     });
 
-    // ─── Listener botón derecho — NUEVA (con validación) ────────
     document.getElementById("btn-nueva-derecha")?.addEventListener("click", () => {
         const btnDer = document.getElementById("btn-nueva-derecha");
         if (btnDer.dataset.accion === "siguiente") {
@@ -514,6 +484,8 @@ async function initIncidencias() {
             btnDer.textContent = "Siguiente →";
             btnDer.dataset.accion = "siguiente";
 
+            limpiarTodosErrores("editar");
+
         } else {
             paso1.classList.add("modal--hidden");
             paso2.classList.remove("modal--hidden");
@@ -529,18 +501,16 @@ async function initIncidencias() {
 
             btnDer.textContent = "Guardar cambios";
             btnDer.dataset.accion = "guardar";
+
+            limpiarTodosErrores("editar");
         }
     }
 
-    // ─── Listener botón izquierdo — EDITAR ──────────────────────
     document.getElementById("btn-editar-izquierda")?.addEventListener("click", () => {
         const btn = document.getElementById("btn-editar-izquierda");
-        if (btn.dataset.accion === "volver") {
-            irAPasoEditar(1);
-        }
+        if (btn.dataset.accion === "volver") irAPasoEditar(1);
     });
 
-    // ─── Listener botón derecho — EDITAR (con validación) ───────
     document.getElementById("btn-editar-derecha")?.addEventListener("click", () => {
         const btn = document.getElementById("btn-editar-derecha");
         if (btn.dataset.accion === "siguiente") {
@@ -548,6 +518,74 @@ async function initIncidencias() {
         } else if (btn.dataset.accion === "guardar") {
             guardarEdicionIncidencia();
         }
+    });
+
+    // ══════════════════════════════════════════════════════════════
+    // SISTEMA DE FILTROS
+    // ══════════════════════════════════════════════════════════════
+
+    let filtroActivo = 'todas';
+
+    function aplicarFiltro(filtro) {
+        filtroActivo = filtro;
+
+        const seccionActivas = document.getElementById("seccion-activas");
+        const seccionResueltas = document.getElementById("seccion-resueltas");
+        const listaActivas = document.getElementById("lista-activas");
+        const listaResueltas = document.getElementById("lista-resueltas");
+
+        document.querySelectorAll(".filtro-btn").forEach(btn => {
+            btn.classList.toggle("filtro-btn--active", btn.dataset.filtro === filtro);
+        });
+
+        if (filtro === 'todas') {
+            seccionActivas.classList.remove("section--filtro-oculto");
+            seccionResueltas.classList.remove("section--filtro-oculto");
+            listaActivas.querySelectorAll(".incident-item").forEach(el => el.style.display = "");
+            listaResueltas.querySelectorAll(".incident-item").forEach(el => el.style.display = "");
+
+        } else if (filtro === 'resuelta') {
+            seccionActivas.classList.add("section--filtro-oculto");
+            seccionResueltas.classList.remove("section--filtro-oculto");
+            listaResueltas.querySelectorAll(".incident-item").forEach(el => el.style.display = "");
+
+        } else {
+            seccionActivas.classList.remove("section--filtro-oculto");
+            seccionResueltas.classList.add("section--filtro-oculto");
+
+            listaActivas.querySelectorAll(".incident-item").forEach(el => {
+                const estadoItem = (el.dataset.estado || '').toLowerCase().trim();
+                const estadoNorm = estadoItem.replace(' ', '_');
+                el.style.display = (estadoNorm === filtro) ? "" : "none";
+            });
+        }
+
+        actualizarMensajeVacio(listaActivas, filtro === 'todas' || filtro !== 'resuelta');
+        actualizarMensajeVacio(listaResueltas, filtro === 'todas' || filtro === 'resuelta');
+    }
+
+    function actualizarMensajeVacio(lista, esVisible) {
+        if (!lista) return;
+        const anterior = lista.querySelector(".filtro-vacio");
+        if (anterior) anterior.remove();
+
+        if (!esVisible) return;
+
+        const itemsVisibles = [...lista.querySelectorAll(".incident-item")]
+            .filter(el => el.style.display !== "none");
+
+        if (itemsVisibles.length === 0) {
+            const msg = document.createElement("li");
+            msg.className = "filtro-vacio";
+            msg.textContent = "No hay incidencias con este estado.";
+            lista.appendChild(msg);
+        }
+    }
+
+    document.querySelectorAll(".filtro-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            aplicarFiltro(btn.dataset.filtro);
+        });
     });
 
     // ─── CARGAR INCIDENCIAS ──────────────────────────────────────────
@@ -666,6 +704,8 @@ async function initIncidencias() {
             document.getElementById("badge-incidencias").textContent =
                 contadores.abierta + contadores.en_curso;
 
+            aplicarFiltro(filtroActivo);
+
         } catch (error) {
             console.error("Error cargando incidencias:", error);
         }
@@ -763,6 +803,29 @@ async function initIncidencias() {
             initToggleComentario();
             setMinDateToday('nueva-fecha-inicio');
             abrirModal("modal-nueva-incidencia");
+
+            // Limpiar rojo en tiempo real al escribir
+            document.getElementById("nueva-tipo")?.addEventListener("change", function () {
+                limpiarErrorCampo(this, "nueva-tipo-error");
+            });
+            document.getElementById("nueva-titulo")?.addEventListener("input", function () {
+                limpiarErrorCampo(this, "nueva-titulo-error");
+            });
+            document.getElementById("nueva-desc")?.addEventListener("input", function () {
+                limpiarErrorCampo(this, "nueva-desc-error");
+            });
+            document.querySelectorAll("#modal-nueva-incidencia .modal__urgencia-btn").forEach(b => {
+                b.addEventListener("click", () => {
+                    const err = document.getElementById("nueva-urgencia-error");
+                    if (err) err.classList.remove("modal__field-error--visible");
+                });
+            });
+            document.getElementById("nueva-fecha-inicio")?.addEventListener("change", function () {
+                limpiarErrorCampo(this, "nueva-fecha-inicio-vacia-error");
+                const errorPasada = document.getElementById("nueva-fecha-inicio-error");
+                if (errorPasada) errorPasada.style.display = 'none';
+                this.classList.remove("modal__input--error");
+            });
         });
     });
 
@@ -808,7 +871,6 @@ async function initIncidencias() {
             initToggleComentario();
             setupFechaInicioValidation('editar-fecha-inicio', 'editar-fecha-inicio-error');
 
-            // Resetear al paso 1 y limpiar errores al abrir
             limpiarTodosErrores("editar");
             irAPasoEditar(1);
             abrirModal("modal-editar-incidencia");
@@ -877,7 +939,6 @@ async function initIncidencias() {
 
     // ─── GUARDAR EDICIÓN ─────────────────────────────────────────────
     async function guardarEdicionIncidencia() {
-        // Validar paso 2 antes de enviar
         if (!validarEditarPaso2()) return;
 
         const modal = document.getElementById("modal-editar-incidencia");
@@ -1240,7 +1301,6 @@ async function initIncidencias() {
         return div.innerHTML;
     }
 
-    // Event: Enviar mensaje al admin
     document.getElementById("btn-enviar-mensaje-admin")?.addEventListener("click", async () => {
         const input = document.getElementById("chat-input-mensaje");
         const mensaje = input.value.trim();
@@ -1270,7 +1330,6 @@ async function initIncidencias() {
         }
     });
 
-    // Event: Ver detalle completo desde el chat
     document.getElementById("btn-ver-detalle-completo")?.addEventListener("click", () => {
         cerrarModal("modal-conversacion-admin");
         const incidenciaEl = document.querySelector(`.incident-item[data-id="${idIncidenciaChatActual}"]`);
@@ -1279,7 +1338,6 @@ async function initIncidencias() {
         }
     });
 
-    // Event: Enter para enviar mensaje (sin Shift)
     document.getElementById("chat-input-mensaje")?.addEventListener("keydown", (e) => {
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
@@ -1295,11 +1353,9 @@ async function initIncidencias() {
         const btn = document.getElementById('btn-ver-conversacion');
         if (!btn) return;
 
-        const idUsuarioLogueado = obtenerIdUsuario();
-        const idCreador = parseInt(incidenciaData.id_usuario || 0);
         const requiereAdmin = parseInt(incidenciaData.notificar_admin || 0) === 1;
 
-        if (idUsuarioLogueado && idCreador === idUsuarioLogueado && requiereAdmin) {
+        if (requiereAdmin) {
             btn.style.display = 'inline-block';
             btn.dataset.incidenciaId = incidenciaData.id_incidencia;
         } else {
@@ -1428,7 +1484,6 @@ async function initIncidencias() {
         }
     });
 
-    // ─── DRAWER: marcar leída al pulsar un item ───────────────────────
     document.getElementById("listaNotificacionesUser")?.addEventListener("click", async (e) => {
         const item = e.target.closest(".notif-drawer__item");
         if (!item) return;
@@ -1468,7 +1523,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // ─── Marcar todas leídas desde el drawer y cerrarlo ──────────────
     marcarBtn?.addEventListener("click", async () => {
         const items = document.querySelectorAll("#listaNotificacionesUser .notif-drawer__item");
         for (const item of items) {
