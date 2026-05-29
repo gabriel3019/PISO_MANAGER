@@ -25,6 +25,11 @@ let filtroActual = "todas";
 
 document.addEventListener("DOMContentLoaded", () => {
     cargarIncidencias();
+    cargarNotificaciones();
+
+    setInterval(() => {
+        cargarNotificaciones();
+    }, 5000);
 });
 
 function rutaImagen(imagen) {

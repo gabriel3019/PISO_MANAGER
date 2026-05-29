@@ -437,13 +437,13 @@ switch ($accion) {
     WHERE id_piso = ?
 ");
 
-            if (!$stmtUsuarios) {
-                echo json_encode([
-                    'success' => false,
-                    'error' => $conn->error
-                ]);
-                exit;
-            }
+        if (!$stmtUsuarios) {
+    echo json_encode([
+        'success' => false,
+        'error' => $conn->error
+    ]);
+    exit;
+}
 
             $stmtUsuarios->bind_param("i", $id_piso);
             $stmtUsuarios->execute();
