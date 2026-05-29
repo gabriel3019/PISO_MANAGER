@@ -53,16 +53,43 @@ async function initIncidencias() {
     const menuToggle = document.getElementById("menuToggle");
     const sidebar = document.getElementById("sidebar");
 
+    // Crear overlay para cerrar al hacer clic fuera
+    const sidebarOverlay = document.createElement("div");
+    sidebarOverlay.style.cssText =
+        "display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:998;";
+    document.body.appendChild(sidebarOverlay);
+
+    function cerrarSidebar() {
+        sidebar.classList.remove("active");
+        menuToggle.innerHTML = "☰";
+        menuToggle.classList.remove("active");
+        sidebarOverlay.style.display = "none";
+        document.body.classList.remove("sidebar-open");
+        // ── AÑADIR: devolver el botón al header ──
+        const header = document.querySelector(".page-header");
+        if (header) header.insertBefore(menuToggle, header.firstChild);
+    }
+
     if (menuToggle && sidebar) {
         menuToggle.addEventListener("click", () => {
-            sidebar.classList.toggle("active");
-            menuToggle.classList.toggle("active");
-
-            if (sidebar.classList.contains("active")) {
-                menuToggle.innerHTML = "✕";
+            const estaAbierto = sidebar.classList.contains("active");
+            if (estaAbierto) {
+                cerrarSidebar();
             } else {
-                menuToggle.innerHTML = "☰";
+                sidebar.classList.add("active");
+                menuToggle.innerHTML = "✕";
+                menuToggle.classList.add("active");
+                sidebarOverlay.style.display = "block";
+                document.body.classList.add("sidebar-open");
+                document.body.appendChild(menuToggle);
             }
+        });
+
+        sidebarOverlay.addEventListener("click", cerrarSidebar);
+
+        // Cerrar también al navegar a otra página desde el sidebar
+        sidebar.querySelectorAll(".sidebar-link").forEach(link => {
+            link.addEventListener("click", cerrarSidebar);
         });
     }
 
@@ -179,14 +206,22 @@ async function initIncidencias() {
     });
 
     function mostrarPreviewImagen(file, previewId) {
+        const inputFile = document.getElementById(previewId.replace("-preview", ""));
+        const dropzone = inputFile?.closest("label.modal__dropzone");
+
+        // Ocultar el recuadro
+        if (dropzone) dropzone.style.display = "none";
+
         let preview = document.getElementById(previewId);
         if (!preview) {
             preview = document.createElement("img");
             preview.id = previewId;
             preview.style.cssText =
-                "width:100%;max-height:180px;object-fit:cover;border-radius:8px;margin-top:8px;";
-            const inputFile = document.getElementById(previewId.replace("-preview", ""));
-            inputFile?.closest(".modal__dropzone")?.after(preview);
+                "width:100%;max-height:180px;object-fit:cover;border-radius:8px;margin-top:8px;cursor:pointer;";
+            // Al hacer clic en la preview, se puede cambiar la imagen
+            preview.title = "Clic para cambiar imagen";
+            preview.addEventListener("click", () => inputFile?.click());
+            dropzone?.parentElement?.appendChild(preview);
         }
         preview.src = URL.createObjectURL(file);
     }
