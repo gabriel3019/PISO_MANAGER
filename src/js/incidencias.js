@@ -275,6 +275,7 @@ async function initIncidencias() {
             .forEach(el => el.style.display = 'none');
     }
 
+    // ─── Validaciones ────────────────────────────────────────────────
     function validarNuevaPaso1() {
         let ok = true;
 
@@ -414,6 +415,9 @@ async function initIncidencias() {
             btnDer.textContent = "Siguiente →";
             btnDer.dataset.accion = "siguiente";
 
+            // CAMBIO 2: limpiar errores al volver al paso 1
+            limpiarTodosErrores("nueva");
+
         } else {
             paso1.classList.add("modal--hidden");
             paso2.classList.remove("modal--hidden");
@@ -429,12 +433,15 @@ async function initIncidencias() {
 
             btnDer.textContent = "Enviar incidencia";
             btnDer.dataset.accion = "enviar";
+
+            // CAMBIO 3: limpiar errores al avanzar al paso 2
+            limpiarTodosErrores("nueva");
         }
     }
 
     document.getElementById("btn-nueva-izquierda")?.addEventListener("click", () => {
         const btnIzq = document.getElementById("btn-nueva-izquierda");
-        if (btnIzq.dataset.accion === "volver") irAPaso(1);
+        if (btnIzq.dataset.accion === "volver") irAPaso(1); limpiarTodosErrores("nueva");
     });
 
     document.getElementById("btn-nueva-derecha")?.addEventListener("click", () => {
@@ -477,6 +484,8 @@ async function initIncidencias() {
             btnDer.textContent = "Siguiente →";
             btnDer.dataset.accion = "siguiente";
 
+            limpiarTodosErrores("editar");
+
         } else {
             paso1.classList.add("modal--hidden");
             paso2.classList.remove("modal--hidden");
@@ -492,6 +501,8 @@ async function initIncidencias() {
 
             btnDer.textContent = "Guardar cambios";
             btnDer.dataset.accion = "guardar";
+
+            limpiarTodosErrores("editar");
         }
     }
 
@@ -513,7 +524,6 @@ async function initIncidencias() {
     // SISTEMA DE FILTROS
     // ══════════════════════════════════════════════════════════════
 
-    // filtroActivo guarda el estado actual: 'todas' | 'abierta' | 'en_curso' | 'resuelta'
     let filtroActivo = 'todas';
 
     function aplicarFiltro(filtro) {
@@ -524,45 +534,38 @@ async function initIncidencias() {
         const listaActivas = document.getElementById("lista-activas");
         const listaResueltas = document.getElementById("lista-resueltas");
 
-        // Actualizar botones
         document.querySelectorAll(".filtro-btn").forEach(btn => {
             btn.classList.toggle("filtro-btn--active", btn.dataset.filtro === filtro);
         });
 
         if (filtro === 'todas') {
-            // Mostrar todo
             seccionActivas.classList.remove("section--filtro-oculto");
             seccionResueltas.classList.remove("section--filtro-oculto");
             listaActivas.querySelectorAll(".incident-item").forEach(el => el.style.display = "");
             listaResueltas.querySelectorAll(".incident-item").forEach(el => el.style.display = "");
 
         } else if (filtro === 'resuelta') {
-            // Solo sección resueltas visible
             seccionActivas.classList.add("section--filtro-oculto");
             seccionResueltas.classList.remove("section--filtro-oculto");
             listaResueltas.querySelectorAll(".incident-item").forEach(el => el.style.display = "");
 
         } else {
-            // 'abierta' o 'en_curso' → solo sección activas, filtrar items dentro
             seccionActivas.classList.remove("section--filtro-oculto");
             seccionResueltas.classList.add("section--filtro-oculto");
 
             listaActivas.querySelectorAll(".incident-item").forEach(el => {
                 const estadoItem = (el.dataset.estado || '').toLowerCase().trim();
-                // Normalizar: 'en curso' → 'en_curso'
                 const estadoNorm = estadoItem.replace(' ', '_');
                 el.style.display = (estadoNorm === filtro) ? "" : "none";
             });
         }
 
-        // Mostrar mensaje vacío si no hay items visibles en la sección activa
         actualizarMensajeVacio(listaActivas, filtro === 'todas' || filtro !== 'resuelta');
         actualizarMensajeVacio(listaResueltas, filtro === 'todas' || filtro === 'resuelta');
     }
 
     function actualizarMensajeVacio(lista, esVisible) {
         if (!lista) return;
-        // Eliminar mensaje vacío anterior si existe
         const anterior = lista.querySelector(".filtro-vacio");
         if (anterior) anterior.remove();
 
@@ -579,7 +582,6 @@ async function initIncidencias() {
         }
     }
 
-    // Listeners de los botones de filtro
     document.querySelectorAll(".filtro-btn").forEach(btn => {
         btn.addEventListener("click", () => {
             aplicarFiltro(btn.dataset.filtro);
@@ -702,7 +704,6 @@ async function initIncidencias() {
             document.getElementById("badge-incidencias").textContent =
                 contadores.abierta + contadores.en_curso;
 
-            // Reaplicar el filtro activo después de recargar
             aplicarFiltro(filtroActivo);
 
         } catch (error) {
@@ -802,6 +803,29 @@ async function initIncidencias() {
             initToggleComentario();
             setMinDateToday('nueva-fecha-inicio');
             abrirModal("modal-nueva-incidencia");
+
+            // Limpiar rojo en tiempo real al escribir
+            document.getElementById("nueva-tipo")?.addEventListener("change", function () {
+                limpiarErrorCampo(this, "nueva-tipo-error");
+            });
+            document.getElementById("nueva-titulo")?.addEventListener("input", function () {
+                limpiarErrorCampo(this, "nueva-titulo-error");
+            });
+            document.getElementById("nueva-desc")?.addEventListener("input", function () {
+                limpiarErrorCampo(this, "nueva-desc-error");
+            });
+            document.querySelectorAll("#modal-nueva-incidencia .modal__urgencia-btn").forEach(b => {
+                b.addEventListener("click", () => {
+                    const err = document.getElementById("nueva-urgencia-error");
+                    if (err) err.classList.remove("modal__field-error--visible");
+                });
+            });
+            document.getElementById("nueva-fecha-inicio")?.addEventListener("change", function () {
+                limpiarErrorCampo(this, "nueva-fecha-inicio-vacia-error");
+                const errorPasada = document.getElementById("nueva-fecha-inicio-error");
+                if (errorPasada) errorPasada.style.display = 'none';
+                this.classList.remove("modal__input--error");
+            });
         });
     });
 
@@ -1329,11 +1353,9 @@ async function initIncidencias() {
         const btn = document.getElementById('btn-ver-conversacion');
         if (!btn) return;
 
-        const idUsuarioLogueado = obtenerIdUsuario();
-        const idCreador = parseInt(incidenciaData.id_usuario || 0);
         const requiereAdmin = parseInt(incidenciaData.notificar_admin || 0) === 1;
 
-        if (idUsuarioLogueado && idCreador === idUsuarioLogueado && requiereAdmin) {
+        if (requiereAdmin) {
             btn.style.display = 'inline-block';
             btn.dataset.incidenciaId = incidenciaData.id_incidencia;
         } else {
