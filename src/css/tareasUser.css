@@ -184,6 +184,7 @@ button{
 
 .btn-primary{
   background:#4f46e5;
+  margin-left: auto;
   color:white;
   border:none;
   padding:10px 15px;
@@ -568,10 +569,15 @@ button{
 /* ================================================= */
 
 .modal-footer{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-top:20px;
+    display:flex;
+    align-items:center;
+    width:100%;
+    margin-top:20px;
+}
+
+.footer-right{
+    display:flex;
+    gap:10px;
 }
 
 .modal-footer.center{
