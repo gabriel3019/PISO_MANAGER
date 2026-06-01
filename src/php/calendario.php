@@ -77,15 +77,15 @@ function obtenerEventos($conn)
     UNION ALL
 
     SELECT
-        i.id_incidencia + 100000 AS id_evento,
-        i.titulo,
-        'incidencia' AS tipo,
-        COALESCE(i.fecha, DATE(i.fecha_creacion)) AS fecha,
-        NULL AS fecha_inicio,
-        NULL AS fecha_fin,
-        NULL AS hora,
-        i.estado,
-        u.nombre AS persona
+    i.id_incidencia + 100000 AS id_evento,
+    i.titulo,
+    'incidencia' AS tipo,
+    COALESCE(i.fecha_inicio, i.fecha, DATE(i.fecha_creacion)) AS fecha,
+    i.fecha_inicio,
+    i.fecha_fin,
+    NULL AS hora,
+    i.estado,
+    u.nombre AS persona
     FROM incidencias i
     INNER JOIN usuarios u ON i.id_usuario = u.id_usuario
     WHERE i.id_piso = ?

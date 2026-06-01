@@ -111,38 +111,75 @@ switch ($accion) {
         );
 
         if ($stmt->execute()) {
-            $id_incidencia = $stmt->insert_id;
 
-            // ── Insertar comentario del admin si existe ──
-            if (!empty($_POST['comentario_admin']) && !empty($_POST['id_usuario_comentario'])) {
-                $comentario            = trim($_POST['comentario_admin']);
-                $id_usuario_comentario = (int)$_POST['id_usuario_comentario'];
+    $id_incidencia = $stmt->insert_id;
 
-                $stmt_msg = $conn->prepare(
-                    "INSERT INTO mensajes_incidencia (id_incidencia, id_usuario, mensaje) VALUES (?, ?, ?)"
-                );
-                $stmt_msg->bind_param("iis", $id_incidencia, $id_usuario_comentario, $comentario);
-                $stmt_msg->execute();
-                $stmt_msg->close();
-            }
+    $stmtCalendario = $conn->prepare("
+        INSERT INTO calendario_eventos
+        (
+            id_piso,
+            titulo,
+            tipo,
+            fecha,
+            fecha_inicio,
+            fecha_fin,
+            estado
+        )
+        VALUES
+        (?, ?, 'incidencia', ?, ?, ?, ?)
+    ");
 
-            // ── NUEVO: Notificar al usuario cuando se crea la incidencia ──
-            if ($notificar_admin) {
-                $mensaje_notif = "Tu incidencia '$titulo' ha sido registrada y el administrador ha sido notificado.";
-                $stmt_notif = $conn->prepare(
-                    "INSERT INTO notificaciones (id_usuario, id_incidencia, mensaje) VALUES (?, ?, ?)"
-                );
-                $stmt_notif->bind_param("iis", $id_usuario, $id_incidencia, $mensaje_notif);
-                $stmt_notif->execute();
-                $stmt_notif->close();
-            }
+    $fechaCalendario = $fecha_inicio;
 
-            echo json_encode(['success' => true, 'id' => $id_incidencia]);
-        } else {
-            echo json_encode(['success' => false, 'error' => $conn->error]);
-        }
-        $stmt->close();
-        break;
+    $stmtCalendario->bind_param(
+        "isssss",
+        $id_piso,
+        $titulo,
+        $fechaCalendario,
+        $fecha_inicio,
+        $fecha_fin,
+        $estado
+    );
+
+    $stmtCalendario->execute();
+    $stmtCalendario->close();
+
+    // ── Insertar comentario del admin si existe ──
+    if (!empty($_POST['comentario_admin']) && !empty($_POST['id_usuario_comentario'])) {
+
+        $comentario = trim($_POST['comentario_admin']);
+        $id_usuario_comentario = (int)$_POST['id_usuario_comentario'];
+
+        $stmt_msg = $conn->prepare(
+            "INSERT INTO mensajes_incidencia (id_incidencia, id_usuario, mensaje) VALUES (?, ?, ?)"
+        );
+
+        $stmt_msg->bind_param(
+            "iis",
+            $id_incidencia,
+            $id_usuario_comentario,
+            $comentario
+        );
+
+        $stmt_msg->execute();
+        $stmt_msg->close();
+    }
+
+    echo json_encode([
+    'success' => true,
+    'id' => $id_incidencia
+]);
+
+} else {
+
+    echo json_encode([
+        'success' => false,
+        'error' => $conn->error
+    ]);
+}
+
+$stmt->close();
+break;
 
     case 'editar':
         $id          = intval($_POST['id']          ?? 0);

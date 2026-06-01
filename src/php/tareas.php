@@ -177,10 +177,31 @@ if ($action === "crear") {
 
     if ($stmt->execute()) {
 
+        $stmtCalendario = $conn->prepare("
+        INSERT INTO calendario_eventos
+        (
+            id_piso,
+            titulo,
+            tipo,
+            fecha,
+            estado
+        )
+        VALUES
+        (?, ?, 'tarea', ?, 'pendiente')
+    ");
+
+        $stmtCalendario->bind_param(
+            "iss",
+            $id_piso,
+            $titulo,
+            $fecha
+        );
+
+        $stmtCalendario->execute();
+
         echo json_encode([
             "success" => true
         ]);
-
     } else {
 
         echo json_encode([
@@ -262,7 +283,6 @@ if ($action === "editar") {
         echo json_encode([
             "success" => true
         ]);
-
     } else {
 
         echo json_encode([
@@ -316,7 +336,6 @@ if ($action === "toggle") {
         echo json_encode([
             "success" => true
         ]);
-
     } else {
 
         echo json_encode([
@@ -334,8 +353,7 @@ if ($action === "toggle") {
 
 if ($action === "eliminar") {
 
-    $id_tarea =
-        intval($input['id_tarea'] ?? 0);
+    $id_tarea = intval($input['id_tarea'] ?? 0);
 
     if (!$id_tarea) {
 
@@ -347,11 +365,54 @@ if ($action === "eliminar") {
         exit;
     }
 
+    // Obtener datos de la tarea
+    $stmtInfo = $conn->prepare("
+        SELECT titulo, fecha
+        FROM tareas
+        WHERE id_tarea = ?
+        AND id_piso = ?
+    ");
+
+    $stmtInfo->bind_param(
+        "ii",
+        $id_tarea,
+        $id_piso
+    );
+
+    $stmtInfo->execute();
+
+    $resultado = $stmtInfo->get_result();
+    $tarea = $resultado->fetch_assoc();
+
+    $stmtInfo->close();
+
+    // Borrar del calendario
+    if ($tarea) {
+
+        $stmtCal = $conn->prepare("
+            DELETE FROM calendario_eventos
+            WHERE id_piso = ?
+            AND tipo = 'tarea'
+            AND titulo = ?
+            AND fecha = ?
+        ");
+
+        $stmtCal->bind_param(
+            "iss",
+            $id_piso,
+            $tarea['titulo'],
+            $tarea['fecha']
+        );
+
+        $stmtCal->execute();
+        $stmtCal->close();
+    }
+
+    // Borrar la tarea
     $stmt = $conn->prepare("
         DELETE FROM tareas
-        WHERE
-            id_tarea=?
-            AND id_piso=?
+        WHERE id_tarea = ?
+        AND id_piso = ?
     ");
 
     $stmt->bind_param(
