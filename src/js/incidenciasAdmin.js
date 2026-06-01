@@ -27,9 +27,8 @@ document.addEventListener("DOMContentLoaded", () => {
     cargarIncidencias();
     cargarNotificaciones();
 
-    setInterval(() => {
-        cargarNotificaciones();
-    }, 5000);
+    setInterval(cargarNotificaciones, 5000);
+
 });
 
 function rutaImagen(imagen) {
@@ -614,7 +613,7 @@ function limpiarFormularioNuevaIncidenciaAdmin() {
     document.getElementById("nueva-fecha-inicio").value = "";
     document.getElementById("nueva-fecha-fin").value = "";
     document.getElementById("nueva-notificar-inquilino").checked = false;
-    
+
     document.getElementById("nueva-imagen").value = "";
 
     const dropzone = document.querySelector(".modal__dropzone");

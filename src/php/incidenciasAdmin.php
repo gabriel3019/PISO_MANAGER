@@ -311,8 +311,11 @@ switch ($accion) {
         $estado             = 'abierta';
 
         // Cuando el admin crea la incidencia no necesita notificarse a sí mismo
-        $notificar_admin = 0;
-        $leido_admin     = 1;
+        $notificar_admin =
+            isset($_POST["notificar_admin"]) ? 1 : 0;
+
+        $leido_admin =
+            $notificar_admin ? 0 : 1;
 
         $imagen_path = null;
 
@@ -480,6 +483,43 @@ switch ($accion) {
             'id'      => $id_nueva_incidencia
         ]);
 
+
+        break;
+
+        echo json_encode([
+            'success' => true,
+            'message' => 'Incidencia creada correctamente',
+            'id'      => $id_nueva_incidencia
+        ]);
+
+        break;
+
+
+    case 'marcar_notificacion_leida':
+
+        $id_incidencia = $_POST['id_incidencia'] ?? null;
+
+        if (!$id_incidencia) {
+            echo json_encode([
+                'success' => false,
+                'error' => 'Falta id_incidencia'
+            ]);
+            exit;
+        }
+
+        $stmt = $conn->prepare("
+            UPDATE incidencias
+            SET leido_admin = 1
+            WHERE id_incidencia = ?
+        ");
+
+        $stmt->bind_param("i", $id_incidencia);
+        $stmt->execute();
+        $stmt->close();
+
+        echo json_encode([
+            'success' => true
+        ]);
 
         break;
 
