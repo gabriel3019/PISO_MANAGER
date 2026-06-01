@@ -78,6 +78,10 @@ const closeDeleteConfirmBtn = document.getElementById("close-delete-confirm");
 const cancelDeleteConfirmBtn = document.getElementById("cancel-delete-confirm");
 const confirmDeleteEventBtn = document.getElementById("confirm-delete-event");
 const deleteConfirmText = document.getElementById("delete-confirm-text");
+const modalConflictoHora = document.getElementById("modal-conflicto-hora");
+const conflictoHoraText = document.getElementById("conflicto-hora-text");
+const closeConflictoHora = document.getElementById("close-conflicto-hora");
+const btnEntendidoConflicto = document.getElementById("btn-entendido-conflicto");
 
 const usuarioActual =
     JSON.parse(
@@ -223,6 +227,27 @@ function validarPrimerPaso() {
 
     return valido;
 }
+
+function mostrarModalConflicto(mensaje) {
+    conflictoHoraText.textContent = mensaje;
+    openModal(modalConflictoHora);
+}
+
+function existeEventoMismaHora(fecha, hora) {
+    return eventos.some((evento) =>
+        evento.tipo === "evento" &&
+        evento.fecha === fecha &&
+        evento.hora === hora
+    );
+}
+
+closeConflictoHora.addEventListener("click", () => {
+    closeModal(modalConflictoHora);
+});
+
+btnEntendidoConflicto.addEventListener("click", () => {
+    closeModal(modalConflictoHora);
+});
 
 eventTitleInput.addEventListener("blur", () => {
     if (!eventTitleInput.value.trim()) {
@@ -1551,15 +1576,10 @@ addEventForm.addEventListener("submit", async (e) => {
             return;
         }
 
-        const existeMismoEvento = eventos.some((evento) =>
-            evento.tipo === "evento" &&
-            evento.fecha === fecha &&
-            evento.hora === hora
-        );
-
-        if (existeMismoEvento) {
-            eventWarning.textContent = "Ya existe un evento en esa fecha y a esa hora.";
-            eventWarning.classList.add("show");
+        if (existeEventoMismaHora(fecha, hora)) {
+            mostrarModalConflicto(
+                `Ya existe un evento el día ${formatDateText(fecha)} a las ${hora}.`
+            );
             return;
         }
 
