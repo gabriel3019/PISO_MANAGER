@@ -153,6 +153,48 @@ input,
   transition: all 0.3s ease;
 }
 
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+
+    padding: 14px 20px;
+
+    border-radius: 12px;
+
+    color: white;
+
+    font-weight: 600;
+
+    z-index: 9999;
+
+    opacity: 0;
+    transform: translateY(-20px);
+
+    transition: all .3s ease;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.toast.success {
+    background: linear-gradient(
+        135deg,
+        #22c55e,
+        #16a34a
+    );
+}
+
+.toast.error {
+    background: linear-gradient(
+        135deg,
+        #ef4444,
+        #dc2626
+    );
+}
+
 /* ================================================= */
 /* ================= MENU HAMBURGUESA ============== */
 /* ================================================= */

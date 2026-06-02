@@ -3,10 +3,10 @@ const API_URL = "../php/ajustes.php";
 /* ================= MENU ================= */
 
 const menuToggle =
-  document.getElementById("menuToggle");
+    document.getElementById("menuToggle");
 
 const sidebar =
-  document.getElementById("sidebar");
+    document.getElementById("sidebar");
 
 /* =========================================================
    INIT
@@ -16,28 +16,28 @@ const sidebar =
 
 if (menuToggle && sidebar) {
 
-  menuToggle.addEventListener(
-    "click",
-    () => {
+    menuToggle.addEventListener(
+        "click",
+        () => {
 
-      sidebar.classList.toggle("active");
+            sidebar.classList.toggle("active");
 
-      menuToggle.classList.toggle("active");
+            menuToggle.classList.toggle("active");
 
-      if (
-        sidebar.classList.contains("active")
-      ) {
+            if (
+                sidebar.classList.contains("active")
+            ) {
 
-        menuToggle.innerHTML = "✕";
+                menuToggle.innerHTML = "✕";
 
-      } else {
+            } else {
 
-        menuToggle.innerHTML = "☰";
+                menuToggle.innerHTML = "☰";
 
-      }
+            }
 
-    }
-  );
+        }
+    );
 
 }
 
@@ -179,218 +179,223 @@ async function cargarPerfil() {
 ========================================================= */
 
 document
-.getElementById("guardarPerfil")
-.addEventListener("click", async () => {
+    .getElementById("guardarPerfil")
+    .addEventListener("click", async () => {
 
-    const data = {
+        const data = {
 
-        action: "guardar",
+            action: "guardar",
 
-        nombre:
-            document.getElementById("nombre")
-            .value.trim(),
+            nombre:
+                document.getElementById("nombre")
+                    .value.trim(),
 
-        apellidos:
-            document.getElementById("apellidos")
-            .value.trim(),
+            apellidos:
+                document.getElementById("apellidos")
+                    .value.trim(),
 
-        dni:
-            document.getElementById("dni")
-            .value.trim(),
+            dni:
+                document.getElementById("dni")
+                    .value.trim(),
 
-        fecha_nacimiento:
-            document.getElementById("fechaNacimiento")
-            .value,
+            fecha_nacimiento:
+                document.getElementById("fechaNacimiento")
+                    .value,
 
-        nacionalidad:
-            document.getElementById("nacionalidad")
-            .value.trim(),
+            nacionalidad:
+                document.getElementById("nacionalidad")
+                    .value.trim(),
 
-        email:
-            document.getElementById("email")
-            .value.trim(),
+            email:
+                document.getElementById("email")
+                    .value.trim(),
 
-        telefono:
-            document.getElementById("telefono")
-            .value.trim(),
+            telefono:
+                document.getElementById("telefono")
+                    .value.trim(),
 
-        numero_cuenta:
-            document.getElementById("numeroCuenta")
-            .value.trim(),
+            numero_cuenta:
+                document.getElementById("numeroCuenta")
+                    .value.trim(),
 
-        direccion:
-            document.getElementById("direccion")
-            .value.trim(),
+            direccion:
+                document.getElementById("direccion")
+                    .value.trim(),
 
-        ciudad:
-            document.getElementById("ciudad")
-            .value.trim(),
+            ciudad:
+                document.getElementById("ciudad")
+                    .value.trim(),
 
-        codigo_postal:
-            document.getElementById("codigoPostal")
-            .value.trim(),
+            codigo_postal:
+                document.getElementById("codigoPostal")
+                    .value.trim(),
 
-        fecha_entrada:
-            document.getElementById("fechaEntrada")
-            .value,
+            fecha_entrada:
+                document.getElementById("fechaEntrada")
+                    .value,
 
-        contacto_emergencia:
-            document.getElementById("contactoEmergencia")
-            .value.trim(),
+            contacto_emergencia:
+                document.getElementById("contactoEmergencia")
+                    .value.trim(),
 
-        telefono_emergencia:
-            document.getElementById("telefonoEmergencia")
-            .value.trim()
-    };
+            telefono_emergencia:
+                document.getElementById("telefonoEmergencia")
+                    .value.trim()
+        };
 
-    /* =================================================
-       VALIDACIONES
-    ================================================= */
+        /* =================================================
+           VALIDACIONES
+        ================================================= */
 
-    if (!data.nombre || !data.email) {
-
-        alert(
-            "Nombre y email son obligatorios"
-        );
-
-        return;
-    }
-
-    /* =================================================
-       FETCH
-    ================================================= */
-
-    try {
-
-        const res = await fetch(API_URL, {
-
-            method: "POST",
-
-            headers: {
-                "Content-Type": "application/json"
-            },
-
-            body: JSON.stringify(data)
-        });
-
-        const json = await res.json();
-
-        if (json.success) {
-
-            alert("Perfil actualizado ✅");
-
-            /* =============================================
-               ACTUALIZAR SESSION
-            ============================================= */
-
-            const usuario =
-                JSON.parse(
-                    sessionStorage.getItem("usuario")
-                ) || {};
-
-            usuario.nombre = data.nombre;
-
-            usuario.email = data.email;
-
-            sessionStorage.setItem(
-                "usuario",
-                JSON.stringify(usuario)
-            );
-
-            /* =============================================
-               SIDEBAR
-            ============================================= */
-
-            const nombreSidebar =
-                document.getElementById("nombreUsuario");
-
-            if (nombreSidebar) {
-
-                nombreSidebar.textContent =
-                    data.nombre;
-            }
-
-        } else {
+        if (!data.nombre || !data.email) {
 
             alert(
-                json.message ||
-                "Error actualizando perfil"
+                "Nombre y email son obligatorios"
             );
+
+            return;
         }
 
-    } catch (err) {
+        /* =================================================
+           FETCH
+        ================================================= */
 
-        console.error(
-            "Error guardando:",
-            err
-        );
-    }
-});
+        try {
+
+            const res = await fetch(API_URL, {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify(data)
+            });
+
+            const json = await res.json();
+
+            if (json.success) {
+
+                mostrarToast(
+                    "Perfil actualizado correctamente",
+                    "success"
+                );
+
+
+
+                /* =============================================
+                   ACTUALIZAR SESSION
+                ============================================= */
+
+                const usuario =
+                    JSON.parse(
+                        sessionStorage.getItem("usuario")
+                    ) || {};
+
+                usuario.nombre = data.nombre;
+
+                usuario.email = data.email;
+
+                sessionStorage.setItem(
+                    "usuario",
+                    JSON.stringify(usuario)
+                );
+
+                /* =============================================
+                   SIDEBAR
+                ============================================= */
+
+                const nombreSidebar =
+                    document.getElementById("nombreUsuario");
+
+                if (nombreSidebar) {
+
+                    nombreSidebar.textContent =
+                        data.nombre;
+                }
+
+            } else {
+
+                mostrarToast(
+                    json.message || "Error actualizando perfil",
+                    "error"
+                );
+            }
+
+        } catch (err) {
+
+            console.error(
+                "Error guardando:",
+                err
+            );
+        }
+    });
 
 /* =========================================================
    FOTO PERFIL
 ========================================================= */
 
 document
-.getElementById("cambiarFoto")
-.addEventListener("click", () => {
+    .getElementById("cambiarFoto")
+    .addEventListener("click", () => {
 
-    document
-        .getElementById("inputFoto")
-        .click();
+        document
+            .getElementById("inputFoto")
+            .click();
 
-});
+    });
 
 document
-.getElementById("inputFoto")
-.addEventListener("change", async (e) => {
+    .getElementById("inputFoto")
+    .addEventListener("change", async (e) => {
 
-    const file = e.target.files[0];
+        const file = e.target.files[0];
 
-    if (!file) return;
+        if (!file) return;
 
-    /* =============================================
-       PREVIEW
-    ============================================= */
+        /* =============================================
+           PREVIEW
+        ============================================= */
 
-    document.getElementById("fotoPerfil").src =
-        URL.createObjectURL(file);
+        document.getElementById("fotoPerfil").src =
+            URL.createObjectURL(file);
 
-    const formData = new FormData();
+        const formData = new FormData();
 
-    formData.append("foto", file);
+        formData.append("foto", file);
 
-    formData.append("action", "foto");
+        formData.append("action", "foto");
 
-    try {
+        try {
 
-        const res = await fetch(API_URL, {
+            const res = await fetch(API_URL, {
 
-            method: "POST",
+                method: "POST",
 
-            body: formData
-        });
+                body: formData
+            });
 
-        const json = await res.json();
+            const json = await res.json();
 
-        if (!json.success) {
+            if (!json.success) {
 
-            alert("Error subiendo imagen");
+                alert("Error subiendo imagen");
 
-        } else {
+            } else {
 
-            document.getElementById("fotoPerfil").src =
-                "../" + json.ruta;
+                document.getElementById("fotoPerfil").src =
+                    "../" + json.ruta;
+            }
+
+        } catch (err) {
+
+            console.error(
+                "Error subiendo foto:",
+                err
+            );
         }
-
-    } catch (err) {
-
-        console.error(
-            "Error subiendo foto:",
-            err
-        );
-    }
-});
+    });
 
 /* =========================================================
    MODO OSCURO
@@ -451,3 +456,28 @@ toggle.addEventListener("change", async () => {
         );
     }
 });
+
+function mostrarToast(mensaje, tipo = "success") {
+
+    const toast = document.createElement("div");
+
+    toast.className = `toast ${tipo}`;
+
+    toast.textContent = mensaje;
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.classList.add("show");
+    }, 50);
+
+    setTimeout(() => {
+
+        toast.classList.remove("show");
+
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
+
+    }, 3000);
+}
