@@ -49,7 +49,11 @@ CREATE TABLE IF NOT EXISTS usuarios (
 
     modo_oscuro BOOLEAN DEFAULT FALSE,
 
-    debe_cambiar_password BOOLEAN DEFAULT TRUE
+    debe_cambiar_password BOOLEAN DEFAULT TRUE,
+
+    reset_token VARCHAR(255) NULL,
+
+    reset_expira DATETIME NULL
 );
 
 
@@ -367,9 +371,7 @@ INSERT INTO calendario_evento_personas VALUES
 (5,2),(5,3),(5,4),
 (6,3),
 (7,2),(7,3),(7,4),
-(8,3),
-(9,2),(9,3),(9,4),
-(10,4);
+(8,3);
 
     ";
 
