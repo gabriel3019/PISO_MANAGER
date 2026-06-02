@@ -433,56 +433,26 @@ function inicializarDescargarContrato() {
 }
 
 /* ================= DARK MODE ================= */
-
 const darkToggle =
-  document.getElementById("darkModeToggle");
+document.getElementById("darkModeToggle");
 
-/* ===== CARGAR ===== */
+if (darkToggle) {
 
-if (
-  localStorage.getItem("darkMode")
-  === "true"
-) {
+    darkToggle.checked =
+        localStorage.getItem("darkMode") === "true";
 
-  document.documentElement
-    .classList.add("dark");
+    darkToggle.addEventListener(
+        "change",
+        () => {
 
-  if (darkToggle) {
-    darkToggle.checked = true;
-  }
+            setModoOscuro(
+                darkToggle.checked
+            );
+
+        }
+    );
 
 }
-
-/* ===== TOGGLE ===== */
-
-darkToggle?.addEventListener(
-  "change",
-  () => {
-
-    if (darkToggle.checked) {
-
-      document.documentElement
-        .classList.add("dark");
-
-      localStorage.setItem(
-        "darkMode",
-        "true"
-      );
-
-    } else {
-
-      document.documentElement
-        .classList.remove("dark");
-
-      localStorage.setItem(
-        "darkMode",
-        "false"
-      );
-
-    }
-
-  }
-);
 
 /* ================= MENU HAMBURGUESA ================= */
 
