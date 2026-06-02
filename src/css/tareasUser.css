@@ -435,7 +435,7 @@ button{
 }
 
 .hidden{
-  display:none;
+  display:none !important;
 }
 
 .modal{
@@ -528,6 +528,18 @@ button{
   box-shadow:0 0 0 3px rgba(79,70,229,0.1);
 }
 
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
 /* ================================================= */
 /* ================= PRIORITY SELECTOR ============= */
 /* ================================================= */
@@ -583,6 +595,18 @@ button{
 .modal-footer.center{
   justify-content:flex-end;
   gap:10px;
+}
+
+.input-error {
+    border: 2px solid #ef4444 !important;
+    background: #fef2f2;
+}
+
+.error-text {
+    color: #ef4444;
+    font-size: 12px;
+    margin-top: 4px;
+    display: block;
 }
 
 /* ================================================= */

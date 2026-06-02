@@ -133,6 +133,45 @@ document.addEventListener(
 
     initBusqueda();
 
+    /* NO PERMITIR FECHAS ANTERIORES */
+    const fechaInput =
+      document.getElementById("fecha");
+
+    if (fechaInput) {
+
+      const hoy =
+        new Date()
+          .toISOString()
+          .split("T")[0];
+
+      fechaInput.min = hoy;
+
+    }
+
+    /* QUITAR ERRORES AL ESCRIBIR */
+
+    document.getElementById("titulo")
+    ?.addEventListener("input", function () {
+
+      this.classList.remove("input-error");
+
+      document.getElementById(
+        "errorTitulo"
+      ).textContent = "";
+
+    });
+
+    document.getElementById("fecha")
+    ?.addEventListener("input", function () {
+
+      this.classList.remove("input-error");
+
+      document.getElementById(
+        "errorFecha"
+      ).textContent = "";
+
+    });
+
   }
 );
 
@@ -298,56 +337,46 @@ function initModal() {
   );
 
   /* ================= STEP NEXT ================= */
+nextStep.addEventListener("click", () => {
 
-  nextStep.addEventListener(
-    "click",
-    () => {
+    const tituloInput = document.getElementById("titulo");
+    const fechaInput = document.getElementById("fecha");
 
-      const titulo =
-        document
-          .getElementById("titulo")
-          .value
-          .trim();
+    const errorTitulo = document.getElementById("errorTitulo");
+    const errorFecha = document.getElementById("errorFecha");
 
-      const fecha =
-        document
-          .getElementById("fecha")
-          .value;
+    errorTitulo.textContent = "";
+    errorFecha.textContent = "";
 
-      if (!titulo) {
+    tituloInput.classList.remove("input-error");
+    fechaInput.classList.remove("input-error");
 
-        mostrarToast(
-          "Introduce un título"
-        );
+    let valido = true;
 
-        return;
-
-      }
-
-      if (!fecha) {
-
-        mostrarToast(
-          "Selecciona una fecha"
-        );
-
-        return;
-
-      }
-
-      step1.classList.add("hidden");
-
-      step2.classList.remove("hidden");
-
-      nextStep.classList.add("hidden");
-
-      crearTareaBtn.classList.remove("hidden");
-
-      backStep.classList.remove("hidden");
-
-      currentStep.textContent = "2";
-
+    if (!tituloInput.value.trim()) {
+        tituloInput.classList.add("input-error");
+        errorTitulo.textContent = "El título es obligatorio";
+        valido = false;
     }
-  );
+
+    if (!fechaInput.value) {
+        fechaInput.classList.add("input-error");
+        errorFecha.textContent = "Selecciona una fecha";
+        valido = false;
+    }
+
+    if (!valido) return;
+
+    step1.classList.add("hidden");
+    step2.classList.remove("hidden");
+
+    nextStep.classList.add("hidden");
+    crearTareaBtn.classList.remove("hidden");
+
+    backStep.classList.remove("hidden");
+
+    currentStep.textContent = "2";
+});
 
   /* ================= STEP BACK ================= */
 
