@@ -2,7 +2,7 @@
 
 session_start();
 
-require_once __DIR__ . "/BBDD/crear_tabla.php";
+//require_once __DIR__ . "/BBDD/crear_tabla.php";
 require_once __DIR__ . "/BBDD/conecta.php";
 
 header('Content-Type: application/json');
