@@ -89,7 +89,7 @@ nav a{
     height:52px;
 
     display:grid;
-    grid-template-columns:32px 1fr;
+    grid-template-columns:32px 1fr auto auto;
 
     align-items:center;
 
@@ -97,17 +97,17 @@ nav a{
 
     padding:0 14px;
 
-    border-radius:12px;
-
-    text-decoration:none;
-
-    color:#444;
+    border-radius:2px;
 
     font-size:14px;
 
-    font-weight:600;
+    color:#444;
 
-    transition:.2s;
+    text-decoration:none;
+
+    cursor:pointer;
+
+    font-weight:600;
 }
 
 nav a:hover{
@@ -118,6 +118,9 @@ nav a.active{
     background:#efede9;
     color:#111;
     font-weight:700;
+
+    border-right:4px solid #222;
+    border-radius:2px;
 }
 
 .logout{
@@ -1029,6 +1032,28 @@ nav a.active{
 
 .dark .error-text{
     color:#f87171;
+}
+
+/* ===== FORZAR SIDEBAR IGUAL QUE INCIDENCIAS ===== */
+
+.sidebar-admin nav a{
+    height:52px;
+    display:grid;
+    grid-template-columns:32px 1fr auto auto;
+    align-items:center;
+    gap:12px;
+}
+
+.sidebar-admin nav a strong{
+    font-size:14px;
+    font-weight:700;
+}
+
+.sidebar-admin nav a img.icon{
+    width:22px;
+    height:22px;
+    min-width:22px;
+    object-fit:contain;
 }
 
 /* ================================================= */
