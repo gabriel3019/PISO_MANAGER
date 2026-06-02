@@ -41,6 +41,8 @@ document.getElementById("volver1");
 const volver2 =
 document.getElementById("volver2");
 
+let companeroSeleccionado = null;
+
 /* ================================================= */
 /* ================= INIT ========================== */
 /* ================================================= */
@@ -699,6 +701,7 @@ lista.forEach(u => {
 
             abrirInfo(u);
 
+
         }
     );
 
@@ -763,7 +766,35 @@ document.getElementById(
     "modalCompanero"
 );
 
+const modalEliminarCompanero =
+document.getElementById(
+    "modalEliminarCompanero"
+);
+
+const btnEliminarCompanero =
+document.getElementById(
+    "btnEliminarCompanero"
+);
+
+const cancelarEliminarCompanero =
+document.getElementById(
+    "cancelarEliminarCompanero"
+);
+
+const confirmarEliminarCompanero =
+document.getElementById(
+    "confirmarEliminarCompanero"
+);
+
 function abrirInfo(u){
+
+companeroSeleccionado = u;
+
+    document.getElementById(
+        "modalNombre"
+    ).textContent =
+        u.nombre || "-";
+
 
 document.getElementById(
     "modalNombre"
@@ -807,6 +838,39 @@ modalCompanero.classList.add(
 
 }
 
+btnEliminarCompanero.addEventListener(
+    "click",
+    () => {
+
+        modalEliminarCompanero.classList.add(
+            "active"
+        );
+
+    }
+);
+
+cancelarEliminarCompanero.addEventListener(
+    "click",
+    () => {
+
+        modalEliminarCompanero.classList.remove(
+            "active"
+        );
+
+    }
+);
+
+confirmarEliminarCompanero.addEventListener(
+    "click",
+    () => {
+
+        eliminarCompanero(
+            companeroSeleccionado.id_usuario
+        );
+
+    }
+);
+
 /* ================= CERRAR ================= */
 
 document
@@ -840,3 +904,66 @@ modalCompanero.addEventListener(
 
 }
 );
+
+async function eliminarCompanero(idUsuario){
+
+    try{
+
+        const res =
+            await fetch(
+                API_URL,
+                {
+                    method:"POST",
+
+                    headers:{
+                        "Content-Type":
+                        "application/json"
+                    },
+
+                    body:JSON.stringify({
+                        action:"eliminar",
+                        id_usuario:idUsuario
+                    })
+                }
+            );
+
+        const data =
+            await res.json();
+
+        if(data.success){
+
+            mostrarToast(
+                "Miembro eliminado correctamente",
+                "success"
+            );
+
+            modalEliminarCompanero.classList.remove(
+                "active"
+            );
+
+            modalCompanero.classList.remove(
+                "active"
+            );
+
+            cargarCompaneros();
+
+        }else{
+
+            mostrarToast(
+                data.message ||
+                "Error al eliminar miembro",
+                "error"
+            );
+
+        }
+
+    }catch(error){
+
+        mostrarToast(
+            "Error del servidor",
+            "error"
+        );
+
+    }
+
+}

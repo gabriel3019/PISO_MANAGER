@@ -254,8 +254,6 @@
                 ✕
             </button>
 
-            <!-- HEADER -->
-
             <div class="modal-top">
 
                 <img id="modalFoto" class="modal-avatar">
@@ -272,31 +270,70 @@
 
             </div>
 
-            <!-- INFO -->
-
             <div class="modal-grid">
 
                 <div class="info-card">
-
                     <span>DNI</span>
-
                     <p id="modalDni"></p>
-
                 </div>
 
                 <div class="info-card">
-
                     <span>Teléfono</span>
-
                     <p id="modalTelefono"></p>
-
                 </div>
+
+            </div>
+
+            <div class="modal-actions">
+
+                <button id="btnEliminarCompanero" class="btn-delete">
+
+                    Eliminar miembro
+
+                </button>
 
             </div>
 
         </div>
 
     </div>
+
+    <div class="modal-overlay" id="modalEliminarCompanero">
+
+        <div class="delete-modal">
+
+            <div class="delete-icon">
+                ⚠️
+            </div>
+
+            <h2>Eliminar miembro</h2>
+
+            <p>
+                ¿Seguro que quieres eliminar este miembro?
+                Esta acción no se puede deshacer.
+            </p>
+
+            <div class="modal-footer center">
+
+                <button id="cancelarEliminarCompanero" class="btn-secondary">
+
+                    Cancelar
+
+                </button>
+
+                <button id="confirmarEliminarCompanero" class="btn-delete">
+
+                    Eliminar
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
 
     <!-- JS -->
     <script src="../js/dark-mode.js"></script>

@@ -26,8 +26,31 @@ if (!isset($_SESSION['id_usuario'])) {
 
 $nombre = trim($_POST['nombre'] ?? '');
 $apellidos = trim($_POST['apellidos'] ?? '');
+
+$dni = trim($_POST['dni'] ?? '');
+$fecha_nacimiento = $_POST['fecha_nacimiento'] ?? null;
+$nacionalidad = trim($_POST['nacionalidad'] ?? '');
+
 $email = trim($_POST['email'] ?? '');
 $password = $_POST['password'] ?? '';
+
+$telefono = trim($_POST['telefono'] ?? '');
+$numero_cuenta = trim($_POST['numero_cuenta'] ?? '');
+
+$direccion = trim($_POST['direccion'] ?? '');
+$ciudad = trim($_POST['ciudad'] ?? '');
+$codigo_postal = trim($_POST['codigo_postal'] ?? '');
+
+$fecha_entrada = $_POST['fecha_entrada'] ?? null;
+
+$contacto_emergencia =
+    trim($_POST['contacto_emergencia'] ?? '');
+
+$telefono_emergencia =
+    trim($_POST['telefono_emergencia'] ?? '');
+
+$foto = null;
+$modo_oscuro = 0;
 
 /* =========================================
    VALIDAR CAMPOS
@@ -89,7 +112,7 @@ if ($result->num_rows > 0) {
 }
 
 /* =========================================
-   ENCRIPTAR PASSWORD
+   PASSWORD
 ========================================= */
 
 $passwordHash = password_hash(
@@ -98,49 +121,80 @@ $passwordHash = password_hash(
 );
 
 /* =========================================
-   DATOS POR DEFECTO
-========================================= */
-
-$telefono = "";
-$direccion = "";
-$foto = null;
-$modo_oscuro = 0;
-
-/* =========================================
-   INSERTAR USUARIO
+   CREAR USUARIO
 ========================================= */
 
 $stmt = $conn->prepare("
-    INSERT INTO usuarios
-    (
-        nombre,
-        apellidos,
-        email,
-        password,
-        telefono,
-        direccion,
-        foto,
-        modo_oscuro,
-        debe_cambiar_password
-    )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
+
+INSERT INTO usuarios
+(
+    nombre,
+    apellidos,
+
+    dni,
+    fecha_nacimiento,
+    nacionalidad,
+
+    email,
+    password,
+
+    telefono,
+    numero_cuenta,
+
+    direccion,
+    ciudad,
+    codigo_postal,
+
+    fecha_entrada,
+
+    contacto_emergencia,
+    telefono_emergencia,
+
+    foto,
+    modo_oscuro,
+    debe_cambiar_password
+)
+
+VALUES
+(
+    ?, ?, ?,
+    ?, ?, ?,
+    ?, ?, ?,
+    ?, ?, ?,
+    ?, ?, ?,
+    ?, ?, 1
+)
+
 ");
 
 $stmt->bind_param(
-    "sssssssi",
+    "ssssssssssssssssi",
+
     $nombre,
     $apellidos,
+
+    $dni,
+    $fecha_nacimiento,
+    $nacionalidad,
+
     $email,
     $passwordHash,
+
     $telefono,
+    $numero_cuenta,
+
     $direccion,
+    $ciudad,
+    $codigo_postal,
+
+    $fecha_entrada,
+
+    $contacto_emergencia,
+    $telefono_emergencia,
+
     $foto,
     $modo_oscuro
 );
-
-/* =========================================
-   ERROR CREAR USUARIO
-========================================= */
 
 if (!$stmt->execute()) {
 
@@ -153,29 +207,71 @@ if (!$stmt->execute()) {
 }
 
 /* =========================================
-   ID USUARIO NUEVO
+   ID NUEVO USUARIO
 ========================================= */
 
-$id_usuario_nuevo = $conn->insert_id;
+$id_usuario_nuevo =
+    $conn->insert_id;
 
 /* =========================================
-   ID PISO ADMIN
+   OBTENER PISO DEL ADMIN
 ========================================= */
 
-$id_piso = $_SESSION['piso_id'];
+$stmtPiso = $conn->prepare("
+
+    SELECT id_piso
+
+    FROM usuarios_pisos
+
+    WHERE id_usuario = ?
+
+    LIMIT 1
+
+");
+
+$stmtPiso->bind_param(
+    "i",
+    $_SESSION['id_usuario']
+);
+
+$stmtPiso->execute();
+
+$piso =
+    $stmtPiso
+    ->get_result()
+    ->fetch_assoc();
+
+$id_piso =
+    $piso['id_piso'] ?? null;
+
+if (!$id_piso) {
+
+    echo json_encode([
+        "success" => false,
+        "message" => "No se encontró el piso"
+    ]);
+
+    exit;
+}
 
 /* =========================================
-   INSERTAR RELACION USUARIO-PISO
+   ASIGNAR AL PISO
 ========================================= */
 
 $stmtRelacion = $conn->prepare("
+
     INSERT INTO usuarios_pisos
     (
         id_usuario,
         id_piso,
         rol
     )
-    VALUES (?, ?, 'miembro')
+
+    VALUES
+    (
+        ?, ?, 'miembro'
+    )
+
 ");
 
 $stmtRelacion->bind_param(
@@ -184,20 +280,20 @@ $stmtRelacion->bind_param(
     $id_piso
 );
 
-/* =========================================
-   RESPUESTA FINAL
-========================================= */
-
-if ($stmtRelacion->execute()) {
-
-    echo json_encode([
-        "success" => true
-    ]);
-
-} else {
+if (!$stmtRelacion->execute()) {
 
     echo json_encode([
         "success" => false,
         "message" => "Error al asignar usuario al piso"
     ]);
+
+    exit;
 }
+
+/* =========================================
+   OK
+========================================= */
+
+echo json_encode([
+    "success" => true
+]);
