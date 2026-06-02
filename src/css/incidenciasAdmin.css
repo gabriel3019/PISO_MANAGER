@@ -1153,3 +1153,84 @@ body.dark .chat-textarea {
     color: #f8fafc;
     border-color: #334155;
 }
+
+/* ======================================== */
+/* ============= MENU MOBILE ============== */
+/* ======================================== */
+
+.menu-toggle {
+
+    display: none;
+
+    width: 42px;
+    height: 42px;
+
+    border: none;
+    border-radius: 10px;
+
+    background: #fff;
+
+    font-size: 24px;
+
+    cursor: pointer;
+
+    align-items: center;
+    justify-content: center;
+
+    box-shadow: 0 2px 8px rgba(0,0,0,.1);
+}
+
+.header-left {
+
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+@media (max-width:1000px) {
+
+    .sidebar-admin {
+
+        position: fixed;
+
+        top: 0;
+        left: -260px;
+
+        width: 250px;
+        height: 100vh;
+
+        z-index: 9999;
+
+        transition: left .3s ease;
+
+        padding-top: 80px;
+    }
+
+    .sidebar-admin.active {
+        left: 0;
+    }
+
+    .menu-toggle {
+        display: flex;
+    }
+
+    .main {
+
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .header {
+        align-items: flex-start;
+    }
+
+    .admin-incidencias-actions {
+
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    #searchInput {
+        width: 100%;
+    }
+}
