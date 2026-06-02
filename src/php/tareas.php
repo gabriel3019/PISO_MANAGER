@@ -199,6 +199,27 @@ if ($action === "crear") {
 
         $stmtCalendario->execute();
 
+        $id_evento = $stmtCalendario->insert_id;
+
+        $stmtPersona = $conn->prepare("
+    INSERT INTO calendario_evento_personas
+    (
+        id_evento,
+        id_usuario
+    )
+    VALUES (?, ?)
+");
+
+        $stmtPersona->bind_param(
+            "ii",
+            $id_evento,
+            $id_usuario_nuevo
+        );
+
+        $stmtPersona->execute();
+        $stmtPersona->close();
+
+
         echo json_encode([
             "success" => true
         ]);
@@ -426,7 +447,6 @@ if ($action === "eliminar") {
         echo json_encode([
             "success" => true
         ]);
-
     } else {
 
         echo json_encode([
