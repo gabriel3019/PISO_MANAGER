@@ -250,98 +250,127 @@ if ($row['total'] == 0) {
     (3,1,'miembro'),
     (4,1,'miembro');
 
-    /* ===== GASTO ===== */
-    INSERT INTO gastos (id_piso,id_pagador,descripcion,monto_total)
-    VALUES (1,2,'Supermercado',60.00);
+    /* ===== GASTOS ===== */
 
-    INSERT INTO gastos_participantes VALUES
-    (1,1,15.00,0),
-    (1,2,15.00,1),
-    (1,3,15.00,0),
-    (1,4,15.00,0);
+INSERT INTO gastos (id_piso,id_pagador,descripcion,monto_total) VALUES
+(1,2,'Supermercado Mercadona',60.00),
+(1,4,'Internet Fibra Mayo',45.99),
+(1,3,'Compra semanal Lidl',82.50),
+(1,2,'Productos limpieza',18.75),
+(1,4,'Factura luz Mayo',96.40),
+(1,3,'Factura agua Mayo',34.20),
+(1,2,'Cena compartida',57.80);
 
-    /* ===== TAREAS ===== */
-    INSERT INTO tareas 
-    (id_piso, id_usuario, titulo, descripcion, prioridad, fecha, frecuencia) VALUES 
-    (1, 2, 'Limpiar cocina', 'Fregar suelo y limpiar encimera', 'media', '2026-05-05', 'semanal'),
-    (1, 4, 'Sacar basura', 'Bajar bolsas al contenedor', 'baja', '2026-05-03', 'puntual'),
-    (1, 3, 'Limpiar baño', 'Limpiar ducha, lavabo y WC', 'alta', '2026-05-06', 'quincenal'),
-    (1, 1, 'Comprar papel higiénico', 'Reponer papel higiénico', 'media', '2026-05-04', 'puntual');
+INSERT INTO gastos_participantes VALUES
+(1,1,15.00,0),(1,2,15.00,1),(1,3,15.00,0),(1,4,15.00,0),
 
-    /* ===== AVISOS ===== */
-    INSERT INTO avisos VALUES
-    (NULL,1,'Reunión','Viernes a las 20:00');
+(2,2,15.33,1),(2,3,15.33,0),(2,4,15.33,0),
 
-    /* ===== INCIDENCIAS ===== */
-    INSERT INTO incidencias (id_piso, id_usuario, tipo, titulo, descripcion, imagen, notificar_admin, urgencia, estado, fecha, fecha_inicio, fecha_fin) 
+(3,2,27.50,0),(3,3,27.50,1),(3,4,27.50,0),
+
+(4,2,6.25,1),(4,3,6.25,1),(4,4,6.25,0),
+
+(5,2,32.13,0),(5,3,32.13,0),(5,4,32.14,1),
+
+(6,2,11.40,1),(6,3,11.40,0),(6,4,11.40,0),
+
+(7,2,19.26,0),(7,3,19.27,1),(7,4,19.27,0);
+
+/* ===== TAREAS ===== */
+
+INSERT INTO tareas
+(id_piso,id_usuario,titulo,descripcion,prioridad,fecha,frecuencia)
 VALUES
-(1, 2, 'fontaneria', 'Fuga baño', 'Pierde agua por la junta del grifo', NULL, 0, 'alta', 'abierta', '2026-05-08', '2026-05-08', NULL),
-(1, 3, 'electricidad', 'Enchufe roto', 'El enchufe del salón no funciona', NULL, 0, 'baja', 'abierta', '2026-05-08', '2026-05-08', NULL),
-(1, 4, 'carpinteria', 'Puerta no cierra', 'La puerta de entrada no cierra bien, está rozando', NULL, 1, 'baja', 'en_curso', '2026-05-08', '2026-05-08', NULL);
 
-    
-    /* ===== MENSAJES ===== */
-    INSERT INTO mensajes_incidencia (id_incidencia,id_usuario,mensaje) VALUES
-    (1,2,'Hay una fuga'),
-    (1,1,'Aviso al fontanero'),
-    (2,3,'Sigue sin funcionar');
+(1,2,'Limpiar cocina','Fregar suelo y limpiar encimera','media','2026-05-05','semanal'),
+(1,4,'Sacar basura','Bajar bolsas al contenedor','baja','2026-05-03','puntual'),
+(1,3,'Limpiar baño','Limpiar ducha, lavabo y WC','alta','2026-05-06','quincenal'),
 
-    /* ===== CALENDARIO ===== */
+(1,2,'Pasar aspiradora','Aspirar salón y pasillo','media','2026-05-25','semanal'),
+(1,3,'Limpiar nevera','Retirar comida caducada','alta','2026-05-26','mensual'),
+(1,4,'Hacer compra semanal','Comprar productos básicos','media','2026-05-27','semanal'),
+(1,2,'Limpiar ventanas','Ventanas del salón y cocina','baja','2026-05-30','mensual'),
+(1,3,'Ordenar trastero','Reorganizar cajas y herramientas','baja','2026-06-01','puntual'),
+(1,4,'Cambiar bombilla cocina','Sustituir bombilla fundida','alta','2026-05-28','puntual');
 
-    INSERT INTO calendario_eventos 
-    (id_piso, titulo, tipo, fecha, fecha_inicio, fecha_fin, hora, estado)
-    SELECT 
-        id_piso,
-        titulo,
-        'incidencia',
-        COALESCE(fecha, DATE(fecha_creacion)),
-        NULL,
-        NULL,
-        NULL,
-        estado
-    FROM incidencias
-    WHERE id_piso = 1
-    AND estado != 'resuelta';
+/* ===== AVISOS ===== */
 
+INSERT INTO avisos VALUES
+(NULL,1,'Reunión semanal','Viernes a las 20:00'),
+(NULL,1,'Visita del casero','Martes a las 18:00'),
+(NULL,1,'Pago alquiler','Recordad pagar antes del día 5'),
+(NULL,1,'Limpieza general','Sábado por la mañana');
 
-    /* ===== 3 EVENTOS EL MISMO DÍA ===== */
+/* ===== INCIDENCIAS ===== */
 
-    INSERT INTO calendario_eventos 
-    (id_piso, titulo, tipo, fecha, fecha_inicio, fecha_fin, hora, estado) 
-    VALUES
-    (1, 'Compra semanal', 'tarea', '2026-05-22', '2026-05-22', NULL, '10:00:00', 'pendiente');
+INSERT INTO incidencias
+(id_piso,id_usuario,tipo,titulo,descripcion,imagen,notificar_admin,urgencia,estado,fecha,fecha_inicio,fecha_fin)
+VALUES
 
-    SET @id_tarea_compra = LAST_INSERT_ID();
+(1,2,'fontaneria','Fuga baño','Pierde agua por la junta del grifo',NULL,0,'alta','abierta','2026-05-08','2026-05-08',NULL),
 
-    INSERT INTO calendario_evento_personas (id_evento, id_usuario) 
-    VALUES
-    (@id_tarea_compra, 2);
+(1,3,'electricidad','Enchufe roto','El enchufe del salón no funciona',NULL,0,'baja','abierta','2026-05-08','2026-05-08',NULL),
 
+(1,4,'carpinteria','Puerta no cierra','La puerta de entrada roza al cerrar',NULL,1,'baja','en_curso','2026-05-08','2026-05-08',NULL),
 
-    INSERT INTO calendario_eventos 
-    (id_piso, titulo, tipo, fecha, fecha_inicio, fecha_fin, hora, estado) 
-    VALUES
-    (1, 'Reunión de convivencia', 'evento', '2026-05-22', '2026-05-22', NULL, '18:00:00', 'pendiente');
+(1,3,'fontaneria','Grifo cocina gotea','Pierde agua constantemente',NULL,1,'media','abierta','2026-05-12','2026-05-12',NULL),
 
-    SET @id_evento_reunion = LAST_INSERT_ID();
+(1,4,'otros','Internet lento','La conexión falla por la noche',NULL,0,'baja','abierta','2026-05-15','2026-05-15',NULL),
 
-    INSERT INTO calendario_evento_personas (id_evento, id_usuario) 
-    VALUES
-    (@id_evento_reunion, 2),
-    (@id_evento_reunion, 3),
-    (@id_evento_reunion, 4);
+(1,2,'carpinteria','Persiana atascada','No sube completamente',NULL,1,'media','en_curso','2026-05-18','2026-05-18',NULL),
 
+(1,3,'electricidad','Chispazo enchufe','Hace chispas al conectar dispositivos',NULL,1,'alta','abierta','2026-05-20','2026-05-20',NULL),
 
-    INSERT INTO calendario_eventos 
-    (id_piso, titulo, tipo, fecha, fecha_inicio, fecha_fin, hora, estado) 
-    VALUES
-    (1, 'Limpiar cocina', 'tarea', '2026-05-22', '2026-05-22', NULL, '20:00:00', 'pendiente');
+(1,2,'electricidad','Bombilla fundida','La luz del pasillo no funciona',NULL,0,'baja','resuelta','2026-05-02','2026-05-02','2026-05-03');
 
-    SET @id_tarea_cocina = LAST_INSERT_ID();
+/* ===== MENSAJES INCIDENCIAS ===== */
 
-    INSERT INTO calendario_evento_personas (id_evento, id_usuario) 
-    VALUES
-    (@id_tarea_cocina, 3);
+INSERT INTO mensajes_incidencia
+(id_incidencia,id_usuario,mensaje)
+VALUES
+
+(1,2,'Hay una fuga en el baño'),
+(1,1,'Aviso al fontanero'),
+
+(2,3,'El enchufe sigue sin funcionar'),
+
+(4,3,'El goteo va a más'),
+(4,1,'Se revisará esta semana'),
+
+(5,4,'La conexión se corta cada noche'),
+(5,1,'Estamos revisando el router'),
+
+(6,2,'La persiana sigue bloqueada'),
+(6,1,'Se pedirá presupuesto'),
+
+(7,3,'Me preocupa usar este enchufe'),
+(7,1,'No lo utilices hasta revisarlo');
+
+/* ===== CALENDARIO ===== */
+
+INSERT INTO calendario_eventos
+(id_piso,titulo,tipo,fecha,hora,estado)
+VALUES
+
+(1,'Compra semanal','evento','2026-05-22','10:00:00','pendiente'),
+(1,'Reunión de convivencia','evento','2026-05-22','18:00:00','pendiente'),
+(1,'Limpiar cocina','tarea','2026-05-22','20:00:00','pendiente'),
+
+(1,'Compra Mercadona','evento','2026-05-24','11:00:00','pendiente'),
+(1,'Cena de compañeros','evento','2026-05-25','21:00:00','pendiente'),
+(1,'Revisión fontanero','incidencia','2026-05-28','10:00:00','pendiente'),
+(1,'Limpieza general','tarea','2026-05-31','17:00:00','pendiente'),
+(1,'Pago alquiler Junio','evento','2026-06-01','09:00:00','pendiente');
+
+INSERT INTO calendario_evento_personas VALUES
+(4,2),
+(5,2),(5,3),(5,4),
+(6,3),
+(7,2),(7,3),(7,4),
+(8,3),
+(9,2),(9,3),(9,4),
+(10,4);
+
     ";
 
     $conn->multi_query($sqlDatos);
