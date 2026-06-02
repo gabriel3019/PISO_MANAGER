@@ -303,44 +303,45 @@ function renderTareas(tareas) {
 
         li.innerHTML = `
 
-            <input
-                type="checkbox"
-                ${completada ? "checked" : ""}
-            >
+    <input
+        type="checkbox"
+        ${completada ? "checked disabled" : ""}
+    >
 
-            <span class="texto">
+    <span class="texto">
 
-                ${t.titulo}
+        ${t.titulo}
 
-                -
+        -
 
-                <b>${t.usuario}</b>
+        <b>${t.usuario}</b>
 
-            </span>
+    </span>
 
-        `;
+`;
 
         const checkbox =
             li.querySelector("input");
 
-        checkbox.addEventListener(
-            "click",
-            (e) => {
+        if (!completada) {
 
-                e.preventDefault();
+            checkbox.addEventListener(
+                "click",
+                (e) => {
 
-                tareaSeleccionada = t;
+                    e.preventDefault();
 
-                modalText.textContent =
+                    tareaSeleccionada = t;
 
-                    completada
-                        ? "¿Marcar tarea como pendiente?"
-                        : "¿Marcar tarea como completada?";
+                    modalText.textContent =
+                        "¿Marcar tarea como completada?";
 
-                modal.classList.remove("hidden");
+                    modal.classList.remove("hidden");
 
-            }
-        );
+                }
+            );
+
+        }
 
         listaTareas.appendChild(li);
 
@@ -388,6 +389,8 @@ cancelarBtn.addEventListener(
     }
 );
 
+
+
 confirmarBtn.addEventListener(
     "click",
     async () => {
@@ -404,12 +407,7 @@ confirmarBtn.addEventListener(
                     .trim()
                     .toLowerCase();
 
-            const nuevoEstado =
-
-                estadoActual === "completada"
-                    ? "pendiente"
-                    : "completada";
-
+            const nuevoEstado = "completada";
             const res = await fetch(
                 API_URL,
                 {
