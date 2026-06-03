@@ -5,7 +5,7 @@ header("Content-Type: application/json");
 $conexion = new mysqli(
     "sql201.infinityfree.com",
     "if0_12345678",
-    "TU_CONTRASEÑA_MYSQL",
+    "PisoManager2026",
     "if0_12345678_piso_manager"
 );
 
