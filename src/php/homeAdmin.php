@@ -9,10 +9,10 @@ error_reporting(E_ALL);
 header("Content-Type: application/json");
 
 $conexion = new mysqli(
-    "sql201.infinityfree.com",
-    "if0_12345678",
+    "sql203.infinityfree.com",
+    "if0_42079927",
     "PisoManager2026",
-    "if0_12345678_piso_manager"
+    "if0_42079927_piso_manager"
 );
 
 if ($conexion->connect_error) {
