@@ -2,7 +2,12 @@
 session_start();
 header("Content-Type: application/json");
 
-$conexion = new mysqli("localhost", "root", "", "piso_manager");
+$conexion = new mysqli(
+    "sql201.infinityfree.com",
+    "if0_12345678",
+    "TU_CONTRASEÑA_MYSQL",
+    "if0_12345678_piso_manager"
+);
 
 if ($conexion->connect_error) {
     echo json_encode([
